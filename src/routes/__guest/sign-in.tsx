@@ -52,8 +52,6 @@ function RouteComponent() {
     }
   }
 
-  console.log(router)
-
   const handleVerifyOTP = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)

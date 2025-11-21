@@ -14,16 +14,192 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      collections: {
+        Row: {
+          color: string | null
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      favorites: {
+        Row: {
+          created_at: string
+          id: string
+          prompt_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          prompt_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          prompt_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "favorites_prompt_id_fkey"
+            columns: ["prompt_id"]
+            isOneToOne: false
+            referencedRelation: "prompts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      prompt_usage: {
+        Row: {
+          created_at: string
+          id: string
+          prompt_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          prompt_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          prompt_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prompt_usage_prompt_id_fkey"
+            columns: ["prompt_id"]
+            isOneToOne: false
+            referencedRelation: "prompts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      prompts: {
+        Row: {
+          category: Database["public"]["Enums"]["prompt_category"]
+          collection_id: string | null
+          content: string
+          created_at: string
+          description: string | null
+          favorite_count: number
+          id: string
+          is_curated: boolean
+          is_featured: boolean
+          is_public: boolean
+          platform: Database["public"]["Enums"]["ai_platform"]
+          tags: string[] | null
+          title: string
+          updated_at: string
+          use_count: number
+          user_id: string | null
+        }
+        Insert: {
+          category?: Database["public"]["Enums"]["prompt_category"]
+          collection_id?: string | null
+          content: string
+          created_at?: string
+          description?: string | null
+          favorite_count?: number
+          id?: string
+          is_curated?: boolean
+          is_featured?: boolean
+          is_public?: boolean
+          platform?: Database["public"]["Enums"]["ai_platform"]
+          tags?: string[] | null
+          title: string
+          updated_at?: string
+          use_count?: number
+          user_id?: string | null
+        }
+        Update: {
+          category?: Database["public"]["Enums"]["prompt_category"]
+          collection_id?: string | null
+          content?: string
+          created_at?: string
+          description?: string | null
+          favorite_count?: number
+          id?: string
+          is_curated?: boolean
+          is_featured?: boolean
+          is_public?: boolean
+          platform?: Database["public"]["Enums"]["ai_platform"]
+          tags?: string[] | null
+          title?: string
+          updated_at?: string
+          use_count?: number
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prompts_collection_id_fkey"
+            columns: ["collection_id"]
+            isOneToOne: false
+            referencedRelation: "collections"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      increment_prompt_use_count: {
+        Args: { prompt_uuid: string; user_uuid: string }
+        Returns: undefined
+      }
+      toggle_favorite: {
+        Args: { prompt_uuid: string; user_uuid: string }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      ai_platform:
+        | "chatgpt"
+        | "claude"
+        | "gemini"
+        | "grok"
+        | "midjourney"
+        | "stable_diffusion"
+        | "all"
+      prompt_category:
+        | "content_creation"
+        | "marketing"
+        | "coding"
+        | "productivity"
+        | "education"
+        | "business"
+        | "creative"
+        | "analysis"
+        | "other"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +326,27 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      ai_platform: [
+        "chatgpt",
+        "claude",
+        "gemini",
+        "grok",
+        "midjourney",
+        "stable_diffusion",
+        "all",
+      ],
+      prompt_category: [
+        "content_creation",
+        "marketing",
+        "coding",
+        "productivity",
+        "education",
+        "business",
+        "creative",
+        "analysis",
+        "other",
+      ],
+    },
   },
 } as const
