@@ -6,6 +6,8 @@ import * as TanstackQuery from '@/libs/react-query/root-provider'
 import { routeTree } from './routeTree.gen'
 import type { ReactNode } from 'react'
 import { AuthStateProvider } from '@/libs/supabase/auth-state-provider'
+import { DefaultCatchBoundary } from '@/components/default-catch-boundary'
+import { NotFound } from '@/components/not-found'
 
 // Create a new router instance
 export const getRouter = () => {
@@ -20,6 +22,8 @@ export const getRouter = () => {
       user: null,
     },
     defaultPreload: 'intent',
+    defaultErrorComponent: DefaultCatchBoundary,
+    defaultNotFoundComponent: () => <NotFound />,
     Wrap: (props: { children: ReactNode }) => {
       return (
         <TanstackQuery.Provider {...rqContext}>

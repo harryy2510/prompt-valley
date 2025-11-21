@@ -15,6 +15,7 @@
     "fix": "pnpm lint:fix && pnpm format:fix",
     "types:cf": "wrangler types",
     "types:db": "pnpx supabase gen types typescript --project-id \"uguvrytefzvyjypcbngo\" --schema public > src/types/database.types.ts",
+    "link": "pnpx supabase link --project-ref \"uguvrytefzvyjypcbngo\"",
     "postinstall": "pnpm types:cf && pnpm types:db"
   },
   "dependencies": {
@@ -91,6 +92,7 @@
     "@vitejs/plugin-react": "^5.0.4",
     "jsdom": "^27.0.0",
     "prettier": "^3.5.3",
+    "supabase": "^2.58.5",
     "tw-animate-css": "^1.3.6",
     "typescript": "^5.7.2",
     "vite": "^7.1.7",
