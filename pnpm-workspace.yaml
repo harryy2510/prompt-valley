@@ -1,4 +1,0 @@
-onlyBuiltDependencies:
-  - msw
-  - supabase
-  - 'true'
