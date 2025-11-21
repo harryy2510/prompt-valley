@@ -1,6 +1,6 @@
-import type { ComponentProps } from 'react'
 import { Command as CommandPrimitive } from 'cmdk'
 import { SearchIcon } from 'lucide-react'
+import type { ComponentProps } from 'react'
 
 import { cn } from '@/libs/cn'
 import {

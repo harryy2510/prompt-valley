@@ -1,7 +1,6 @@
-import type { ComponentProps } from 'react'
 import { useMemo } from 'react'
 import * as SliderPrimitive from '@radix-ui/react-slider'
-
+import type { ComponentProps } from 'react'
 
 import { cn } from '@/libs/cn'
 

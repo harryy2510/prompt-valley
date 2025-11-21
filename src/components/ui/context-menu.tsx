@@ -1,7 +1,6 @@
-import type { ComponentProps } from 'react'
 import * as ContextMenuPrimitive from '@radix-ui/react-context-menu'
 import { CheckIcon, ChevronRightIcon, CircleIcon } from 'lucide-react'
-
+import type { ComponentProps } from 'react'
 
 import { cn } from '@/libs/cn'
 

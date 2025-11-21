@@ -1,7 +1,7 @@
-import type { ComponentProps } from 'react'
 import { useContext } from 'react'
 import { OTPInput, OTPInputContext } from 'input-otp'
 import { MinusIcon } from 'lucide-react'
+import type { ComponentProps } from 'react'
 
 import { cn } from '@/libs/cn'
 

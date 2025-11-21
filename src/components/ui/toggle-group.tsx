@@ -1,7 +1,7 @@
-import type { ComponentProps, CSSProperties } from 'react'
 import { createContext, useContext } from 'react'
 import * as ToggleGroupPrimitive from '@radix-ui/react-toggle-group'
-import { type VariantProps } from 'class-variance-authority'
+import type {VariantProps} from 'class-variance-authority';
+import type { CSSProperties, ComponentProps } from 'react'
 
 import { cn } from '@/libs/cn'
 import { toggleVariants } from '@/components/ui/toggle'

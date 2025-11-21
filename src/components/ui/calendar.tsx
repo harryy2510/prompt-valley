@@ -1,11 +1,12 @@
-import type { ComponentProps } from 'react'
-import { useRef, useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import {
   ChevronDownIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
 } from 'lucide-react'
-import { DayButton, DayPicker, getDefaultClassNames } from 'react-day-picker'
+import { DayPicker, getDefaultClassNames } from 'react-day-picker'
+import type { DayButton} from 'react-day-picker';
+import type { ComponentProps } from 'react'
 
 import { cn } from '@/libs/cn'
 import { Button, buttonVariants } from '@/components/ui/button'

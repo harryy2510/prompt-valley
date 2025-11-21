@@ -1,6 +1,7 @@
-import type { ComponentProps } from 'react'
 import * as TogglePrimitive from '@radix-ui/react-toggle'
-import { cva, type VariantProps } from 'class-variance-authority'
+import {  cva } from 'class-variance-authority'
+import type {VariantProps} from 'class-variance-authority';
+import type { ComponentProps } from 'react'
 
 import { cn } from '@/libs/cn'
 

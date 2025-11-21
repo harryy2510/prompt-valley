@@ -3,22 +3,46 @@ import {
   Scripts,
   createRootRouteWithContext,
 } from '@tanstack/react-router'
-import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
 
-import Header from '../components/Header'
-
-import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
+import TanStackQueryDevtools from '@/libs/react-query/query-devtools'
+import TanStackRouterDevtools from '@/libs/react-query/router-devtools'
 
 import appCss from '../styles.css?url'
 
 import type { QueryClient } from '@tanstack/react-query'
+import type { PropsWithChildren } from 'react'
+import type { Session, User } from '@supabase/supabase-js'
+import { seo } from '@/utils/seo'
+import { sessionQueryOptions } from '@/actions/auth'
 
-interface MyRouterContext {
+// ============================================
+// Router Context Type
+// ============================================
+
+export interface RouterContext {
   queryClient: QueryClient
+  session: Session | null
+  user: User | null
 }
 
-export const Route = createRootRouteWithContext<MyRouterContext>()({
+// ============================================
+// Root Route
+// ============================================
+
+export const Route = createRootRouteWithContext<RouterContext>()({
+  beforeLoad: async ({ context }) => {
+    // Use React Query to fetch and cache the session
+    const authData = await context.queryClient.ensureQueryData(
+      sessionQueryOptions(),
+    )
+
+    return {
+      session: authData.session,
+      user: authData.user,
+    }
+  },
+
   head: () => ({
     meta: [
       {
@@ -28,9 +52,13 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         name: 'viewport',
         content: 'width=device-width, initial-scale=1',
       },
-      {
-        title: 'TanStack Start Starter',
-      },
+      ...seo({
+        title: 'Prompt Valley - Curated Prompts for Every AI Use Case',
+        description:
+          'Discover a growing collection of high quality AI prompts across multiple categories. Simple to browse, easy to copy, and designed for better AI results.',
+        keywords:
+          'ai prompts, prompt library, prompt collection, chatgpt prompts, midjourney prompts, dalle prompts, stable diffusion prompts, best ai prompts, prompt ideas, prompt directory, prompt marketplace, creative prompts, productivity prompts, writing prompts, coding prompts, marketing prompts, seo prompts, business prompts, brainstorming prompts, image prompts, text prompts, top ai prompts, curated ai prompts, prompt categories, prompt generator, prompt templates, ai workflow prompts, daily prompts, professional prompts, premium prompts, prompt packs, prompt vault, prompt valley, ai tools, ai resources, ai content ideas',
+      }),
     ],
     links: [
       {
@@ -43,26 +71,21 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
   shellComponent: RootDocument,
 })
 
-function RootDocument({ children }: { children: React.ReactNode }) {
+// ============================================
+// Root Document Shell
+// ============================================
+
+function RootDocument({ children }: PropsWithChildren) {
   return (
     <html lang="en">
       <head>
         <HeadContent />
       </head>
       <body>
-        <Header />
         {children}
         <TanStackDevtools
-          config={{
-            position: 'bottom-right',
-          }}
-          plugins={[
-            {
-              name: 'Tanstack Router',
-              render: <TanStackRouterDevtoolsPanel />,
-            },
-            TanStackQueryDevtools,
-          ]}
+          config={{ position: 'bottom-right' }}
+          plugins={[TanStackRouterDevtools, TanStackQueryDevtools]}
         />
         <Scripts />
       </body>

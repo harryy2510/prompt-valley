@@ -1,10 +1,18 @@
 'use client'
 
-import type { ComponentProps, CSSProperties } from 'react';
-import { createContext, useContext, useState, useCallback, useEffect, useMemo } from 'react';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react'
 import { Slot } from '@radix-ui/react-slot'
-import { cva, type VariantProps } from 'class-variance-authority'
+import {  cva } from 'class-variance-authority'
 import { PanelLeftIcon } from 'lucide-react'
+import type {VariantProps} from 'class-variance-authority';
+import type { CSSProperties, ComponentProps } from 'react'
 
 import { useIsMobile } from '@/hooks/use-mobile'
 import { cn } from '@/libs/cn'
@@ -128,7 +136,7 @@ function SidebarProvider({
   )
 
   return (
-    (<SidebarContext.Provider value={contextValue}>
+    <SidebarContext.Provider value={contextValue}>
       <TooltipProvider delayDuration={0}>
         <div
           data-slot="sidebar-wrapper"
@@ -148,8 +156,8 @@ function SidebarProvider({
           {children}
         </div>
       </TooltipProvider>
-    </SidebarContext.Provider>)
-  );
+    </SidebarContext.Provider>
+  )
 }
 
 function Sidebar({
@@ -183,7 +191,7 @@ function Sidebar({
 
   if (isMobile) {
     return (
-      (<Sheet open={openMobile} onOpenChange={setOpenMobile} {...props}>
+      <Sheet open={openMobile} onOpenChange={setOpenMobile} {...props}>
         <SheetContent
           data-sidebar="sidebar"
           data-slot="sidebar"
@@ -202,8 +210,8 @@ function Sidebar({
           </SheetHeader>
           <div className="flex h-full w-full flex-col">{children}</div>
         </SheetContent>
-      </Sheet>)
-    );
+      </Sheet>
+    )
   }
 
   return (
@@ -319,10 +327,7 @@ function SidebarInset({ className, ...props }: ComponentProps<'main'>) {
   )
 }
 
-function SidebarInput({
-  className,
-  ...props
-}: ComponentProps<typeof Input>) {
+function SidebarInput({ className, ...props }: ComponentProps<typeof Input>) {
   return (
     <Input
       data-slot="sidebar-input"
@@ -438,10 +443,7 @@ function SidebarGroupAction({
   )
 }
 
-function SidebarGroupContent({
-  className,
-  ...props
-}: ComponentProps<'div'>) {
+function SidebarGroupContent({ className, ...props }: ComponentProps<'div'>) {
   return (
     <div
       data-slot="sidebar-group-content"
@@ -578,10 +580,7 @@ function SidebarMenuAction({
   )
 }
 
-function SidebarMenuBadge({
-  className,
-  ...props
-}: ComponentProps<'div'>) {
+function SidebarMenuBadge({ className, ...props }: ComponentProps<'div'>) {
   return (
     <div
       data-slot="sidebar-menu-badge"
@@ -613,7 +612,7 @@ function SidebarMenuSkeleton({
   }, [])
 
   return (
-    (<div
+    <div
       data-slot="sidebar-menu-skeleton"
       data-sidebar="menu-skeleton"
       className={cn('flex h-8 items-center gap-2 rounded-md px-2', className)}
@@ -634,8 +633,8 @@ function SidebarMenuSkeleton({
           } as CSSProperties
         }
       />
-    </div>)
-  );
+    </div>
+  )
 }
 
 function SidebarMenuSub({ className, ...props }: ComponentProps<'ul'>) {
@@ -653,10 +652,7 @@ function SidebarMenuSub({ className, ...props }: ComponentProps<'ul'>) {
   )
 }
 
-function SidebarMenuSubItem({
-  className,
-  ...props
-}: ComponentProps<'li'>) {
+function SidebarMenuSubItem({ className, ...props }: ComponentProps<'li'>) {
   return (
     <li
       data-slot="sidebar-menu-sub-item"

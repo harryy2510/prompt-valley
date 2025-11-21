@@ -1,5 +1,5 @@
-import type { ComponentProps } from 'react'
 import * as AlertDialogPrimitive from '@radix-ui/react-alert-dialog'
+import type { ComponentProps } from 'react'
 
 import { cn } from '@/libs/cn'
 import { buttonVariants } from '@/components/ui/button'

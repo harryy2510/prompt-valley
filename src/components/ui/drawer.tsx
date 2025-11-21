@@ -1,6 +1,5 @@
-import type { ComponentProps } from 'react'
 import { Drawer as DrawerPrimitive } from 'vaul'
-
+import type { ComponentProps } from 'react'
 
 import { cn } from '@/libs/cn'
 

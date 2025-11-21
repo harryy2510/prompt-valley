@@ -1,6 +1,6 @@
-import type { ComponentProps } from 'react'
 import { GripVerticalIcon } from 'lucide-react'
 import * as ResizablePrimitive from 'react-resizable-panels'
+import type { ComponentProps } from 'react'
 
 import { cn } from '@/libs/cn'
 
