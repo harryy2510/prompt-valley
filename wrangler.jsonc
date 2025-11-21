@@ -6,6 +6,6 @@
   "main": "@tanstack/react-start/server-entry",
   "route": {
     "custom_domain": true,
-    "pattern": "promptvalley.com"
+    "pattern": "promptvalley.ai"
   }
 }
