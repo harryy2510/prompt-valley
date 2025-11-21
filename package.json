@@ -16,7 +16,7 @@
     "types:cf": "wrangler types",
     "types:db": "pnpx supabase gen types typescript --project-id \"uguvrytefzvyjypcbngo\" --schema public > src/types/database.types.ts",
     "link": "pnpx supabase link --project-ref \"uguvrytefzvyjypcbngo\"",
-    "postinstall": "pnpm types:cf && pnpm types:db"
+    "types": "pnpm types:cf && pnpm types:db"
   },
   "dependencies": {
     "@cloudflare/vite-plugin": "^1.13.8",
