@@ -16,6 +16,8 @@ import type { Session, User } from '@supabase/supabase-js'
 import { seo } from '@/utils/seo'
 import { sessionQueryOptions } from '@/actions/auth'
 
+import '@fontsource-variable/space-grotesk'
+
 // ============================================
 // Router Context Type
 // ============================================
@@ -64,6 +66,35 @@ export const Route = createRootRouteWithContext<RouterContext>()({
       {
         rel: 'stylesheet',
         href: appCss,
+      },
+
+      // Favicon
+      {
+        rel: 'icon',
+        type: 'image/svg+xml',
+        href: '/favicon.svg',
+      },
+      {
+        rel: 'icon',
+        type: 'image/png',
+        sizes: '96x96',
+        href: '/favicon-96x96.png',
+      },
+      {
+        rel: 'icon',
+        type: 'image/x-icon',
+        href: '/favicon.ico',
+      },
+      // Apple Touch Icon
+      {
+        rel: 'apple-touch-icon',
+        sizes: '180x180',
+        href: '/apple-touch-icon.png',
+      },
+      // Web App Manifest
+      {
+        rel: 'manifest',
+        href: '/site.webmanifest',
       },
     ],
   }),
