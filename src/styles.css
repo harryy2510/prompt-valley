@@ -51,7 +51,7 @@ code {
   --input: oklch(0.95 0 0);
   --ring: oklch(0.15 0 0);
 
-  --radius: 1.5rem; /* Rounded buttons from design */
+  --radius: 0.75rem; /* Rounded buttons from design */
 }
 
 .dark {

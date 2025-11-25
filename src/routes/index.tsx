@@ -14,80 +14,115 @@ function RouteComponent() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex h-16 items-center justify-between">
-            {/* Logo */}
-            <Link to="/" className="flex items-center gap-2">
-              <div className="flex items-center gap-1">
-                <div className="h-6 w-6 rounded bg-foreground" />
-                <span className="text-lg font-bold">prompt valley</span>
+      <header className="sticky top-0 z-50 border-b border-border bg-background">
+        <div className="mx-auto max-w-7xl px-6">
+          <div className="flex h-[64px] items-center gap-3">
+            {/* Logo - Two lines stacked */}
+            <Link to="/" className="flex items-center gap-2 shrink-0">
+              <img src="/icon.svg" alt="Prompt Valley" className="h-6 w-6" />
+              <div className="flex flex-col">
+                <span className="text-[13px] font-semibold leading-none">
+                  prompt
+                </span>
+                <span className="text-[13px] font-semibold leading-none">
+                  valley
+                </span>
               </div>
             </Link>
 
             {/* Search */}
-            <div className="hidden md:flex flex-1 max-w-md mx-8">
-              <div className="relative w-full">
+            <div className="w-[280px] ml-2">
+              <div className="relative">
+                <svg
+                  className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/80"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  strokeWidth={2}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
+                </svg>
                 <input
                   type="text"
                   placeholder="Search"
-                  className="w-full rounded-lg border border-border bg-muted/50 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                  className="w-full h-9 rounded-lg bg-muted dark:bg-muted/20 pl-9 pr-4 text-sm placeholder:text-muted-foreground/80 focus:outline-none border-0 transition-colors"
                 />
               </div>
             </div>
 
+            {/* Spacer */}
+            <div className="flex-1" />
+
             {/* Right side */}
-            <div className="flex items-center gap-3">
-              <Button variant="outline" size="sm" asChild>
-                <Link to="/pricing">Get PRO</Link>
-              </Button>
-              {isAuthenticated ? (
-                <Button size="sm" asChild>
-                  <Link to="/dashboard">Dashboard</Link>
-                </Button>
-              ) : (
-                <Button size="sm" asChild>
-                  <Link to="/sign-in">Log in</Link>
-                </Button>
-              )}
-              <Button size="sm" className="bg-foreground text-background hover:bg-foreground/90" asChild>
-                <Link to="/sign-up">Start Free</Link>
-              </Button>
+            <div className="flex items-center gap-2 shrink-0">
+              <Link
+                to="/pricing"
+                className="text-sm font-semibold text-foreground hover:bg-muted px-3 py-1.5 rounded-sm transition-colors"
+              >
+                Get PRO
+              </Link>
+              <Link
+                to="/sign-in"
+                className="text-sm font-medium text-muted-foreground hover:bg-muted px-3 py-1.5 rounded-sm transition-colors"
+              >
+                Log in
+              </Link>
+              <Link
+                to="/sign-up"
+                className="bg-foreground text-background hover:bg-foreground/90 rounded-sm px-5 py-2 text-sm font-medium transition-all inline-block"
+              >
+                Start <span className="text-[#e5d5a8]">Free</span>
+              </Link>
             </div>
           </div>
         </div>
       </header>
 
       {/* Announcement Banner */}
-      <div className="border-b border-border bg-amber-50 dark:bg-amber-950/20 px-4 py-3">
-        <div className="mx-auto max-w-7xl flex items-center justify-between">
-          <p className="text-sm">
-            New: New Beaver Pro products are now available - explore the new collection.
+      <div className="border-b border-border bg-orange-200 dark:bg-amber-950/20 px-4 py-3">
+        <div className="mx-auto max-w-7xl flex items-center justify-center gap-4">
+          <p className="text-sm font-medium">
+            New: Nano Banana Pro prompts are now available - explore the new
+            collection.
           </p>
-          <Button size="sm" variant="ghost" className="text-sm font-medium">
-            Try it now
-          </Button>
+          <Link
+            to="/sign-up"
+            className="bg-foreground text-background hover:bg-foreground/90 rounded-sm px-5 py-2 text-sm font-medium transition-all inline-block"
+          >
+            Try it out
+          </Link>
         </div>
       </div>
 
       {/* Hero Section */}
-      <section className="bg-gradient-to-b from-amber-50/50 to-background dark:from-amber-950/10 px-4 sm:px-6 lg:px-8 py-24 lg:py-32">
+      <section className="bg-orange-50 px-4 sm:px-6 lg:px-8 py-24 lg:py-32">
         <div className="mx-auto max-w-5xl text-center">
           <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight leading-tight">
             High-Quality{' '}
-            <span className="text-accent">AI Prompt Templates</span>{' '}
-            for Better AI Results
+            <span className="text-accent">AI Prompt Templates</span> for Better
+            AI Results
           </h1>
-          <p className="mt-6 text-lg sm:text-xl text-muted-foreground max-w-3xl mx-auto">
-            Discover and organize expert-crafted prompts for ChatGPT, Gemini, and image models to consistently get better AI output.
+          <p className="mt-6 text-lg sm:text-xl text-foreground max-w-3xl mx-auto">
+            Discover and organize expert-crafted prompts for ChatGPT, Gemini,
+            and image models to consistently get better AI output.
           </p>
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Button size="lg" className="rounded-full px-8 py-6 text-base bg-foreground text-background hover:bg-foreground/90 min-w-[160px]">
-              Start Free
-            </Button>
-            <Button size="lg" variant="outline" className="rounded-full px-8 py-6 text-base min-w-[160px]">
-              Get <span className="text-accent font-semibold ml-1">PRO</span>
-            </Button>
+            <Link
+              to="/sign-up"
+              className="bg-foreground text-background hover:bg-foreground/90 rounded-sm min-w-[160px] px-6 py-3 text-md font-medium transition-all inline-block"
+            >
+              Start <span className="text-[#e5d5a8]">Free</span>
+            </Link>
+            <Link
+              to="/sign-up"
+              className="text-foreground rounded-sm min-w-[160px] px-6 py-3 text-md font-medium transition-all inline-block border-1"
+            >
+              Get <span className="text-accent">PRO</span>
+            </Link>
           </div>
           <p className="mt-6 text-sm text-muted-foreground">
             Free forever. No credit card required.
@@ -100,9 +135,13 @@ function RouteComponent() {
         <div className="mx-auto max-w-7xl">
           {/* Section Header */}
           <div className="mb-8">
-            <h2 className="text-3xl font-bold mb-2">Explore the Best AI Prompts</h2>
+            <h2 className="text-3xl font-bold mb-2">
+              Explore the Best AI Prompts
+            </h2>
             <p className="text-muted-foreground">
-              Browse 50,000+ curated prompt templates for writing, creativity, and image generation. All fully customizable for you to make them truly yours.
+              Browse 50,000+ curated prompt templates for writing, creativity,
+              and image generation. All fully customizable for you to make them
+              truly yours.
             </p>
           </div>
 
@@ -131,12 +170,19 @@ function RouteComponent() {
           <div className="mb-8 rounded-2xl border-2 border-accent/30 bg-accent/5 p-6 flex items-center justify-between">
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <span className="px-2 py-1 rounded-md bg-accent text-white text-xs font-bold">PRO</span>
+                <span className="px-2 py-1 rounded-md bg-accent text-white text-xs font-bold">
+                  PRO
+                </span>
               </div>
-              <h3 className="font-semibold text-lg mb-1">Unlock everything PromptValley has to offer.</h3>
+              <h3 className="font-semibold text-lg mb-1">
+                Unlock everything PromptValley has to offer.
+              </h3>
               <p className="text-sm text-muted-foreground">Cancel anytime.</p>
             </div>
-            <Button className="rounded-full bg-accent hover:bg-accent/90" asChild>
+            <Button
+              className="rounded-full bg-accent hover:bg-accent/90"
+              asChild
+            >
               <Link to="/pricing">Upgrade</Link>
             </Button>
           </div>
@@ -146,96 +192,120 @@ function RouteComponent() {
             {[
               {
                 title: 'Elegant Fashion Portraits',
-                description: 'Dramatic, ultra-realistic close-up in black and white with high-contrast li...',
-                image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop&q=80',
+                description:
+                  'Dramatic, ultra-realistic close-up in black and white with high-contrast li...',
+                image:
+                  'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop&q=80',
                 category: 'Gemini',
                 tag: 'Image generation',
                 pro: false,
               },
               {
                 title: 'Futuristic Flight Designs',
-                description: 'Dramatic, ultra-realistic close-up in black and white with high-contrast li...',
-                image: 'https://images.unsplash.com/photo-1614730321146-b6fa6a46bcb4?w=400&h=300&fit=crop&q=80',
+                description:
+                  'Dramatic, ultra-realistic close-up in black and white with high-contrast li...',
+                image:
+                  'https://images.unsplash.com/photo-1614730321146-b6fa6a46bcb4?w=400&h=300&fit=crop&q=80',
                 category: 'Gemini',
                 tag: 'Image generation',
                 pro: false,
               },
               {
                 title: 'Loving Lifestyle Scenes',
-                description: 'Dramatic, ultra-realistic close-up in black and white with high-contrast li...',
-                image: 'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=400&h=300&fit=crop&q=80',
+                description:
+                  'Dramatic, ultra-realistic close-up in black and white with high-contrast li...',
+                image:
+                  'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=400&h=300&fit=crop&q=80',
                 category: 'Gemini',
                 tag: 'Image generation',
                 pro: false,
               },
               {
                 title: 'Fantasy Wildlife',
-                description: 'Dramatic, ultra-realistic close-up in black and white with high-contrast li...',
-                image: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=400&h=300&fit=crop&q=80',
+                description:
+                  'Dramatic, ultra-realistic close-up in black and white with high-contrast li...',
+                image:
+                  'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=400&h=300&fit=crop&q=80',
                 category: 'Gemini',
                 tag: 'Image generation',
                 pro: true,
               },
               {
                 title: 'Futuristic Flight Designs',
-                description: 'Dramatic, ultra-realistic close-up in black and white with high-contrast li...',
-                image: 'https://images.unsplash.com/photo-1614730321146-b6fa6a46bcb4?w=400&h=300&fit=crop&q=80',
+                description:
+                  'Dramatic, ultra-realistic close-up in black and white with high-contrast li...',
+                image:
+                  'https://images.unsplash.com/photo-1614730321146-b6fa6a46bcb4?w=400&h=300&fit=crop&q=80',
                 category: 'Gemini',
                 tag: 'Image generation',
                 pro: true,
               },
               {
                 title: 'Elegant Fashion Portraits',
-                description: 'Dramatic, ultra-realistic close-up in black and white with high-contrast li...',
-                image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop&q=80',
+                description:
+                  'Dramatic, ultra-realistic close-up in black and white with high-contrast li...',
+                image:
+                  'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop&q=80',
                 category: 'Gemini',
                 tag: 'Image generation',
                 pro: true,
               },
               {
                 title: 'Loving Lifestyle Scenes',
-                description: 'Dramatic, ultra-realistic close-up in black and white with high-contrast li...',
-                image: 'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=400&h=300&fit=crop&q=80',
+                description:
+                  'Dramatic, ultra-realistic close-up in black and white with high-contrast li...',
+                image:
+                  'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=400&h=300&fit=crop&q=80',
                 category: 'Gemini',
                 tag: 'Image generation',
                 pro: true,
               },
               {
                 title: 'Loving Lifestyle Scenes',
-                description: 'Dramatic, ultra-realistic close-up in black and white with high-contrast li...',
-                image: 'https://images.unsplash.com/photo-1500964757637-c85e8a162699?w=400&h=300&fit=crop&q=80',
+                description:
+                  'Dramatic, ultra-realistic close-up in black and white with high-contrast li...',
+                image:
+                  'https://images.unsplash.com/photo-1500964757637-c85e8a162699?w=400&h=300&fit=crop&q=80',
                 category: 'Gemini',
                 tag: 'Image generation',
                 pro: true,
               },
               {
                 title: 'Loving Lifestyle Scenes',
-                description: 'Dramatic, ultra-realistic close-up in black and white with high-contrast li...',
-                image: 'https://images.unsplash.com/photo-1500964757637-c85e8a162699?w=400&h=300&fit=crop&q=80',
+                description:
+                  'Dramatic, ultra-realistic close-up in black and white with high-contrast li...',
+                image:
+                  'https://images.unsplash.com/photo-1500964757637-c85e8a162699?w=400&h=300&fit=crop&q=80',
                 category: 'Gemini',
                 tag: 'Image generation',
                 pro: true,
               },
               {
                 title: 'Loving Lifestyle Scenes',
-                description: 'Dramatic, ultra-realistic close-up in black and white with high-contrast li...',
-                image: 'https://images.unsplash.com/photo-1500964757637-c85e8a162699?w=400&h=300&fit=crop&q=80',
+                description:
+                  'Dramatic, ultra-realistic close-up in black and white with high-contrast li...',
+                image:
+                  'https://images.unsplash.com/photo-1500964757637-c85e8a162699?w=400&h=300&fit=crop&q=80',
                 category: 'Gemini',
                 tag: 'Image generation',
                 pro: true,
               },
               {
                 title: 'Loving Lifestyle Scenes',
-                description: 'Dramatic, ultra-realistic close-up in black and white with high-contrast li...',
-                image: 'https://images.unsplash.com/photo-1500964757637-c85e8a162699?w=400&h=300&fit=crop&q=80',
+                description:
+                  'Dramatic, ultra-realistic close-up in black and white with high-contrast li...',
+                image:
+                  'https://images.unsplash.com/photo-1500964757637-c85e8a162699?w=400&h=300&fit=crop&q=80',
                 category: 'Gemini',
                 tag: 'Image generation',
                 pro: true,
               },
               {
                 title: 'Loving Lifestyle Scenes',
-                description: 'Dramatic, ultra-realistic close-up in black and white with high-contrast li...',
-                image: 'https://images.unsplash.com/photo-1500964757637-c85e8a162699?w=400&h=300&fit=crop&q=80',
+                description:
+                  'Dramatic, ultra-realistic close-up in black and white with high-contrast li...',
+                image:
+                  'https://images.unsplash.com/photo-1500964757637-c85e8a162699?w=400&h=300&fit=crop&q=80',
                 category: 'Gemini',
                 tag: 'Image generation',
                 pro: true,
@@ -258,7 +328,9 @@ function RouteComponent() {
                 {/* PRO Badge */}
                 {prompt.pro && (
                   <div className="absolute top-3 left-3 z-10">
-                    <span className="px-2 py-1 rounded-md bg-accent text-white text-xs font-bold">PRO</span>
+                    <span className="px-2 py-1 rounded-md bg-accent text-white text-xs font-bold">
+                      PRO
+                    </span>
                   </div>
                 )}
 
@@ -297,9 +369,12 @@ function RouteComponent() {
       {/* FAQ Section */}
       <section className="px-4 sm:px-6 lg:px-8 py-16 bg-muted/30">
         <div className="mx-auto max-w-3xl text-center">
-          <h2 className="text-3xl font-bold mb-8">Frequently asked questions</h2>
+          <h2 className="text-3xl font-bold mb-8">
+            Frequently asked questions
+          </h2>
           <p className="text-muted-foreground mb-8">
-            Is my content private and secure? Does Freeple use my log-in or outputs to train its models?
+            Is my content private and secure? Does Freeple use my log-in or
+            outputs to train its models?
           </p>
         </div>
       </section>
@@ -307,7 +382,9 @@ function RouteComponent() {
       {/* Sign Up Section */}
       <section className="px-4 sm:px-6 lg:px-8 py-16">
         <div className="mx-auto max-w-md text-center">
-          <h2 className="text-3xl font-bold mb-8">Sign up and elevate your vision</h2>
+          <h2 className="text-3xl font-bold mb-8">
+            Sign up and elevate your vision
+          </h2>
           <div className="space-y-3">
             <Button
               variant="outline"
@@ -356,7 +433,9 @@ function RouteComponent() {
             <div className="col-span-2 md:col-span-1">
               <div className="flex items-center gap-1 mb-4">
                 <div className="h-6 w-6 rounded bg-white" />
-                <span className="text-lg font-bold text-white">prompt valley</span>
+                <span className="text-lg font-bold text-white">
+                  prompt valley
+                </span>
               </div>
               <p className="text-sm text-slate-400">
                 Get better output from AI with PromptValley.
@@ -367,8 +446,22 @@ function RouteComponent() {
             <div>
               <h3 className="font-semibold text-white mb-4">Explore</h3>
               <ul className="space-y-2 text-sm">
-                <li><Link to="/pricing" className="hover:text-white transition-colors">Pricing</Link></li>
-                <li><Link to="/blog" className="hover:text-white transition-colors">Blog</Link></li>
+                <li>
+                  <Link
+                    to="/pricing"
+                    className="hover:text-white transition-colors"
+                  >
+                    Pricing
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/blog"
+                    className="hover:text-white transition-colors"
+                  >
+                    Blog
+                  </Link>
+                </li>
               </ul>
             </div>
 
@@ -376,8 +469,22 @@ function RouteComponent() {
             <div>
               <h3 className="font-semibold text-white mb-4">Contact</h3>
               <ul className="space-y-2 text-sm">
-                <li><Link to="/contact" className="hover:text-white transition-colors">LinkedIn</Link></li>
-                <li><Link to="/support" className="hover:text-white transition-colors">X (Twitter)</Link></li>
+                <li>
+                  <Link
+                    to="/contact"
+                    className="hover:text-white transition-colors"
+                  >
+                    LinkedIn
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/support"
+                    className="hover:text-white transition-colors"
+                  >
+                    X (Twitter)
+                  </Link>
+                </li>
               </ul>
             </div>
           </div>
@@ -387,8 +494,15 @@ function RouteComponent() {
               © PromptValley 2018-2025. All rights reserved.
             </p>
             <div className="flex gap-6 text-sm">
-              <Link to="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
-              <Link to="/terms" className="hover:text-white transition-colors">Terms</Link>
+              <Link
+                to="/privacy"
+                className="hover:text-white transition-colors"
+              >
+                Privacy Policy
+              </Link>
+              <Link to="/terms" className="hover:text-white transition-colors">
+                Terms
+              </Link>
             </div>
           </div>
         </div>
