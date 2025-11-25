@@ -9,6 +9,7 @@
     "pattern": "promptvalley.ai"
   },
   "env": {
-    "VITE_SUPABASE_URL": "https://uguvrytefzvyjypcbngo.supabase.co"
+    "VITE_SUPABASE_URL": "https://uguvrytefzvyjypcbngo.supabase.co",
+    "VITE_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVndXZyeXRlZnp2eWp5cGNibmdvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2OTMyMTAsImV4cCI6MjA3OTI2OTIxMH0.9cFArwwoh7vL8wRIhGADT9B64hf5rmB18rRudLjGDks"
   }
 }
