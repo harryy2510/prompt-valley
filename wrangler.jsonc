@@ -10,5 +10,8 @@
   },
   "vars": {
     "VITE_SUPABASE_URL": "https://uguvrytefzvyjypcbngo.supabase.co"
+  },
+  "env": {
+    "VITE_SUPABASE_URL": "https://uguvrytefzvyjypcbngo.supabase.co"
   }
 }
