@@ -111,19 +111,19 @@ function RootDocument({ children }: PropsWithChildren) {
     <html lang="en">
       <head>
         <HeadContent />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                const savedTheme = localStorage.getItem('theme');
-                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
-                  document.documentElement.classList.add('dark');
-                }
-              })();
-            `,
-          }}
-        />
+        {/*<script*/}
+        {/*  dangerouslySetInnerHTML={{*/}
+        {/*    __html: `*/}
+        {/*      (function() {*/}
+        {/*        const savedTheme = localStorage.getItem('theme');*/}
+        {/*        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;*/}
+        {/*        if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {*/}
+        {/*          document.documentElement.classList.add('dark');*/}
+        {/*        }*/}
+        {/*      })();*/}
+        {/*    `,*/}
+        {/*  }}*/}
+        {/*/>*/}
       </head>
       <body>
         {children}
