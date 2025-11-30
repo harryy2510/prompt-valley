@@ -19,12 +19,14 @@ CREATE INDEX idx_user_favorites_created_at ON user_favorites(created_at DESC);
 CREATE OR REPLACE FUNCTION update_prompt_saves_count()
 RETURNS TRIGGER
 LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = ''
 AS $$
 BEGIN
   IF TG_OP = 'INSERT' THEN
-    UPDATE prompts SET saves_count = saves_count + 1 WHERE id = NEW.prompt_id;
+    UPDATE public.prompts SET saves_count = saves_count + 1 WHERE id = NEW.prompt_id;
   ELSIF TG_OP = 'DELETE' THEN
-    UPDATE prompts SET saves_count = GREATEST(saves_count - 1, 0) WHERE id = OLD.prompt_id;
+    UPDATE public.prompts SET saves_count = GREATEST(saves_count - 1, 0) WHERE id = OLD.prompt_id;
   END IF;
   RETURN NULL;
 END;
@@ -40,15 +42,15 @@ ALTER TABLE user_favorites ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Users can view their own favorites"
   ON user_favorites FOR SELECT
-  USING (auth.uid() = user_id);
+  USING ((SELECT auth.uid()) = user_id);
 
 CREATE POLICY "Users can create their own favorites"
   ON user_favorites FOR INSERT
-  WITH CHECK (auth.uid() = user_id);
+  WITH CHECK ((SELECT auth.uid()) = user_id);
 
 CREATE POLICY "Users can delete their own favorites"
   ON user_favorites FOR DELETE
-  USING (auth.uid() = user_id);
+  USING ((SELECT auth.uid()) = user_id);
 
 -- Grants
 GRANT SELECT, INSERT, DELETE ON TABLE user_favorites TO authenticated;

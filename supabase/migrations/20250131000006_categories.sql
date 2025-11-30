@@ -26,16 +26,18 @@ CREATE TRIGGER set_updated_at_categories
 CREATE OR REPLACE FUNCTION prevent_category_cycle()
 RETURNS TRIGGER
 LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = ''
 AS $$
 BEGIN
   IF NEW.parent_id IS NOT NULL THEN
     -- Check if setting this parent would create a cycle
     IF EXISTS (
       WITH RECURSIVE category_tree AS (
-        SELECT id, parent_id FROM categories WHERE id = NEW.parent_id
+        SELECT id, parent_id FROM public.categories WHERE id = NEW.parent_id
         UNION ALL
         SELECT c.id, c.parent_id
-        FROM categories c
+        FROM public.categories c
         INNER JOIN category_tree ct ON c.id = ct.parent_id
       )
       SELECT 1 FROM category_tree WHERE id = NEW.id
@@ -59,9 +61,17 @@ CREATE POLICY "Anyone can view categories"
   ON categories FOR SELECT
   USING (true);
 
-CREATE POLICY "Admins can manage categories"
-  ON categories FOR ALL
-  USING (auth.jwt() ->> 'role' = 'admin');
+CREATE POLICY "Admins can insert categories"
+  ON categories FOR INSERT
+  WITH CHECK ((SELECT auth.jwt() ->> 'role') = 'admin');
+
+CREATE POLICY "Admins can update categories"
+  ON categories FOR UPDATE
+  USING ((SELECT auth.jwt() ->> 'role') = 'admin');
+
+CREATE POLICY "Admins can delete categories"
+  ON categories FOR DELETE
+  USING ((SELECT auth.jwt() ->> 'role') = 'admin');
 
 -- Grants
 GRANT SELECT ON TABLE categories TO anon, authenticated;

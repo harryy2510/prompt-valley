@@ -57,17 +57,21 @@ ALTER TABLE users ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Users can view their own profile"
   ON users FOR SELECT
   TO authenticated
-  USING (id = auth.uid());
+  USING (id = (SELECT auth.uid()) OR (SELECT auth.jwt() ->> 'role') = 'admin');
 
 CREATE POLICY "Users can update their own profile"
   ON users FOR UPDATE
   TO authenticated
-  USING (id = auth.uid())
-  WITH CHECK (id = auth.uid());
+  USING (id = (SELECT auth.uid()))
+  WITH CHECK (id = (SELECT auth.uid()));
 
-CREATE POLICY "Admins have full access"
-  ON users FOR ALL
-  USING (auth.jwt() ->> 'role' = 'admin');
+CREATE POLICY "Admins can insert users"
+  ON users FOR INSERT
+  WITH CHECK ((SELECT auth.jwt() ->> 'role') = 'admin');
+
+CREATE POLICY "Admins can delete users"
+  ON users FOR DELETE
+  USING ((SELECT auth.jwt() ->> 'role') = 'admin');
 
 -- Grants
 GRANT SELECT ON TABLE users TO authenticated;

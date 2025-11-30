@@ -45,18 +45,22 @@ CREATE TRIGGER set_updated_at_prompts
 CREATE OR REPLACE FUNCTION increment_prompt_views(prompt_uuid UUID)
 RETURNS void
 LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = ''
 AS $$
 BEGIN
-  UPDATE prompts SET views_count = views_count + 1 WHERE id = prompt_uuid;
+  UPDATE public.prompts SET views_count = views_count + 1 WHERE id = prompt_uuid;
 END;
 $$;
 
 CREATE OR REPLACE FUNCTION increment_prompt_copies(prompt_uuid UUID)
 RETURNS void
 LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = ''
 AS $$
 BEGIN
-  UPDATE prompts SET copies_count = copies_count + 1 WHERE id = prompt_uuid;
+  UPDATE public.prompts SET copies_count = copies_count + 1 WHERE id = prompt_uuid;
 END;
 $$;
 
@@ -65,11 +69,19 @@ ALTER TABLE prompts ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Anyone can view published prompts"
   ON prompts FOR SELECT
-  USING (is_published = true);
+  USING (is_published = true OR (SELECT auth.jwt() ->> 'role') = 'admin');
 
-CREATE POLICY "Admins can manage prompts"
-  ON prompts FOR ALL
-  USING (auth.jwt() ->> 'role' = 'admin');
+CREATE POLICY "Admins can insert prompts"
+  ON prompts FOR INSERT
+  WITH CHECK ((SELECT auth.jwt() ->> 'role') = 'admin');
+
+CREATE POLICY "Admins can update prompts"
+  ON prompts FOR UPDATE
+  USING ((SELECT auth.jwt() ->> 'role') = 'admin');
+
+CREATE POLICY "Admins can delete prompts"
+  ON prompts FOR DELETE
+  USING ((SELECT auth.jwt() ->> 'role') = 'admin');
 
 -- Grants
 GRANT SELECT ON TABLE prompts TO anon, authenticated;

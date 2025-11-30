@@ -26,9 +26,17 @@ CREATE POLICY "Anyone can view tags"
   ON tags FOR SELECT
   USING (true);
 
-CREATE POLICY "Admins can manage tags"
-  ON tags FOR ALL
-  USING (auth.jwt() ->> 'role' = 'admin');
+CREATE POLICY "Admins can insert tags"
+  ON tags FOR INSERT
+  WITH CHECK ((SELECT auth.jwt() ->> 'role') = 'admin');
+
+CREATE POLICY "Admins can update tags"
+  ON tags FOR UPDATE
+  USING ((SELECT auth.jwt() ->> 'role') = 'admin');
+
+CREATE POLICY "Admins can delete tags"
+  ON tags FOR DELETE
+  USING ((SELECT auth.jwt() ->> 'role') = 'admin');
 
 -- Grants
 GRANT SELECT ON TABLE tags TO anon, authenticated;

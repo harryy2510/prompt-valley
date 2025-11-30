@@ -23,11 +23,16 @@ CREATE POLICY "Anyone can view prompt_models for published prompts"
       WHERE prompts.id = prompt_models.prompt_id
       AND prompts.is_published = true
     )
+    OR (SELECT auth.jwt() ->> 'role') = 'admin'
   );
 
-CREATE POLICY "Admins can manage prompt_models"
-  ON prompt_models FOR ALL
-  USING (auth.jwt() ->> 'role' = 'admin');
+CREATE POLICY "Admins can insert prompt_models"
+  ON prompt_models FOR INSERT
+  WITH CHECK ((SELECT auth.jwt() ->> 'role') = 'admin');
+
+CREATE POLICY "Admins can delete prompt_models"
+  ON prompt_models FOR DELETE
+  USING ((SELECT auth.jwt() ->> 'role') = 'admin');
 
 -- Grants
 GRANT SELECT ON TABLE prompt_models TO anon, authenticated;

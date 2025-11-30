@@ -34,9 +34,17 @@ CREATE POLICY "Anyone can view ai_models"
   ON ai_models FOR SELECT
   USING (true);
 
-CREATE POLICY "Admins can manage ai_models"
-  ON ai_models FOR ALL
-  USING (auth.jwt() ->> 'role' = 'admin');
+CREATE POLICY "Admins can insert ai_models"
+  ON ai_models FOR INSERT
+  WITH CHECK ((SELECT auth.jwt() ->> 'role') = 'admin');
+
+CREATE POLICY "Admins can update ai_models"
+  ON ai_models FOR UPDATE
+  USING ((SELECT auth.jwt() ->> 'role') = 'admin');
+
+CREATE POLICY "Admins can delete ai_models"
+  ON ai_models FOR DELETE
+  USING ((SELECT auth.jwt() ->> 'role') = 'admin');
 
 -- Grants
 GRANT SELECT ON TABLE ai_models TO anon, authenticated;
