@@ -1,0 +1,68 @@
+-- ============================================================================
+-- CATEGORIES TABLE
+-- ============================================================================
+
+CREATE TABLE categories (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  parent_id UUID REFERENCES categories(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  slug TEXT NOT NULL UNIQUE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  CONSTRAINT no_self_reference CHECK (id != parent_id)
+);
+
+-- Indexes
+CREATE INDEX idx_categories_parent_id ON categories(parent_id);
+CREATE INDEX idx_categories_slug ON categories(slug);
+
+-- Trigger for updated_at
+CREATE TRIGGER set_updated_at_categories
+  BEFORE UPDATE ON categories
+  FOR EACH ROW
+  EXECUTE FUNCTION set_updated_at();
+
+-- Function to prevent cyclic references
+CREATE OR REPLACE FUNCTION prevent_category_cycle()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+AS $$
+BEGIN
+  IF NEW.parent_id IS NOT NULL THEN
+    -- Check if setting this parent would create a cycle
+    IF EXISTS (
+      WITH RECURSIVE category_tree AS (
+        SELECT id, parent_id FROM categories WHERE id = NEW.parent_id
+        UNION ALL
+        SELECT c.id, c.parent_id
+        FROM categories c
+        INNER JOIN category_tree ct ON c.id = ct.parent_id
+      )
+      SELECT 1 FROM category_tree WHERE id = NEW.id
+    ) THEN
+      RAISE EXCEPTION 'Cannot set parent: would create a cycle';
+    END IF;
+  END IF;
+  RETURN NEW;
+END;
+$$;
+
+CREATE TRIGGER prevent_category_cycle_trigger
+  BEFORE INSERT OR UPDATE ON categories
+  FOR EACH ROW
+  EXECUTE FUNCTION prevent_category_cycle();
+
+-- RLS
+ALTER TABLE categories ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Anyone can view categories"
+  ON categories FOR SELECT
+  USING (true);
+
+CREATE POLICY "Admins can manage categories"
+  ON categories FOR ALL
+  USING (auth.jwt() ->> 'role' = 'admin');
+
+-- Grants
+GRANT SELECT ON TABLE categories TO anon, authenticated;
+GRANT ALL ON TABLE categories TO service_role;

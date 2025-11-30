@@ -3,6 +3,12 @@ import { Button } from '@/components/ui/button'
 import { Copy, Bookmark } from 'lucide-react'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { useIsAuthenticated } from '@/actions/auth'
+import { LinkButton } from '@/components/ui/link-button'
+import { IconButton } from '@/components/ui/icon-button'
+import { CategoryFilterGroup } from '@/components/category-filter'
+import { ProBadge } from '@/components/pro-badge'
+import { SearchInput } from '@/components/search-input'
+import { Logo } from '@/components/logo'
 
 export const Route = createFileRoute('/')({
   component: RouteComponent,
@@ -17,66 +23,26 @@ function RouteComponent() {
       <header className="sticky top-0 z-50 border-b border-border bg-background">
         <div className="mx-auto max-w-7xl px-6">
           <div className="flex h-[64px] items-center gap-3">
-            {/* Logo - Two lines stacked */}
-            <Link to="/" className="flex items-center gap-2 shrink-0">
-              <img src="/icon.svg" alt="Prompt Valley" className="h-6 w-6" />
-              <div className="flex flex-col">
-                <span className="text-[13px] font-semibold leading-none">
-                  prompt
-                </span>
-                <span className="text-[13px] font-semibold leading-none">
-                  valley
-                </span>
-              </div>
-            </Link>
+            {/* Logo */}
+            <Logo />
 
             {/* Search */}
-            <div className="w-[280px] ml-2">
-              <div className="relative">
-                <svg
-                  className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/80"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  strokeWidth={2}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                  />
-                </svg>
-                <input
-                  type="text"
-                  placeholder="Search"
-                  className="w-full h-9 rounded-lg bg-muted dark:bg-muted/20 pl-9 pr-4 text-sm placeholder:text-muted-foreground/80 focus:outline-none border-0 transition-colors"
-                />
-              </div>
-            </div>
+            <SearchInput containerClassName="w-[280px] ml-2" />
 
             {/* Spacer */}
             <div className="flex-1" />
 
             {/* Right side */}
             <div className="flex items-center gap-2 shrink-0">
-              <Link
-                to="/pricing"
-                className="text-sm font-semibold text-foreground hover:bg-muted px-3 py-1.5 rounded-sm transition-colors"
-              >
+              <LinkButton to="/pricing" variant="nav-link" size="nav">
                 Get PRO
-              </Link>
-              <Link
-                to="/sign-in"
-                className="text-sm font-medium text-muted-foreground hover:bg-muted px-3 py-1.5 rounded-sm transition-colors"
-              >
+              </LinkButton>
+              <LinkButton to="/sign-in" variant="nav-link-muted" size="nav">
                 Log in
-              </Link>
-              <Link
-                to="/sign-up"
-                className="bg-foreground text-background hover:bg-foreground/90 rounded-sm px-5 py-2 text-sm font-medium transition-all inline-block"
-              >
+              </LinkButton>
+              <LinkButton to="/sign-up" variant="brand-primary" size="cta">
                 Start <span className="text-[#e5d5a8]">Free</span>
-              </Link>
+              </LinkButton>
             </div>
           </div>
         </div>
@@ -89,12 +55,9 @@ function RouteComponent() {
             New: Nano Banana Pro prompts are now available - explore the new
             collection.
           </p>
-          <Link
-            to="/sign-up"
-            className="bg-foreground text-background hover:bg-foreground/90 rounded-sm px-5 py-2 text-sm font-medium transition-all inline-block"
-          >
+          <LinkButton to="/sign-up" variant="brand-primary" size="cta">
             Try it out
-          </Link>
+          </LinkButton>
         </div>
       </div>
 
@@ -111,18 +74,22 @@ function RouteComponent() {
             and image models to consistently get better AI output.
           </p>
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link
+            <LinkButton
               to="/sign-up"
-              className="bg-foreground text-background hover:bg-foreground/90 rounded-sm min-w-[160px] px-6 py-3 text-md font-medium transition-all inline-block"
+              variant="brand-primary"
+              size="cta-lg"
+              className="min-w-[160px]"
             >
               Start <span className="text-[#e5d5a8]">Free</span>
-            </Link>
-            <Link
+            </LinkButton>
+            <LinkButton
               to="/sign-up"
-              className="text-foreground rounded-sm min-w-[160px] px-6 py-3 text-md font-medium transition-all inline-block border-1"
+              variant="brand-secondary"
+              size="cta-lg"
+              className="min-w-[160px]"
             >
               Get <span className="text-accent">PRO</span>
-            </Link>
+            </LinkButton>
           </div>
           <p className="mt-6 text-sm text-muted-foreground">
             Free forever. No credit card required.
@@ -146,45 +113,34 @@ function RouteComponent() {
           </div>
 
           {/* Category Filters */}
-          <div className="flex gap-2 mb-8 overflow-x-auto pb-2">
-            {[
+          <CategoryFilterGroup
+            categories={[
               { name: 'All', active: true },
               { name: 'Latest', active: false },
               { name: 'Writing', active: false },
               { name: 'Image Generation', active: false },
-            ].map((category) => (
-              <button
-                key={category.name}
-                className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
-                  category.active
-                    ? 'bg-foreground text-background'
-                    : 'border border-border bg-background hover:bg-muted'
-                }`}
-              >
-                {category.name}
-              </button>
-            ))}
-          </div>
+            ]}
+            className="mb-8"
+          />
 
           {/* PRO Upsell Card */}
           <div className="mb-8 rounded-2xl border-2 border-accent/30 bg-accent/5 p-6 flex items-center justify-between">
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <span className="px-2 py-1 rounded-md bg-accent text-white text-xs font-bold">
-                  PRO
-                </span>
+                <ProBadge />
               </div>
               <h3 className="font-semibold text-lg mb-1">
                 Unlock everything PromptValley has to offer.
               </h3>
               <p className="text-sm text-muted-foreground">Cancel anytime.</p>
             </div>
-            <Button
+            <LinkButton
+              to="/pricing"
+              variant="default"
               className="rounded-full bg-accent hover:bg-accent/90"
-              asChild
             >
-              <Link to="/pricing">Upgrade</Link>
-            </Button>
+              Upgrade
+            </LinkButton>
           </div>
 
           {/* Prompts Grid */}
@@ -317,20 +273,24 @@ function RouteComponent() {
               >
                 {/* Copy & Bookmark Buttons */}
                 <div className="absolute top-3 right-3 z-10 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button className="p-2 rounded-lg bg-background/90 backdrop-blur-sm border border-border hover:bg-background transition-colors">
+                  <IconButton
+                    variant="outline"
+                    className="bg-background/90 backdrop-blur-sm border border-border hover:bg-background"
+                  >
                     <Copy className="h-4 w-4" />
-                  </button>
-                  <button className="p-2 rounded-lg bg-background/90 backdrop-blur-sm border border-border hover:bg-background transition-colors">
+                  </IconButton>
+                  <IconButton
+                    variant="outline"
+                    className="bg-background/90 backdrop-blur-sm border border-border hover:bg-background"
+                  >
                     <Bookmark className="h-4 w-4" />
-                  </button>
+                  </IconButton>
                 </div>
 
                 {/* PRO Badge */}
                 {prompt.pro && (
                   <div className="absolute top-3 left-3 z-10">
-                    <span className="px-2 py-1 rounded-md bg-accent text-white text-xs font-bold">
-                      PRO
-                    </span>
+                    <ProBadge />
                   </div>
                 )}
 
