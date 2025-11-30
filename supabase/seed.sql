@@ -1,571 +1,417 @@
 -- ============================================================================
 -- PROMPTVALLEY SEED DATA
--- Description: Initial data for AI providers, models, categories, and tags
--- Note: Run after all migrations are complete (supabase db reset)
+-- Fresh seed data matching the new schema
 -- ============================================================================
 
 -- ============================================================================
 -- AI PROVIDERS
 -- ============================================================================
 
-INSERT INTO ai_providers (name, display_name, slug, logo_url, website_url, description, sort_order) VALUES
--- Major AI Companies
-('OpenAI', 'OpenAI', 'openai', 'https://cdn.openai.com/assets/favicon-32x32.png', 'https://openai.com', 'Leading AI research company behind ChatGPT and GPT models', 1),
-('Anthropic', 'Anthropic', 'anthropic', 'https://www.anthropic.com/images/icons/safari-pinned-tab.svg', 'https://www.anthropic.com', 'AI safety company behind Claude models', 2),
-('Google', 'Google AI', 'google', 'https://www.google.com/favicon.ico', 'https://ai.google', 'Google''s AI division with Gemini models', 3),
-('xAI', 'xAI', 'xai', NULL, 'https://x.ai', 'Elon Musk''s AI company behind Grok', 4),
-('Meta', 'Meta AI', 'meta', 'https://static.xx.fbcdn.net/rsrc.php/yb/r/hLRJ1GG_y0J.ico', 'https://ai.meta.com', 'Meta''s open-source AI models', 5),
-('Mistral AI', 'Mistral AI', 'mistral', NULL, 'https://mistral.ai', 'European AI company with open models', 6),
-
--- Image Generation
-('Midjourney', 'Midjourney', 'midjourney', NULL, 'https://www.midjourney.com', 'AI art generation platform', 10),
-('Stability AI', 'Stability AI', 'stability', NULL, 'https://stability.ai', 'Creators of Stable Diffusion', 11),
-('Ideogram', 'Ideogram', 'ideogram', NULL, 'https://ideogram.ai', 'Text-to-image AI with superior text rendering', 12),
-('DALL-E', 'DALL-E', 'dalle', NULL, 'https://openai.com/dall-e-3', 'OpenAI''s image generation', 13);
+INSERT INTO ai_providers (name, slug, logo_url, website_url) VALUES
+('OpenAI', 'openai', 'https://cdn.openai.com/assets/favicon-32x32.png', 'https://openai.com'),
+('Anthropic', 'anthropic', 'https://www.anthropic.com/images/icons/safari-pinned-tab.svg', 'https://www.anthropic.com'),
+('Google', 'google', 'https://www.google.com/favicon.ico', 'https://ai.google'),
+('xAI', 'xai', NULL, 'https://x.ai'),
+('Meta', 'meta', 'https://static.xx.fbcdn.net/rsrc.php/yb/r/hLRJ1GG_y0J.ico', 'https://ai.meta.com'),
+('Mistral AI', 'mistral', NULL, 'https://mistral.ai'),
+('Midjourney', 'midjourney', NULL, 'https://www.midjourney.com'),
+('Stability AI', 'stability', NULL, 'https://stability.ai'),
+('Ideogram', 'ideogram', NULL, 'https://ideogram.ai');
 
 -- ============================================================================
--- AI MODELS - Text/Chat Models
+-- AI MODELS
 -- ============================================================================
 
 -- OpenAI Models
-INSERT INTO ai_models (
-  provider_id, model_id, model_name, model_version, slug, capabilities,
-  context_window, max_output_tokens, cost_input_per_million, cost_output_per_million,
-  description, is_featured, release_date, sort_order
-)
+INSERT INTO ai_models (id, provider_id, name, slug, capabilities, context_window, max_output_tokens, cost_input_per_million, cost_output_per_million)
 SELECT
-  p.id,
+  'gpt-4o',
+  id,
+  'GPT-4o',
+  'gpt-4o',
+  ARRAY['text', 'code', 'image']::model_capability[],
+  128000,
+  16384,
+  2.5000,
+  10.0000
+FROM ai_providers WHERE slug = 'openai';
+
+INSERT INTO ai_models (id, provider_id, name, slug, capabilities, context_window, max_output_tokens, cost_input_per_million, cost_output_per_million)
+SELECT
   'gpt-4-turbo',
+  id,
   'GPT-4 Turbo',
-  '2024-04-09',
   'gpt-4-turbo',
-  ARRAY['text', 'vision', 'code']::model_capability[],
+  ARRAY['text', 'code', 'image']::model_capability[],
   128000,
   4096,
   10.0000,
-  30.0000,
-  'Most capable GPT-4 model with vision capabilities',
-  true,
-  '2024-04-09',
-  1
-FROM ai_providers p WHERE p.slug = 'openai'
+  30.0000
+FROM ai_providers WHERE slug = 'openai';
 
-UNION ALL
-
+INSERT INTO ai_models (id, provider_id, name, slug, capabilities, context_window, max_output_tokens, cost_input_per_million, cost_output_per_million)
 SELECT
-  p.id,
-  'gpt-4o',
-  'GPT-4o',
-  '2024-05-13',
-  'gpt-4o',
-  ARRAY['text', 'vision', 'audio', 'code', 'multimodal']::model_capability[],
-  128000,
-  4096,
-  5.0000,
-  15.0000,
-  'Omni-modal model with text, vision, and audio',
-  true,
-  '2024-05-13',
-  2
-FROM ai_providers p WHERE p.slug = 'openai'
-
-UNION ALL
-
-SELECT
-  p.id,
   'gpt-3.5-turbo',
+  id,
   'GPT-3.5 Turbo',
-  '0125',
   'gpt-3-5-turbo',
   ARRAY['text', 'code']::model_capability[],
   16385,
   4096,
   0.5000,
-  1.5000,
-  'Fast and affordable model for simpler tasks',
-  false,
-  '2023-03-01',
-  10
-FROM ai_providers p WHERE p.slug = 'openai';
+  1.5000
+FROM ai_providers WHERE slug = 'openai';
 
 -- Anthropic Models
-INSERT INTO ai_models (
-  provider_id, model_id, model_name, model_version, slug, capabilities,
-  context_window, max_output_tokens, cost_input_per_million, cost_output_per_million,
-  description, is_featured, release_date, sort_order
-)
+INSERT INTO ai_models (id, provider_id, name, slug, capabilities, context_window, max_output_tokens, cost_input_per_million, cost_output_per_million)
 SELECT
-  p.id,
   'claude-3-5-sonnet-20241022',
+  id,
   'Claude 3.5 Sonnet',
-  '3.5',
   'claude-3-5-sonnet',
-  ARRAY['text', 'vision', 'code']::model_capability[],
+  ARRAY['text', 'code', 'image']::model_capability[],
   200000,
   8192,
   3.0000,
-  15.0000,
-  'Most intelligent Claude model with extended context',
-  true,
-  '2024-10-22',
-  1
-FROM ai_providers p WHERE p.slug = 'anthropic'
+  15.0000
+FROM ai_providers WHERE slug = 'anthropic';
 
-UNION ALL
-
+INSERT INTO ai_models (id, provider_id, name, slug, capabilities, context_window, max_output_tokens, cost_input_per_million, cost_output_per_million)
 SELECT
-  p.id,
   'claude-3-opus-20240229',
+  id,
   'Claude 3 Opus',
-  '3.0',
   'claude-3-opus',
-  ARRAY['text', 'vision', 'code']::model_capability[],
+  ARRAY['text', 'code', 'image']::model_capability[],
   200000,
   4096,
   15.0000,
-  75.0000,
-  'Most powerful Claude 3 model for complex tasks',
-  true,
-  '2024-02-29',
-  2
-FROM ai_providers p WHERE p.slug = 'anthropic'
+  75.0000
+FROM ai_providers WHERE slug = 'anthropic';
 
-UNION ALL
-
+INSERT INTO ai_models (id, provider_id, name, slug, capabilities, context_window, max_output_tokens, cost_input_per_million, cost_output_per_million)
 SELECT
-  p.id,
-  'claude-3-sonnet-20240229',
-  'Claude 3 Sonnet',
-  '3.0',
-  'claude-3-sonnet',
-  ARRAY['text', 'vision', 'code']::model_capability[],
-  200000,
-  4096,
-  3.0000,
-  15.0000,
-  'Balanced performance and speed',
-  false,
-  '2024-02-29',
-  3
-FROM ai_providers p WHERE p.slug = 'anthropic'
-
-UNION ALL
-
-SELECT
-  p.id,
   'claude-3-haiku-20240307',
+  id,
   'Claude 3 Haiku',
-  '3.0',
   'claude-3-haiku',
-  ARRAY['text', 'vision', 'code']::model_capability[],
+  ARRAY['text', 'code', 'image']::model_capability[],
   200000,
   4096,
   0.2500,
-  1.2500,
-  'Fastest and most affordable Claude 3 model',
-  false,
-  '2024-03-07',
-  10
-FROM ai_providers p WHERE p.slug = 'anthropic';
+  1.2500
+FROM ai_providers WHERE slug = 'anthropic';
 
--- Google Gemini Models
-INSERT INTO ai_models (
-  provider_id, model_id, model_name, model_version, slug, capabilities,
-  context_window, max_output_tokens, cost_input_per_million, cost_output_per_million,
-  description, is_featured, release_date, sort_order
-)
+-- Google Models
+INSERT INTO ai_models (id, provider_id, name, slug, capabilities, context_window, max_output_tokens, cost_input_per_million, cost_output_per_million)
 SELECT
-  p.id,
-  'gemini-2.0-flash',
+  'gemini-2.0-flash-exp',
+  id,
   'Gemini 2.0 Flash',
-  '2.0',
   'gemini-2-0-flash',
-  ARRAY['text', 'vision', 'audio', 'video', 'code', 'multimodal']::model_capability[],
+  ARRAY['text', 'code', 'image']::model_capability[],
   1000000,
   8192,
-  0.0750,
-  0.3000,
-  'Fastest multimodal model with massive context window',
-  true,
-  '2024-12-11',
-  1
-FROM ai_providers p WHERE p.slug = 'google'
+  0.0000,
+  0.0000
+FROM ai_providers WHERE slug = 'google';
 
-UNION ALL
-
+INSERT INTO ai_models (id, provider_id, name, slug, capabilities, context_window, max_output_tokens, cost_input_per_million, cost_output_per_million)
 SELECT
-  p.id,
   'gemini-1.5-pro',
+  id,
   'Gemini 1.5 Pro',
-  '1.5',
   'gemini-1-5-pro',
-  ARRAY['text', 'vision', 'audio', 'code', 'multimodal']::model_capability[],
+  ARRAY['text', 'code', 'image']::model_capability[],
   2000000,
   8192,
   1.2500,
-  5.0000,
-  'Advanced model with 2M token context window',
-  true,
-  '2024-05-14',
-  2
-FROM ai_providers p WHERE p.slug = 'google'
+  5.0000
+FROM ai_providers WHERE slug = 'google';
 
-UNION ALL
-
+-- xAI Models
+INSERT INTO ai_models (id, provider_id, name, slug, capabilities, context_window, max_output_tokens, cost_input_per_million, cost_output_per_million)
 SELECT
-  p.id,
-  'gemini-1.5-flash',
-  'Gemini 1.5 Flash',
-  '1.5',
-  'gemini-1-5-flash',
-  ARRAY['text', 'vision', 'audio', 'code', 'multimodal']::model_capability[],
-  1000000,
-  8192,
-  0.0750,
-  0.3000,
-  'Fast and affordable with large context',
-  false,
-  '2024-05-14',
-  3
-FROM ai_providers p WHERE p.slug = 'google';
-
--- xAI Grok Models
-INSERT INTO ai_models (
-  provider_id, model_id, model_name, model_version, slug, capabilities,
-  context_window, max_output_tokens, cost_input_per_million, cost_output_per_million,
-  description, is_featured, release_date, sort_order
-)
-SELECT
-  p.id,
   'grok-2',
+  id,
   'Grok 2',
-  '2.0',
   'grok-2',
   ARRAY['text', 'code']::model_capability[],
   128000,
   4096,
-  NULL,
-  NULL,
-  'Latest Grok model with real-time X/Twitter data',
-  true,
-  '2024-08-01',
-  1
-FROM ai_providers p WHERE p.slug = 'xai';
+  2.0000,
+  10.0000
+FROM ai_providers WHERE slug = 'xai';
 
 -- Meta Models
-INSERT INTO ai_models (
-  provider_id, model_id, model_name, model_version, slug, capabilities,
-  context_window, max_output_tokens, cost_input_per_million, cost_output_per_million,
-  description, is_featured, release_date, sort_order
-)
+INSERT INTO ai_models (id, provider_id, name, slug, capabilities, context_window, max_output_tokens, cost_input_per_million, cost_output_per_million)
 SELECT
-  p.id,
   'llama-3.3-70b',
+  id,
   'Llama 3.3 70B',
-  '3.3',
   'llama-3-3-70b',
   ARRAY['text', 'code']::model_capability[],
   128000,
   4096,
-  NULL,
-  NULL,
-  'Open-source model with strong performance',
-  true,
-  '2024-12-01',
-  1
-FROM ai_providers p WHERE p.slug = 'meta'
-
-UNION ALL
-
-SELECT
-  p.id,
-  'llama-3.2-vision',
-  'Llama 3.2 Vision',
-  '3.2',
-  'llama-3-2-vision',
-  ARRAY['text', 'vision', 'code']::model_capability[],
-  128000,
-  4096,
-  NULL,
-  NULL,
-  'Llama with vision capabilities',
-  true,
-  '2024-09-25',
-  2
-FROM ai_providers p WHERE p.slug = 'meta';
+  0.0000,
+  0.0000
+FROM ai_providers WHERE slug = 'meta';
 
 -- Mistral Models
-INSERT INTO ai_models (
-  provider_id, model_id, model_name, model_version, slug, capabilities,
-  context_window, max_output_tokens, cost_input_per_million, cost_output_per_million,
-  description, is_featured, release_date, sort_order
-)
+INSERT INTO ai_models (id, provider_id, name, slug, capabilities, context_window, max_output_tokens, cost_input_per_million, cost_output_per_million)
 SELECT
-  p.id,
   'mistral-large-2',
+  id,
   'Mistral Large 2',
-  '2',
   'mistral-large-2',
   ARRAY['text', 'code']::model_capability[],
   128000,
   4096,
   2.0000,
-  6.0000,
-  'Flagship model for complex reasoning',
-  true,
-  '2024-07-24',
-  1
-FROM ai_providers p WHERE p.slug = 'mistral';
+  6.0000
+FROM ai_providers WHERE slug = 'mistral';
 
--- ============================================================================
--- AI MODELS - Image Generation
--- ============================================================================
-
--- Midjourney
-INSERT INTO ai_models (
-  provider_id, model_id, model_name, model_version, slug, capabilities,
-  context_window, max_output_tokens, cost_input_per_million, cost_output_per_million,
-  description, is_featured, release_date, sort_order
-)
+-- Image Generation Models
+INSERT INTO ai_models (id, provider_id, name, slug, capabilities, context_window, max_output_tokens, cost_input_per_million, cost_output_per_million)
 SELECT
-  p.id,
   'midjourney-v6',
+  id,
   'Midjourney V6',
-  '6',
   'midjourney-v6',
   ARRAY['image']::model_capability[],
   NULL,
   NULL,
   NULL,
-  NULL,
-  'Latest version with improved quality and coherence',
-  true,
-  '2023-12-21',
-  1
-FROM ai_providers p WHERE p.slug = 'midjourney'
+  NULL
+FROM ai_providers WHERE slug = 'midjourney';
 
-UNION ALL
-
+INSERT INTO ai_models (id, provider_id, name, slug, capabilities, context_window, max_output_tokens, cost_input_per_million, cost_output_per_million)
 SELECT
-  p.id,
-  'midjourney-niji-6',
-  'Niji 6',
-  '6',
-  'midjourney-niji-6',
-  ARRAY['image']::model_capability[],
-  NULL,
-  NULL,
-  NULL,
-  NULL,
-  'Anime and illustration focused model',
-  false,
-  '2024-03-01',
-  2
-FROM ai_providers p WHERE p.slug = 'midjourney';
-
--- Stable Diffusion
-INSERT INTO ai_models (
-  provider_id, model_id, model_name, model_version, slug, capabilities,
-  context_window, max_output_tokens, cost_input_per_million, cost_output_per_million,
-  description, is_featured, release_date, sort_order
-)
-SELECT
-  p.id,
-  'stable-diffusion-3',
-  'Stable Diffusion 3',
-  '3',
-  'stable-diffusion-3',
-  ARRAY['image']::model_capability[],
-  NULL,
-  NULL,
-  NULL,
-  NULL,
-  'Latest open-source image generation model',
-  true,
-  '2024-04-17',
-  1
-FROM ai_providers p WHERE p.slug = 'stability'
-
-UNION ALL
-
-SELECT
-  p.id,
-  'sdxl',
-  'SDXL 1.0',
-  '1.0',
-  'sdxl',
-  ARRAY['image']::model_capability[],
-  NULL,
-  NULL,
-  NULL,
-  NULL,
-  'High-quality image generation',
-  false,
-  '2023-07-26',
-  2
-FROM ai_providers p WHERE p.slug = 'stability';
-
--- Ideogram
-INSERT INTO ai_models (
-  provider_id, model_id, model_name, model_version, slug, capabilities,
-  context_window, max_output_tokens, cost_input_per_million, cost_output_per_million,
-  description, is_featured, release_date, sort_order
-)
-SELECT
-  p.id,
-  'ideogram-2.0',
-  'Ideogram 2.0',
-  '2.0',
-  'ideogram-2-0',
-  ARRAY['image']::model_capability[],
-  NULL,
-  NULL,
-  NULL,
-  NULL,
-  'Superior text rendering in images',
-  true,
-  '2024-08-01',
-  1
-FROM ai_providers p WHERE p.slug = 'ideogram';
-
--- DALL-E
-INSERT INTO ai_models (
-  provider_id, model_id, model_name, model_version, slug, capabilities,
-  context_window, max_output_tokens, cost_input_per_million, cost_output_per_million,
-  description, is_featured, release_date, sort_order
-)
-SELECT
-  p.id,
   'dall-e-3',
+  id,
   'DALL-E 3',
-  '3',
   'dall-e-3',
   ARRAY['image']::model_capability[],
   NULL,
   NULL,
   NULL,
+  NULL
+FROM ai_providers WHERE slug = 'openai';
+
+INSERT INTO ai_models (id, provider_id, name, slug, capabilities, context_window, max_output_tokens, cost_input_per_million, cost_output_per_million)
+SELECT
+  'stable-diffusion-3',
+  id,
+  'Stable Diffusion 3',
+  'stable-diffusion-3',
+  ARRAY['image']::model_capability[],
   NULL,
-  'OpenAI''s latest image generation model',
-  true,
-  '2023-10-01',
-  1
-FROM ai_providers p WHERE p.slug = 'dalle';
+  NULL,
+  NULL,
+  NULL
+FROM ai_providers WHERE slug = 'stability';
+
+INSERT INTO ai_models (id, provider_id, name, slug, capabilities, context_window, max_output_tokens, cost_input_per_million, cost_output_per_million)
+SELECT
+  'ideogram-v2',
+  id,
+  'Ideogram V2',
+  'ideogram-v2',
+  ARRAY['image']::model_capability[],
+  NULL,
+  NULL,
+  NULL,
+  NULL
+FROM ai_providers WHERE slug = 'ideogram';
 
 -- ============================================================================
 -- CATEGORIES
 -- ============================================================================
 
--- Root Categories
-INSERT INTO categories (name, slug, description, icon, color, sort_order) VALUES
-('Writing', 'writing', 'Content creation, copywriting, and writing tasks', '✍️', '#6366f1', 1),
-('Image Generation', 'image-generation', 'AI image creation and art generation', '🎨', '#ec4899', 2),
-('Coding', 'coding', 'Programming, debugging, and development', '💻', '#8b5cf6', 3),
-('Marketing', 'marketing', 'Marketing, sales, and business content', '📊', '#f59e0b', 4),
-('Productivity', 'productivity', 'Organization, planning, and efficiency', '⚡', '#10b981', 5),
-('Analysis', 'analysis', 'Data analysis, research, and insights', '🔍', '#3b82f6', 6),
-('Education', 'education', 'Learning, teaching, and explanations', '📚', '#06b6d4', 7),
-('Creative', 'creative', 'Creative thinking and brainstorming', '💡', '#f97316', 8);
+-- Root categories
+INSERT INTO categories (name, slug) VALUES
+('Writing', 'writing'),
+('Image Generation', 'image-generation'),
+('Coding', 'coding'),
+('Marketing', 'marketing'),
+('Productivity', 'productivity'),
+('Analysis', 'analysis'),
+('Education', 'education'),
+('Creative', 'creative');
 
 -- Subcategories for Writing
-INSERT INTO categories (parent_id, name, slug, description, icon, sort_order)
-SELECT id, 'Email Sequences', 'email-sequences', 'Email campaigns and drip sequences', '📧', 1
-FROM categories WHERE slug = 'writing'
-UNION ALL
-SELECT id, 'LinkedIn Posts', 'linkedin-posts', 'Professional LinkedIn content', '💼', 2
-FROM categories WHERE slug = 'writing'
-UNION ALL
-SELECT id, 'Social Media', 'social-media', 'Social media posts and captions', '📱', 3
-FROM categories WHERE slug = 'writing'
-UNION ALL
-SELECT id, 'Blog Posts', 'blog-posts', 'Long-form blog content', '📝', 4
-FROM categories WHERE slug = 'writing'
-UNION ALL
-SELECT id, 'Ad Copy', 'ad-copy', 'Advertising and sales copy', '🎯', 5
-FROM categories WHERE slug = 'writing'
-UNION ALL
-SELECT id, 'Landing Pages', 'landing-pages', 'Landing page copywriting', '🌐', 6
-FROM categories WHERE slug = 'writing'
-UNION ALL
-SELECT id, 'Case Studies', 'case-studies', 'Customer success stories', '📄', 7
-FROM categories WHERE slug = 'writing'
-UNION ALL
-SELECT id, 'Cold Outreach', 'cold-outreach', 'Cold emails and DMs', '❄️', 8
-FROM categories WHERE slug = 'writing';
+INSERT INTO categories (parent_id, name, slug)
+SELECT id, 'Email Sequences', 'email-sequences' FROM categories WHERE slug = 'writing';
+
+INSERT INTO categories (parent_id, name, slug)
+SELECT id, 'LinkedIn Posts', 'linkedin-posts' FROM categories WHERE slug = 'writing';
+
+INSERT INTO categories (parent_id, name, slug)
+SELECT id, 'Social Media', 'social-media' FROM categories WHERE slug = 'writing';
+
+INSERT INTO categories (parent_id, name, slug)
+SELECT id, 'Blog Posts', 'blog-posts' FROM categories WHERE slug = 'writing';
 
 -- Subcategories for Image Generation
-INSERT INTO categories (parent_id, name, slug, description, icon, sort_order)
-SELECT id, 'Illustrations', 'illustrations', 'Digital illustrations and drawings', '🖼️', 1
-FROM categories WHERE slug = 'image-generation'
-UNION ALL
-SELECT id, 'Fashion Shoots', 'fashion-shoots', 'Fashion photography and styling', '👗', 2
-FROM categories WHERE slug = 'image-generation'
-UNION ALL
-SELECT id, 'Product Photos', 'product-photos', 'Product photography', '📦', 3
-FROM categories WHERE slug = 'image-generation'
-UNION ALL
-SELECT id, 'Movie-Style Images', 'movie-style', 'Cinematic and film-like imagery', '🎬', 4
-FROM categories WHERE slug = 'image-generation'
-UNION ALL
-SELECT id, 'Website Heroes', 'website-heroes', 'Hero images for websites', '🖥️', 5
-FROM categories WHERE slug = 'image-generation'
-UNION ALL
-SELECT id, 'Branding Assets', 'branding-assets', 'Logos, icons, and brand visuals', '🎨', 6
-FROM categories WHERE slug = 'image-generation'
-UNION ALL
-SELECT id, 'Posters', 'posters', 'Poster designs and artwork', '🖼️', 7
-FROM categories WHERE slug = 'image-generation';
+INSERT INTO categories (parent_id, name, slug)
+SELECT id, 'Illustrations', 'illustrations' FROM categories WHERE slug = 'image-generation';
+
+INSERT INTO categories (parent_id, name, slug)
+SELECT id, 'Fashion Photography', 'fashion-photography' FROM categories WHERE slug = 'image-generation';
+
+INSERT INTO categories (parent_id, name, slug)
+SELECT id, 'Product Photos', 'product-photos' FROM categories WHERE slug = 'image-generation';
+
+INSERT INTO categories (parent_id, name, slug)
+SELECT id, 'Logos & Branding', 'logos-branding' FROM categories WHERE slug = 'image-generation';
+
+-- Subcategories for Coding
+INSERT INTO categories (parent_id, name, slug)
+SELECT id, 'Python', 'python' FROM categories WHERE slug = 'coding';
+
+INSERT INTO categories (parent_id, name, slug)
+SELECT id, 'JavaScript', 'javascript' FROM categories WHERE slug = 'coding';
+
+INSERT INTO categories (parent_id, name, slug)
+SELECT id, 'Debugging', 'debugging' FROM categories WHERE slug = 'coding';
 
 -- ============================================================================
 -- TAGS
 -- ============================================================================
 
-INSERT INTO tags (name, slug, description, is_featured) VALUES
--- General Tags
-('Beginner Friendly', 'beginner-friendly', 'Easy to use for beginners', true),
-('Advanced', 'advanced', 'For experienced users', false),
-('Quick Win', 'quick-win', 'Fast results with minimal effort', true),
-('Trending', 'trending', 'Popular and trending prompts', true),
+INSERT INTO tags (name, slug) VALUES
+('Beginner Friendly', 'beginner-friendly'),
+('Advanced', 'advanced'),
+('SEO', 'seo'),
+('Viral', 'viral'),
+('Professional', 'professional'),
+('Photorealistic', 'photorealistic'),
+('ChatGPT', 'chatgpt'),
+('Claude', 'claude'),
+('Midjourney', 'midjourney'),
+('Quick', 'quick'),
+('Detailed', 'detailed'),
+('B2B', 'b2b'),
+('B2C', 'b2c'),
+('Technical', 'technical'),
+('Creative', 'creative'),
+('Business', 'business'),
+('Personal', 'personal'),
+('Education', 'education'),
+('Marketing', 'marketing'),
+('Sales', 'sales'),
+('Customer Support', 'customer-support'),
+('Content Creation', 'content-creation'),
+('Productivity', 'productivity'),
+('Data Analysis', 'data-analysis'),
+('Research', 'research');
 
--- Content Type Tags
-('SEO', 'seo', 'Search engine optimized content', true),
-('Viral', 'viral', 'Designed for viral reach', true),
-('Professional', 'professional', 'Business and corporate tone', false),
-('Casual', 'casual', 'Relaxed and friendly tone', false),
-('Technical', 'technical', 'Technical and detailed', false),
+-- ============================================================================
+-- SAMPLE PROMPTS (Optional - you can add your own)
+-- ============================================================================
 
--- Style Tags
-('Minimalist', 'minimalist', 'Clean and simple', false),
-('Detailed', 'detailed', 'Comprehensive and thorough', false),
-('Creative', 'creative', 'Innovative and unique', true),
-('Data-Driven', 'data-driven', 'Focused on metrics and data', false),
+-- Example: LinkedIn Post Generator
+INSERT INTO prompts (
+  title,
+  slug,
+  description,
+  content,
+  category_id,
+  tier,
+  is_featured,
+  is_published,
+  sort_order,
+  published_at
+)
+SELECT
+  'Professional LinkedIn Post Generator',
+  'professional-linkedin-post-generator',
+  'Create engaging LinkedIn posts that drive engagement and establish thought leadership',
+  'You are a LinkedIn content strategist. Write a professional LinkedIn post about [TOPIC] that:
+- Starts with a hook that grabs attention in the first line
+- Shares a personal story or insight
+- Provides 3-5 actionable takeaways
+- Ends with a question to encourage comments
+- Uses short paragraphs (2-3 lines max)
+- Includes relevant emojis sparingly
+- Stays under 1,300 characters
 
--- Image Tags
-('Photorealistic', 'photorealistic', 'Photo-like quality', true),
-('Artistic', 'artistic', 'Artistic and stylized', false),
-('Abstract', 'abstract', 'Abstract visual style', false),
-('Vintage', 'vintage', 'Retro and vintage aesthetics', false),
-('Modern', 'modern', 'Contemporary style', false),
-('Minimalist Design', 'minimalist-design', 'Clean minimal visuals', false),
+Topic: [INSERT YOUR TOPIC HERE]
 
--- Industry Tags
-('SaaS', 'saas', 'Software as a service', false),
-('E-commerce', 'ecommerce', 'Online retail', false),
-('B2B', 'b2b', 'Business to business', false),
-('B2C', 'b2c', 'Business to consumer', false),
-('Startup', 'startup', 'Early-stage companies', true),
-('Agency', 'agency', 'Marketing and creative agencies', false),
+Write the post now.',
+  id,
+  'free',
+  true,
+  true,
+  1,
+  NOW()
+FROM categories WHERE slug = 'linkedin-posts';
 
--- Platform Tags
-('ChatGPT', 'chatgpt', 'Optimized for ChatGPT', true),
-('Claude', 'claude', 'Optimized for Claude', true),
-('Gemini', 'gemini', 'Optimized for Gemini', true),
-('Midjourney', 'midjourney', 'Midjourney prompts', true),
-('Stable Diffusion', 'stable-diffusion', 'SD prompts', false),
+-- Link the prompt to tags
+INSERT INTO prompt_tags (prompt_id, tag_id)
+SELECT
+  p.id,
+  t.id
+FROM prompts p
+CROSS JOIN tags t
+WHERE p.slug = 'professional-linkedin-post-generator'
+AND t.slug IN ('beginner-friendly', 'professional', 'chatgpt', 'claude', 'content-creation', 'marketing');
 
--- Use Case Tags
-('Sales', 'sales', 'Sales and conversion', true),
-('Engagement', 'engagement', 'Audience engagement', false),
-('Lead Generation', 'lead-generation', 'Generate leads', true),
-('Brand Building', 'brand-building', 'Build brand awareness', false),
-('Education', 'education', 'Educational content', false),
-('Entertainment', 'entertainment', 'Entertaining content', false);
+-- Link the prompt to compatible models
+INSERT INTO prompt_models (prompt_id, model_id)
+SELECT
+  p.id,
+  m.id
+FROM prompts p
+CROSS JOIN ai_models m
+WHERE p.slug = 'professional-linkedin-post-generator'
+AND m.id IN ('gpt-4o', 'claude-3-5-sonnet-20241022', 'gemini-2.0-flash-exp');
+
+-- ============================================================================
+-- Example: Midjourney Product Photo Prompt
+-- ============================================================================
+
+INSERT INTO prompts (
+  title,
+  slug,
+  description,
+  content,
+  images,
+  category_id,
+  tier,
+  is_featured,
+  is_published,
+  sort_order,
+  published_at
+)
+SELECT
+  'E-commerce Product Photography',
+  'ecommerce-product-photography',
+  'Generate stunning product photos for e-commerce with perfect lighting and composition',
+  'Professional product photography of [PRODUCT DESCRIPTION], clean white background, studio lighting, 8k, ultra detailed, commercial photography, centered composition, soft shadows, high-end catalog style --ar 1:1 --style raw --v 6',
+  ARRAY[]::TEXT[],
+  id,
+  'free',
+  true,
+  true,
+  2,
+  NOW()
+FROM categories WHERE slug = 'product-photos';
+
+INSERT INTO prompt_tags (prompt_id, tag_id)
+SELECT
+  p.id,
+  t.id
+FROM prompts p
+CROSS JOIN tags t
+WHERE p.slug = 'ecommerce-product-photography'
+AND t.slug IN ('midjourney', 'professional', 'photorealistic', 'business');
+
+INSERT INTO prompt_models (prompt_id, model_id)
+SELECT
+  p.id,
+  m.id
+FROM prompts p
+CROSS JOIN ai_models m
+WHERE p.slug = 'ecommerce-product-photography'
+AND m.id = 'midjourney-v6';
