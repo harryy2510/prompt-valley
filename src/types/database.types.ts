@@ -1,9 +1,3 @@
-/**
- * Database types for PromptValley
- * Generated from Supabase schema
- * Last updated: 2025-01-30
- */
-
 export type Json =
   | string
   | number
@@ -12,324 +6,542 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[]
 
-// ============================================================================
-// ENUMS
-// ============================================================================
-
-export type AccessLevel = 'free' | 'pro'
-export type ModelCapability = 'text' | 'image' | 'video' | 'audio' | 'code' | 'vision' | 'multimodal'
-export type SubscriptionTier = 'free' | 'pro' | 'enterprise'
-
-// ============================================================================
-// TABLE TYPES
-// ============================================================================
-
-export interface AIProvider {
-  id: string
-  name: string
-  display_name: string
-  slug: string
-  logo_url: string | null
-  website_url: string | null
-  description: string | null
-  is_active: boolean
-  sort_order: number
-  created_at: string
-  updated_at: string
-}
-
-export interface AIModel {
-  id: string
-  provider_id: string
-  model_id: string
-  model_name: string
-  model_version: string | null
-  slug: string
-  capabilities: ModelCapability[]
-  context_window: number | null
-  max_output_tokens: number | null
-  cost_input_per_million: number | null
-  cost_output_per_million: number | null
-  description: string | null
-  is_active: boolean
-  is_featured: boolean
-  release_date: string | null
-  deprecation_date: string | null
-  sort_order: number
-  created_at: string
-  updated_at: string
-}
-
-export interface Category {
-  id: string
-  parent_id: string | null
-  name: string
-  slug: string
-  description: string | null
-  icon: string | null
-  color: string | null
-  is_active: boolean
-  sort_order: number
-  created_at: string
-  updated_at: string
-}
-
-export interface Tag {
-  id: string
-  name: string
-  slug: string
-  description: string | null
-  usage_count: number
-  is_featured: boolean
-  created_at: string
-  updated_at: string
-}
-
-export interface Prompt {
-  id: string
-  title: string
-  slug: string
-  description: string | null
-  content: string // PROTECTED - access controlled by access_level
-  category_id: string | null
-  access_level: AccessLevel
-  views_count: number
-  saves_count: number
-  copies_count: number
-  is_featured: boolean
-  is_published: boolean
-  featured_order: number | null
-  meta_title: string | null
-  meta_description: string | null
-  created_by: string | null
-  reviewed_by: string | null
-  reviewed_at: string | null
-  created_at: string
-  updated_at: string
-  published_at: string | null
-}
-
-export interface PromptImage {
-  id: string
-  prompt_id: string
-  image_url: string
-  alt_text: string | null
-  caption: string | null
-  sort_order: number
-  is_primary: boolean
-  width: number | null
-  height: number | null
-  file_size: number | null
-  created_at: string
-}
-
-export interface PromptTag {
-  prompt_id: string
-  tag_id: string
-  created_at: string
-}
-
-export interface PromptModel {
-  prompt_id: string
-  model_id: string
-  recommended_settings: Json | null
-  is_primary: boolean
-  created_at: string
-}
-
-export interface UserFavorite {
-  id: string
-  user_id: string
-  prompt_id: string
-  notes: string | null
-  created_at: string
-}
-
-export interface UserSubscription {
-  id: string
-  user_id: string
-  tier: SubscriptionTier
-  stripe_customer_id: string | null
-  stripe_subscription_id: string | null
-  stripe_price_id: string | null
-  is_active: boolean
-  current_period_start: string | null
-  current_period_end: string | null
-  cancel_at_period_end: boolean
-  canceled_at: string | null
-  created_at: string
-  updated_at: string
-}
-
-// ============================================================================
-// DATABASE INTERFACE
-// ============================================================================
-
-export interface Database {
+export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: '13.0.5'
+  }
   public: {
     Tables: {
-      ai_providers: {
-        Row: AIProvider
-        Insert: Omit<AIProvider, 'id' | 'created_at' | 'updated_at'> & {
-          id?: string
-          created_at?: string
-          updated_at?: string
-        }
-        Update: Partial<Omit<AIProvider, 'id' | 'created_at' | 'updated_at'>>
-      }
       ai_models: {
-        Row: AIModel
-        Insert: Omit<AIModel, 'id' | 'created_at' | 'updated_at'> & {
-          id?: string
+        Row: {
+          capabilities: Database['public']['Enums']['model_capability'][]
+          context_window: number | null
+          cost_input_per_million: number | null
+          cost_output_per_million: number | null
+          created_at: string
+          id: string
+          max_output_tokens: number | null
+          name: string
+          provider_id: string
+          updated_at: string
+        }
+        Insert: {
+          capabilities?: Database['public']['Enums']['model_capability'][]
+          context_window?: number | null
+          cost_input_per_million?: number | null
+          cost_output_per_million?: number | null
           created_at?: string
+          id: string
+          max_output_tokens?: number | null
+          name: string
+          provider_id: string
           updated_at?: string
         }
-        Update: Partial<Omit<AIModel, 'id' | 'created_at' | 'updated_at'>>
+        Update: {
+          capabilities?: Database['public']['Enums']['model_capability'][]
+          context_window?: number | null
+          cost_input_per_million?: number | null
+          cost_output_per_million?: number | null
+          created_at?: string
+          id?: string
+          max_output_tokens?: number | null
+          name?: string
+          provider_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'ai_models_provider_id_fkey'
+            columns: ['provider_id']
+            isOneToOne: false
+            referencedRelation: 'ai_providers'
+            referencedColumns: ['id']
+          },
+        ]
+      }
+      ai_providers: {
+        Row: {
+          created_at: string
+          id: string
+          logo_url: string | null
+          name: string
+          updated_at: string
+          website_url: string | null
+        }
+        Insert: {
+          created_at?: string
+          id: string
+          logo_url?: string | null
+          name: string
+          updated_at?: string
+          website_url?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          logo_url?: string | null
+          name?: string
+          updated_at?: string
+          website_url?: string | null
+        }
+        Relationships: []
       }
       categories: {
-        Row: Category
-        Insert: Omit<Category, 'id' | 'created_at' | 'updated_at'> & {
-          id?: string
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          parent_id: string | null
+          updated_at: string
+        }
+        Insert: {
           created_at?: string
+          id: string
+          name: string
+          parent_id?: string | null
           updated_at?: string
         }
-        Update: Partial<Omit<Category, 'id' | 'created_at' | 'updated_at'>>
-      }
-      tags: {
-        Row: Tag
-        Insert: Omit<Tag, 'id' | 'usage_count' | 'created_at' | 'updated_at'> & {
-          id?: string
-          usage_count?: number
+        Update: {
           created_at?: string
+          id?: string
+          name?: string
+          parent_id?: string | null
           updated_at?: string
         }
-        Update: Partial<Omit<Tag, 'id' | 'usage_count' | 'created_at' | 'updated_at'>>
-      }
-      prompts: {
-        Row: Prompt
-        Insert: Omit<Prompt, 'id' | 'views_count' | 'saves_count' | 'copies_count' | 'created_at' | 'updated_at'> & {
-          id?: string
-          views_count?: number
-          saves_count?: number
-          copies_count?: number
-          created_at?: string
-          updated_at?: string
-        }
-        Update: Partial<Omit<Prompt, 'id' | 'views_count' | 'saves_count' | 'copies_count' | 'created_at' | 'updated_at'>>
-      }
-      prompt_images: {
-        Row: PromptImage
-        Insert: Omit<PromptImage, 'id' | 'created_at'> & {
-          id?: string
-          created_at?: string
-        }
-        Update: Partial<Omit<PromptImage, 'id' | 'created_at'>>
-      }
-      prompt_tags: {
-        Row: PromptTag
-        Insert: Omit<PromptTag, 'created_at'> & {
-          created_at?: string
-        }
-        Update: never
+        Relationships: [
+          {
+            foreignKeyName: 'categories_parent_id_fkey'
+            columns: ['parent_id']
+            isOneToOne: false
+            referencedRelation: 'categories'
+            referencedColumns: ['id']
+          },
+        ]
       }
       prompt_models: {
-        Row: PromptModel
-        Insert: Omit<PromptModel, 'created_at'> & {
-          created_at?: string
+        Row: {
+          created_at: string
+          model_id: string
+          prompt_id: string
         }
-        Update: Partial<Omit<PromptModel, 'prompt_id' | 'model_id' | 'created_at'>>
-      }
-      user_favorites: {
-        Row: UserFavorite
-        Insert: Omit<UserFavorite, 'id' | 'created_at'> & {
-          id?: string
+        Insert: {
           created_at?: string
+          model_id: string
+          prompt_id: string
         }
-        Update: Partial<Omit<UserFavorite, 'id' | 'user_id' | 'prompt_id' | 'created_at'>>
-      }
-      user_subscriptions: {
-        Row: UserSubscription
-        Insert: Omit<UserSubscription, 'id' | 'created_at' | 'updated_at'> & {
-          id?: string
+        Update: {
           created_at?: string
+          model_id?: string
+          prompt_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'prompt_models_model_id_fkey'
+            columns: ['model_id']
+            isOneToOne: false
+            referencedRelation: 'ai_models'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'prompt_models_prompt_id_fkey'
+            columns: ['prompt_id']
+            isOneToOne: false
+            referencedRelation: 'prompts'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'prompt_models_prompt_id_fkey'
+            columns: ['prompt_id']
+            isOneToOne: false
+            referencedRelation: 'prompts_with_access'
+            referencedColumns: ['id']
+          },
+        ]
+      }
+      prompt_tags: {
+        Row: {
+          created_at: string
+          prompt_id: string
+          tag_id: string
+        }
+        Insert: {
+          created_at?: string
+          prompt_id: string
+          tag_id: string
+        }
+        Update: {
+          created_at?: string
+          prompt_id?: string
+          tag_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'prompt_tags_prompt_id_fkey'
+            columns: ['prompt_id']
+            isOneToOne: false
+            referencedRelation: 'prompts'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'prompt_tags_prompt_id_fkey'
+            columns: ['prompt_id']
+            isOneToOne: false
+            referencedRelation: 'prompts_with_access'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'prompt_tags_tag_id_fkey'
+            columns: ['tag_id']
+            isOneToOne: false
+            referencedRelation: 'tags'
+            referencedColumns: ['id']
+          },
+        ]
+      }
+      prompts: {
+        Row: {
+          category_id: string | null
+          content: string
+          copies_count: number
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          images: string[] | null
+          is_featured: boolean
+          is_published: boolean
+          published_at: string | null
+          saves_count: number
+          sort_order: number | null
+          tier: Database['public']['Enums']['tier']
+          title: string
+          updated_at: string
+          views_count: number
+        }
+        Insert: {
+          category_id?: string | null
+          content: string
+          copies_count?: number
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id: string
+          images?: string[] | null
+          is_featured?: boolean
+          is_published?: boolean
+          published_at?: string | null
+          saves_count?: number
+          sort_order?: number | null
+          tier?: Database['public']['Enums']['tier']
+          title: string
+          updated_at?: string
+          views_count?: number
+        }
+        Update: {
+          category_id?: string | null
+          content?: string
+          copies_count?: number
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          images?: string[] | null
+          is_featured?: boolean
+          is_published?: boolean
+          published_at?: string | null
+          saves_count?: number
+          sort_order?: number | null
+          tier?: Database['public']['Enums']['tier']
+          title?: string
+          updated_at?: string
+          views_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'prompts_category_id_fkey'
+            columns: ['category_id']
+            isOneToOne: false
+            referencedRelation: 'categories'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'prompts_created_by_fkey'
+            columns: ['created_by']
+            isOneToOne: false
+            referencedRelation: 'user_profiles'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'prompts_created_by_fkey'
+            columns: ['created_by']
+            isOneToOne: false
+            referencedRelation: 'users'
+            referencedColumns: ['id']
+          },
+        ]
+      }
+      tags: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id: string
+          name: string
           updated_at?: string
         }
-        Update: Partial<Omit<UserSubscription, 'id' | 'user_id' | 'created_at' | 'updated_at'>>
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_favorites: {
+        Row: {
+          created_at: string
+          id: string
+          prompt_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          prompt_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          prompt_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'user_favorites_prompt_id_fkey'
+            columns: ['prompt_id']
+            isOneToOne: false
+            referencedRelation: 'prompts'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'user_favorites_prompt_id_fkey'
+            columns: ['prompt_id']
+            isOneToOne: false
+            referencedRelation: 'prompts_with_access'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'user_favorites_user_id_fkey'
+            columns: ['user_id']
+            isOneToOne: false
+            referencedRelation: 'user_profiles'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'user_favorites_user_id_fkey'
+            columns: ['user_id']
+            isOneToOne: false
+            referencedRelation: 'users'
+            referencedColumns: ['id']
+          },
+        ]
+      }
+      users: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          email: string
+          id: string
+          name: string | null
+          stripe_cancel_at_period_end: boolean | null
+          stripe_canceled_at: string | null
+          stripe_current_period_end: string | null
+          stripe_current_period_start: string | null
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          stripe_subscription_status: string | null
+          tier: Database['public']['Enums']['tier']
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          email: string
+          id: string
+          name?: string | null
+          stripe_cancel_at_period_end?: boolean | null
+          stripe_canceled_at?: string | null
+          stripe_current_period_end?: string | null
+          stripe_current_period_start?: string | null
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          stripe_subscription_status?: string | null
+          tier?: Database['public']['Enums']['tier']
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          name?: string | null
+          stripe_cancel_at_period_end?: boolean | null
+          stripe_canceled_at?: string | null
+          stripe_current_period_end?: string | null
+          stripe_current_period_start?: string | null
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          stripe_subscription_status?: string | null
+          tier?: Database['public']['Enums']['tier']
+          updated_at?: string
+        }
+        Relationships: []
       }
     }
-    Views: Record<string, never>
-    Functions: {
-      user_has_pro_access: {
-        Args: { user_uuid: string }
-        Returns: boolean
-      }
-      get_prompt_content: {
-        Args: { prompt_uuid: string; user_uuid: string }
-        Returns: {
-          id: string
-          title: string
-          slug: string
-          description: string | null
+    Views: {
+      prompts_with_access: {
+        Row: {
+          category_id: string | null
           content: string | null
-          access_level: AccessLevel
-          has_access: boolean
-        }[]
+          copies_count: number | null
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          id: string | null
+          images: string[] | null
+          is_featured: boolean | null
+          is_published: boolean | null
+          published_at: string | null
+          saves_count: number | null
+          sort_order: number | null
+          tier: Database['public']['Enums']['tier'] | null
+          title: string | null
+          updated_at: string | null
+          views_count: number | null
+        }
+        Insert: {
+          category_id?: string | null
+          content?: never
+          copies_count?: number | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string | null
+          images?: string[] | null
+          is_featured?: boolean | null
+          is_published?: boolean | null
+          published_at?: string | null
+          saves_count?: number | null
+          sort_order?: number | null
+          tier?: Database['public']['Enums']['tier'] | null
+          title?: string | null
+          updated_at?: string | null
+          views_count?: number | null
+        }
+        Update: {
+          category_id?: string | null
+          content?: never
+          copies_count?: number | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string | null
+          images?: string[] | null
+          is_featured?: boolean | null
+          is_published?: boolean | null
+          published_at?: string | null
+          saves_count?: number | null
+          sort_order?: number | null
+          tier?: Database['public']['Enums']['tier'] | null
+          title?: string | null
+          updated_at?: string | null
+          views_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'prompts_category_id_fkey'
+            columns: ['category_id']
+            isOneToOne: false
+            referencedRelation: 'categories'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'prompts_created_by_fkey'
+            columns: ['created_by']
+            isOneToOne: false
+            referencedRelation: 'user_profiles'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'prompts_created_by_fkey'
+            columns: ['created_by']
+            isOneToOne: false
+            referencedRelation: 'users'
+            referencedColumns: ['id']
+          },
+        ]
+      }
+      user_profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string | null
+          email: string | null
+          id: string | null
+          name: string | null
+          tier: Database['public']['Enums']['tier'] | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string | null
+          email?: string | null
+          id?: string | null
+          name?: string | null
+          tier?: Database['public']['Enums']['tier'] | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string | null
+          email?: string | null
+          id?: string | null
+          name?: string | null
+          tier?: Database['public']['Enums']['tier'] | null
+        }
+        Relationships: []
+      }
+    }
+    Functions: {
+      get_user_billing_info: { Args: { user_id_param: string }; Returns: Json }
+      handle_stripe_webhook: { Args: { payload: Json }; Returns: undefined }
+      increment_prompt_copies: {
+        Args: { prompt_text_id: string }
+        Returns: undefined
       }
       increment_prompt_views: {
-        Args: { prompt_uuid: string }
-        Returns: void
+        Args: { prompt_text_id: string }
+        Returns: undefined
       }
-      increment_prompt_copies: {
-        Args: { prompt_uuid: string }
-        Returns: void
-      }
+      user_can_access_pro_content: { Args: never; Returns: boolean }
     }
     Enums: {
-      access_level: AccessLevel
-      model_capability: ModelCapability
-      subscription_tier: SubscriptionTier
+      model_capability: 'text' | 'image' | 'video' | 'code'
+      tier: 'free' | 'pro'
+    }
+    CompositeTypes: {
+      [_ in never]: never
     }
   }
 }
 
-// ============================================================================
-// HELPER TYPES
-// ============================================================================
+type DatabaseWithoutInternals = Omit<Database, '__InternalSupabase'>
 
-// Prompt with relations
-export interface PromptWithRelations extends Prompt {
-  category?: Category | null
-  tags?: Tag[]
-  models?: (PromptModel & { model: AIModel })[]
-  images?: PromptImage[]
-  is_favorited?: boolean
-}
-
-// AI Model with provider
-export interface AIModelWithProvider extends AIModel {
-  provider: AIProvider
-}
-
-// Category with children
-export interface CategoryWithChildren extends Category {
-  children?: Category[]
-  parent?: Category | null
-}
-
-// User with subscription
-export interface UserWithSubscription {
-  user_id: string
-  subscription?: UserSubscription | null
-  has_pro_access: boolean
-}
-
-// ============================================================================
-// TYPE HELPERS (for Supabase client)
-// ============================================================================
-
-type DatabaseWithoutInternals = Database
-
-type DefaultSchema = DatabaseWithoutInternals['public']
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, 'public'>]
 
 export type Tables<
   DefaultSchemaTableNameOrOptions extends
@@ -427,16 +639,28 @@ export type Enums<
     ? DefaultSchema['Enums'][DefaultSchemaEnumNameOrOptions]
     : never
 
-// ============================================================================
-// CONSTANTS
-// ============================================================================
+export type CompositeTypes<
+  PublicCompositeTypeNameOrOptions extends
+    | keyof DefaultSchema['CompositeTypes']
+    | { schema: keyof DatabaseWithoutInternals },
+  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes']
+    : never = never,
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes'][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema['CompositeTypes']
+    ? DefaultSchema['CompositeTypes'][PublicCompositeTypeNameOrOptions]
+    : never
 
 export const Constants = {
   public: {
     Enums: {
-      access_level: ['free', 'pro'] as const,
-      model_capability: ['text', 'image', 'video', 'audio', 'code', 'vision', 'multimodal'] as const,
-      subscription_tier: ['free', 'pro', 'enterprise'] as const,
+      model_capability: ['text', 'image', 'video', 'code'],
+      tier: ['free', 'pro'],
     },
   },
 } as const
