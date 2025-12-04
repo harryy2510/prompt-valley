@@ -3,7 +3,7 @@
 -- ============================================================================
 
 CREATE TABLE prompt_models (
-  prompt_id UUID NOT NULL REFERENCES prompts(id) ON DELETE CASCADE,
+  prompt_id TEXT NOT NULL REFERENCES prompts(id) ON DELETE CASCADE,
   model_id TEXT NOT NULL REFERENCES ai_models(id) ON DELETE CASCADE,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   PRIMARY KEY (prompt_id, model_id)
@@ -30,9 +30,21 @@ CREATE POLICY "Admins can insert prompt_models"
   ON prompt_models FOR INSERT
   WITH CHECK ((SELECT auth.jwt() ->> 'role') = 'admin');
 
+CREATE POLICY "Admins can update prompt_models"
+  ON prompt_models FOR UPDATE
+  USING ((SELECT auth.jwt() ->> 'role') = 'admin');
+
 CREATE POLICY "Admins can delete prompt_models"
   ON prompt_models FOR DELETE
   USING ((SELECT auth.jwt() ->> 'role') = 'admin');
+
+CREATE POLICY "Service role bypasses RLS on prompt_models"
+  ON prompt_models
+  AS PERMISSIVE
+  FOR ALL
+  TO service_role
+  USING (true)
+  WITH CHECK (true);
 
 -- Grants
 GRANT SELECT ON TABLE prompt_models TO anon, authenticated;

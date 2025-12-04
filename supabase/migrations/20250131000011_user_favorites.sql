@@ -5,7 +5,7 @@
 CREATE TABLE user_favorites (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  prompt_id UUID NOT NULL REFERENCES prompts(id) ON DELETE CASCADE,
+  prompt_id TEXT NOT NULL REFERENCES prompts(id) ON DELETE CASCADE,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   CONSTRAINT unique_user_favorite UNIQUE(user_id, prompt_id)
 );

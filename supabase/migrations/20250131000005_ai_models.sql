@@ -1,12 +1,13 @@
 -- ============================================================================
 -- AI_MODELS TABLE
+-- id column contains model identifiers from providers (e.g., 'gpt-4o', 'claude-3-5-sonnet-20241022', 'gemini-2.0-flash-exp')
+-- No validation constraint since third-party IDs may use dots, underscores, etc.
 -- ============================================================================
 
 CREATE TABLE ai_models (
   id TEXT PRIMARY KEY,
-  provider_id UUID NOT NULL REFERENCES ai_providers(id) ON DELETE CASCADE,
+  provider_id TEXT NOT NULL REFERENCES ai_providers(id) ON DELETE CASCADE,
   name TEXT NOT NULL,
-  slug TEXT NOT NULL UNIQUE,
   capabilities model_capability[] NOT NULL DEFAULT '{text}',
   context_window INTEGER,
   max_output_tokens INTEGER,
@@ -18,7 +19,6 @@ CREATE TABLE ai_models (
 
 -- Indexes
 CREATE INDEX idx_ai_models_provider_id ON ai_models(provider_id);
-CREATE INDEX idx_ai_models_slug ON ai_models(slug);
 CREATE INDEX idx_ai_models_capabilities ON ai_models USING GIN(capabilities);
 
 -- Trigger for updated_at

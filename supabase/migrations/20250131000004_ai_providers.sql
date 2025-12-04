@@ -1,19 +1,22 @@
 -- ============================================================================
 -- AI_PROVIDERS TABLE
+-- id column contains slug values (e.g., 'openai', 'google')
 -- ============================================================================
 
 CREATE TABLE ai_providers (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  id TEXT PRIMARY KEY CHECK (id ~ '^[a-z0-9]+(-[a-z0-9]+)*$'),
   name TEXT NOT NULL UNIQUE,
-  slug TEXT NOT NULL UNIQUE,
   logo_url TEXT,
   website_url TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- Indexes
-CREATE INDEX idx_ai_providers_slug ON ai_providers(slug);
+-- Trigger to auto-generate id from name if not provided
+CREATE TRIGGER generate_slug_ai_providers
+  BEFORE INSERT ON ai_providers
+  FOR EACH ROW
+  EXECUTE FUNCTION generate_slug_from_name();
 
 -- Trigger for updated_at
 CREATE TRIGGER set_updated_at_ai_providers

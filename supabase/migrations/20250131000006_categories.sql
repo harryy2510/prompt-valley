@@ -1,12 +1,12 @@
 -- ============================================================================
 -- CATEGORIES TABLE
+-- id column contains slug values (e.g., 'writing', 'linkedin-post')
 -- ============================================================================
 
 CREATE TABLE categories (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  parent_id UUID REFERENCES categories(id) ON DELETE CASCADE,
+  id TEXT PRIMARY KEY CHECK (id ~ '^[a-z0-9]+(-[a-z0-9]+)*$'),
+  parent_id TEXT REFERENCES categories(id) ON DELETE CASCADE,
   name TEXT NOT NULL,
-  slug TEXT NOT NULL UNIQUE,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   CONSTRAINT no_self_reference CHECK (id != parent_id)
@@ -14,7 +14,12 @@ CREATE TABLE categories (
 
 -- Indexes
 CREATE INDEX idx_categories_parent_id ON categories(parent_id);
-CREATE INDEX idx_categories_slug ON categories(slug);
+
+-- Trigger to auto-generate id from name if not provided
+CREATE TRIGGER generate_slug_categories
+  BEFORE INSERT ON categories
+  FOR EACH ROW
+  EXECUTE FUNCTION generate_slug_from_name();
 
 -- Trigger for updated_at
 CREATE TRIGGER set_updated_at_categories
