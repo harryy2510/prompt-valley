@@ -8,8 +8,8 @@
 -- ============================================================================
 
 INSERT INTO ai_providers (id, name, logo_url, website_url) VALUES
-('openai', 'OpenAI', 'https://cdn.openai.com/assets/favicon-32x32.png', 'https://openai.com'),
-('google', 'Google', 'https://www.google.com/favicon.ico', 'https://ai.google');
+('openai', 'OpenAI', 'ai-models/openai.svg', 'https://openai.com'),
+('google', 'Google', 'ai-models/gemini.svg', 'https://ai.google');
 
 -- ============================================================================
 -- AI MODELS (Only ChatGPT and Gemini from images)
