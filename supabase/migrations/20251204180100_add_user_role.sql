@@ -1,19 +1,17 @@
--- Create user_role enum (skip if already exists)
-DO $$ BEGIN
-  CREATE TYPE user_role AS ENUM ('user', 'admin');
-EXCEPTION
-  WHEN duplicate_object THEN NULL;
-END $$;
+-- ============================================================================
+-- ADD USER ROLE SYSTEM
+-- ============================================================================
+-- This migration adds a role column to users and syncs it to JWT claims
 
--- Add role column to users table (skip if already exists)
-DO $$ BEGIN
-  ALTER TABLE users ADD COLUMN role user_role NOT NULL DEFAULT 'user';
-EXCEPTION
-  WHEN duplicate_column THEN NULL;
-END $$;
+-- Create user_role enum
+CREATE TYPE user_role AS ENUM ('user', 'admin');
 
--- Create index for role lookups (skip if already exists)
-CREATE INDEX IF NOT EXISTS idx_users_role ON users(role);
+-- Add role column to users table
+ALTER TABLE users
+ADD COLUMN role user_role NOT NULL DEFAULT 'user';
+
+-- Create index for role lookups
+CREATE INDEX idx_users_role ON users(role);
 
 -- ============================================================================
 -- SYNC ROLE FROM public.users TO auth.users (for JWT claims)
@@ -47,12 +45,14 @@ CREATE TRIGGER trg_sync_user_role_to_jwt
   EXECUTE FUNCTION sync_user_role_to_jwt();
 
 -- ============================================================================
--- UPDATE EXISTING sync_auth_user_to_public TO INCLUDE ROLE SYNC
+-- UPDATE EXISTING sync_auth_user_to_public TO INCLUDE ROLE
 -- ============================================================================
 
--- Update the existing function to also sync the role back to JWT on creation
-DROP FUNCTION IF EXISTS sync_auth_user_to_public() CASCADE;
+-- Drop the existing function and its trigger
+DROP TRIGGER IF EXISTS trg_sync_auth_users_to_public ON auth.users;
+DROP FUNCTION IF EXISTS sync_auth_user_to_public();
 
+-- Recreate the function with role support
 CREATE OR REPLACE FUNCTION sync_auth_user_to_public()
 RETURNS TRIGGER
 LANGUAGE plpgsql
