@@ -31,15 +31,15 @@ CREATE POLICY "Anyone can view tags"
 
 CREATE POLICY "Admins can insert tags"
   ON tags FOR INSERT
-  WITH CHECK ((SELECT auth.jwt() ->> 'role') = 'admin');
+  WITH CHECK ((SELECT auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
 
 CREATE POLICY "Admins can update tags"
   ON tags FOR UPDATE
-  USING ((SELECT auth.jwt() ->> 'role') = 'admin');
+  USING ((SELECT auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
 
 CREATE POLICY "Admins can delete tags"
   ON tags FOR DELETE
-  USING ((SELECT auth.jwt() ->> 'role') = 'admin');
+  USING ((SELECT auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
 
 -- Grants
 GRANT SELECT ON TABLE tags TO anon, authenticated;

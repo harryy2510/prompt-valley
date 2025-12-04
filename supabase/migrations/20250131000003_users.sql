@@ -8,6 +8,7 @@ CREATE TABLE users (
   name TEXT,
   avatar_url TEXT,
   tier tier NOT NULL DEFAULT 'free',
+  role user_role NOT NULL DEFAULT 'user',
   -- Stripe subscription fields
   stripe_customer_id TEXT UNIQUE,
   stripe_subscription_id TEXT,
@@ -22,6 +23,7 @@ CREATE TABLE users (
 
 -- Indexes
 CREATE INDEX idx_users_email ON users(email);
+CREATE INDEX idx_users_role ON users(role);
 CREATE INDEX idx_users_stripe_customer_id ON users(stripe_customer_id);
 CREATE INDEX idx_users_stripe_subscription_status ON users(stripe_subscription_status);
 
@@ -39,12 +41,13 @@ SECURITY DEFINER
 SET search_path = ''
 AS $$
 BEGIN
-  INSERT INTO public.users (id, email, name, avatar_url)
+  INSERT INTO public.users (id, email, name, avatar_url, role)
   VALUES (
     NEW.id,
     NEW.email,
     NEW.raw_user_meta_data->>'name',
-    NEW.raw_user_meta_data->>'avatar_url'
+    NEW.raw_user_meta_data->>'avatar_url',
+    'user'  -- Default role for new users
   )
   ON CONFLICT (id) DO UPDATE
   SET
@@ -62,13 +65,42 @@ CREATE TRIGGER trg_sync_auth_users_to_public
   FOR EACH ROW
   EXECUTE FUNCTION sync_auth_user_to_public();
 
+-- ============================================================================
+-- SYNC ROLE TO JWT CLAIMS
+-- ============================================================================
+-- When role changes in public.users, sync it to auth.users.raw_app_meta_data
+-- so it appears in JWT claims for RLS policies
+
+CREATE OR REPLACE FUNCTION sync_user_role_to_jwt()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = ''
+AS $$
+BEGIN
+  -- Update auth.users app_metadata with the role
+  UPDATE auth.users
+  SET raw_app_meta_data =
+    COALESCE(raw_app_meta_data, '{}'::jsonb) ||
+    jsonb_build_object('role', NEW.role::text)
+  WHERE id = NEW.id;
+
+  RETURN NEW;
+END;
+$$;
+
+CREATE TRIGGER trg_sync_user_role_to_jwt
+  AFTER INSERT OR UPDATE OF role ON users
+  FOR EACH ROW
+  EXECUTE FUNCTION sync_user_role_to_jwt();
+
 -- RLS
 ALTER TABLE users ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Users can view their own full profile"
   ON users FOR SELECT
   TO authenticated
-  USING (id = (SELECT auth.uid()) OR (SELECT auth.jwt() ->> 'role') = 'admin');
+  USING (id = (SELECT auth.uid()) OR (SELECT auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
 
 CREATE POLICY "Users can update their own profile"
   ON users FOR UPDATE
@@ -78,11 +110,11 @@ CREATE POLICY "Users can update their own profile"
 
 CREATE POLICY "Admins can insert users"
   ON users FOR INSERT
-  WITH CHECK ((SELECT auth.jwt() ->> 'role') = 'admin');
+  WITH CHECK ((SELECT auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
 
 CREATE POLICY "Admins can delete users"
   ON users FOR DELETE
-  USING ((SELECT auth.jwt() ->> 'role') = 'admin');
+  USING ((SELECT auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
 
 -- ============================================================================
 -- PUBLIC USER PROFILES VIEW

@@ -87,7 +87,7 @@ DECLARE
   result JSON;
 BEGIN
   -- Security check: Only return data if user is requesting their own info
-  IF auth.uid() != user_id_param AND (SELECT auth.jwt() ->> 'role') != 'admin' THEN
+  IF auth.uid() != user_id_param AND (SELECT auth.jwt() -> 'app_metadata' ->> 'role') != 'admin' THEN
     RAISE EXCEPTION 'Access denied: You can only view your own billing information';
   END IF;
 

@@ -54,7 +54,7 @@ SET search_path = ''
 AS $$
 BEGIN
   -- Admins can access everything
-  IF (SELECT auth.jwt() ->> 'role') = 'admin' THEN
+  IF (SELECT auth.jwt() -> 'app_metadata' ->> 'role') = 'admin' THEN
     RETURN true;
   END IF;
 
@@ -99,19 +99,19 @@ ALTER TABLE prompts ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Anyone can view published prompts"
   ON prompts FOR SELECT
-  USING (is_published = true OR (SELECT auth.jwt() ->> 'role') = 'admin');
+  USING (is_published = true OR (SELECT auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
 
 CREATE POLICY "Admins can insert prompts"
   ON prompts FOR INSERT
-  WITH CHECK ((SELECT auth.jwt() ->> 'role') = 'admin');
+  WITH CHECK ((SELECT auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
 
 CREATE POLICY "Admins can update prompts"
   ON prompts FOR UPDATE
-  USING ((SELECT auth.jwt() ->> 'role') = 'admin');
+  USING ((SELECT auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
 
 CREATE POLICY "Admins can delete prompts"
   ON prompts FOR DELETE
-  USING ((SELECT auth.jwt() ->> 'role') = 'admin');
+  USING ((SELECT auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
 
 -- View with tier-based content masking
 -- Free users can see pro prompts exist, but content is masked

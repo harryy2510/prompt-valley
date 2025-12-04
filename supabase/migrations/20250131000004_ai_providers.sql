@@ -33,15 +33,15 @@ CREATE POLICY "Anyone can view ai_providers"
 
 CREATE POLICY "Admins can insert ai_providers"
   ON ai_providers FOR INSERT
-  WITH CHECK ((SELECT auth.jwt() ->> 'role') = 'admin');
+  WITH CHECK ((SELECT auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
 
 CREATE POLICY "Admins can update ai_providers"
   ON ai_providers FOR UPDATE
-  USING ((SELECT auth.jwt() ->> 'role') = 'admin');
+  USING ((SELECT auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
 
 CREATE POLICY "Admins can delete ai_providers"
   ON ai_providers FOR DELETE
-  USING ((SELECT auth.jwt() ->> 'role') = 'admin');
+  USING ((SELECT auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
 
 -- Grants
 GRANT SELECT ON TABLE ai_providers TO anon, authenticated;

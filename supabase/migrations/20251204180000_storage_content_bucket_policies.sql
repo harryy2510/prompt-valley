@@ -1,18 +1,18 @@
 -- Storage policies for content-bucket
 -- Note: Bucket already exists from Supabase dashboard
--- Uses JWT-based role checking for consistency with other policies
+-- Uses JWT app_metadata.role for admin checks
 
 -- Allow public read access to all files
 CREATE POLICY "Public read access for content-bucket"
 ON storage.objects FOR SELECT
 USING (bucket_id = 'content-bucket');
 
--- Allow admins to upload (checks JWT claims)
+-- Allow admins to upload (checks JWT app_metadata.role)
 CREATE POLICY "Admins can upload to content-bucket"
 ON storage.objects FOR INSERT
 WITH CHECK (
   bucket_id = 'content-bucket'
-  AND (SELECT auth.jwt() ->> 'role') = 'admin'
+  AND (SELECT auth.jwt() -> 'app_metadata' ->> 'role') = 'admin'
 );
 
 -- Allow service role full access (for backend operations)
@@ -28,7 +28,7 @@ CREATE POLICY "Admins can update content-bucket files"
 ON storage.objects FOR UPDATE
 USING (
   bucket_id = 'content-bucket'
-  AND (SELECT auth.jwt() ->> 'role') = 'admin'
+  AND (SELECT auth.jwt() -> 'app_metadata' ->> 'role') = 'admin'
 );
 
 -- Allow admins to delete files
@@ -36,5 +36,5 @@ CREATE POLICY "Admins can delete from content-bucket"
 ON storage.objects FOR DELETE
 USING (
   bucket_id = 'content-bucket'
-  AND (SELECT auth.jwt() ->> 'role') = 'admin'
+  AND (SELECT auth.jwt() -> 'app_metadata' ->> 'role') = 'admin'
 );

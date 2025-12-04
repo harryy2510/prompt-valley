@@ -68,15 +68,15 @@ CREATE POLICY "Anyone can view categories"
 
 CREATE POLICY "Admins can insert categories"
   ON categories FOR INSERT
-  WITH CHECK ((SELECT auth.jwt() ->> 'role') = 'admin');
+  WITH CHECK ((SELECT auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
 
 CREATE POLICY "Admins can update categories"
   ON categories FOR UPDATE
-  USING ((SELECT auth.jwt() ->> 'role') = 'admin');
+  USING ((SELECT auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
 
 CREATE POLICY "Admins can delete categories"
   ON categories FOR DELETE
-  USING ((SELECT auth.jwt() ->> 'role') = 'admin');
+  USING ((SELECT auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
 
 -- Grants
 GRANT SELECT ON TABLE categories TO anon, authenticated;
