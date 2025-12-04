@@ -19,6 +19,19 @@ serve(async (req) => {
   }
 
   try {
+    // Support both GET (with query param) and POST (with body)
+    const url = new URL(req.url)
+    const priceId = req.method === 'GET'
+      ? url.searchParams.get('priceId')
+      : (await req.json()).priceId
+
+    if (!priceId) {
+      return new Response(JSON.stringify({ error: 'priceId is required' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
+
     // Get user from auth header
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
@@ -77,12 +90,12 @@ serve(async (req) => {
         .eq('id', user.id)
     }
 
-    // Create checkout session
+    // Create checkout session with client-provided price ID
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       line_items: [
         {
-          price: Deno.env.get('STRIPE_PRICE_ID')!, // Set this secret
+          price: priceId,
           quantity: 1,
         },
       ],
@@ -94,9 +107,15 @@ serve(async (req) => {
       },
     })
 
-    return new Response(JSON.stringify({ url: session.url }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    })
+    // If GET request, redirect directly to Stripe
+    // If POST request, return JSON with URL
+    if (req.method === 'GET') {
+      return Response.redirect(session.url!, 303)
+    } else {
+      return new Response(JSON.stringify({ url: session.url }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
   } catch (error: any) {
     console.error('Error creating checkout session:', error)
     return new Response(JSON.stringify({ error: error.message }), {

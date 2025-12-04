@@ -19,7 +19,8 @@ import { useState } from 'react'
  * This runs on the server to keep your Supabase function URL secure
  */
 const createCheckoutSession = createServerFn({ method: 'POST' })
-  .handler(async () => {
+  .validator((data: { priceId: string }) => data)
+  .handler(async ({ data }) => {
     const supabase = getSupabaseClient()
 
     // Get current user session
@@ -29,7 +30,7 @@ const createCheckoutSession = createServerFn({ method: 'POST' })
       throw new Error('Unauthorized')
     }
 
-    // Call your Supabase Edge Function
+    // Call your Supabase Edge Function with the price ID
     const response = await fetch(
       `${process.env.SUPABASE_URL}/functions/v1/create-checkout-session`,
       {
@@ -38,6 +39,7 @@ const createCheckoutSession = createServerFn({ method: 'POST' })
           Authorization: `Bearer ${session.access_token}`,
           'Content-Type': 'application/json',
         },
+        body: JSON.stringify({ priceId: data.priceId }),
       }
     )
 
@@ -128,21 +130,28 @@ export const Route = createFileRoute('/billing')({
 // COMPONENT
 // ============================================================================
 
+// Define your Stripe price IDs (get these from Stripe Dashboard)
+const STRIPE_PRICES = {
+  monthly: 'price_xxxxx', // Replace with your monthly price ID
+  yearly: 'price_yyyyy',  // Replace with your yearly price ID
+} as const
+
 function BillingPage() {
   const { billingInfo } = Route.useLoaderData()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [selectedPrice, setSelectedPrice] = useState<'monthly' | 'yearly'>('monthly')
 
   /**
    * Handle upgrade to Pro
    */
-  const handleUpgrade = async () => {
+  const handleUpgrade = async (priceId: string) => {
     try {
       setLoading(true)
       setError(null)
 
       // Create checkout session and get redirect URL
-      const checkoutUrl = await createCheckoutSession()
+      const checkoutUrl = await createCheckoutSession({ data: { priceId } })
 
       // Redirect to Stripe Checkout
       window.location.href = checkoutUrl

@@ -64,9 +64,15 @@ serve(async (req) => {
       return_url: `${Deno.env.get('APP_URL')}/billing`,
     })
 
-    return new Response(JSON.stringify({ url: session.url }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    })
+    // If GET request, redirect directly to Stripe
+    // If POST request, return JSON with URL
+    if (req.method === 'GET') {
+      return Response.redirect(session.url, 303)
+    } else {
+      return new Response(JSON.stringify({ url: session.url }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
   } catch (error: any) {
     console.error('Error creating portal session:', error)
     return new Response(JSON.stringify({ error: error.message }), {
