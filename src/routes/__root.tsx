@@ -12,9 +12,9 @@ import appCss from '../styles.css?url'
 
 import type { QueryClient } from '@tanstack/react-query'
 import type { PropsWithChildren } from 'react'
-import type { Session, User } from '@supabase/supabase-js'
+import type { User } from '@supabase/supabase-js'
 import { seo } from '@/utils/seo'
-import { sessionQueryOptions } from '@/actions/auth'
+import { userQueryOptions, useAuthStateListener } from '@/actions/auth'
 
 // ============================================
 // Router Context Type
@@ -22,7 +22,6 @@ import { sessionQueryOptions } from '@/actions/auth'
 
 export interface RouterContext {
   queryClient: QueryClient
-  session: Session | null
   user: User | null
 }
 
@@ -33,21 +32,14 @@ export interface RouterContext {
 export const Route = createRootRouteWithContext<RouterContext>()({
   beforeLoad: async ({ context }) => {
     // Use React Query to fetch and cache the session
-    const authData = await context.queryClient.ensureQueryData(
-      sessionQueryOptions(),
-    )
+    const user = await context.queryClient.ensureQueryData(userQueryOptions())
 
-    return {
-      session: authData.session,
-      user: authData.user,
-    }
+    return { user }
   },
 
   head: () => ({
     meta: [
-      {
-        charSet: 'utf-8',
-      },
+      { charSet: 'utf-8' },
       {
         name: 'viewport',
         content: 'width=device-width, initial-scale=1',
@@ -105,23 +97,24 @@ export const Route = createRootRouteWithContext<RouterContext>()({
 // ============================================
 
 function RootDocument({ children }: PropsWithChildren) {
+  useAuthStateListener()
   return (
     <html lang="en">
       <head>
         <HeadContent />
-        {/*<script*/}
-        {/*  dangerouslySetInnerHTML={{*/}
-        {/*    __html: `*/}
-        {/*      (function() {*/}
-        {/*        const savedTheme = localStorage.getItem('theme');*/}
-        {/*        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;*/}
-        {/*        if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {*/}
-        {/*          document.documentElement.classList.add('dark');*/}
-        {/*        }*/}
-        {/*      })();*/}
-        {/*    `,*/}
-        {/*  }}*/}
-        {/*/>*/}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                const savedTheme = localStorage.getItem('prompt-valley-theme');
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+                  document.documentElement.classList.add('dark');
+                }
+              })();
+            `,
+          }}
+        />
       </head>
       <body>
         {children}

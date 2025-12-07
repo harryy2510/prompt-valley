@@ -1,12 +1,22 @@
-import { getCookies, setCookie } from '@tanstack/react-start/server'
 import { createServerClient } from '@supabase/ssr'
-import { Database } from '@/types/database.types'
+import { getCookies, setCookie } from '@tanstack/react-start/server'
 
+import type { Database } from '@/types/database.types'
+
+import { STORAGE_KEY } from './constants'
+
+/**
+ * Server-side Supabase with cookie-based session management
+ * Uses service role key for data operations (bypasses RLS)
+ */
 export function getSupabaseServerClient() {
-  return createServerClient<Database, 'public'>(
-    process.env.VITE_SUPABASE_URL!,
-    process.env.VITE_SUPABASE_ANON_KEY!,
+  return createServerClient<Database>(
+    process.env.VITE_SUPABASE_URL,
+    process.env.VITE_SUPABASE_PUBLISHABLE_KEY,
     {
+      auth: {
+        storageKey: STORAGE_KEY,
+      },
       cookies: {
         getAll() {
           return Object.entries(getCookies()).map(([name, value]) => ({

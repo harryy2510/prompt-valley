@@ -7,12 +7,12 @@ import { createFileRoute, redirect } from '@tanstack/react-router'
 export const Route = createFileRoute('/__authed')({
   beforeLoad: async ({ context, location }) => {
     // Session is already in context from root route
-    if (!context.session) {
+    if (!context.user) {
       throw redirect({
-        to: '/sign-in',
         search: {
-          redirect: location.href,
+          to: location.href,
         },
+        to: '/auth',
       })
     }
   },

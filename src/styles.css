@@ -1,10 +1,20 @@
 @import 'tailwindcss';
-@import './fonts.css';
 @import 'tw-animate-css';
 
 @plugin '@tailwindcss/typography';
 
 @custom-variant dark (&:is(.dark *));
+
+@font-face {
+  font-family: 'Satoshi-Variable';
+  src:
+    url('/fonts/Satoshi-Variable.woff2') format('woff2'),
+    url('/fonts/Satoshi-Variable.woff') format('woff'),
+    url('/fonts/Satoshi-Variable.ttf') format('truetype');
+  font-weight: 300 900;
+  font-display: swap;
+  font-style: normal;
+}
 
 /* ============================================================================
    CSS VARIABLES - DESIGN TOKENS
@@ -14,44 +24,44 @@
   /* -------------------------------------------------------------------------
      Color Palette - Primary (Purple/Indigo)
      ------------------------------------------------------------------------- */
-  --color-primary-50: #F2F5FF;
-  --color-primary-100: #E1E7FC;
-  --color-primary-200: #C0C8F8;
-  --color-primary-300: #9EA6F4;
-  --color-primary-400: #7C82F1;
-  --color-primary-500: #5A5AED;
-  --color-primary-600: #4D44C8;
-  --color-primary-700: #3F30A1;
-  --color-primary-800: #311F75;
+  --color-primary-50: #f2f5ff;
+  --color-primary-100: #e1e7fc;
+  --color-primary-200: #c0c8f8;
+  --color-primary-300: #9ea6f4;
+  --color-primary-400: #7c82f1;
+  --color-primary-500: #5a5aed;
+  --color-primary-600: #4d44c8;
+  --color-primary-700: #3f30a1;
+  --color-primary-800: #311f75;
   --color-primary-900: #201147;
 
   /* -------------------------------------------------------------------------
      Color Palette - Secondary (Warm/Gold)
      ------------------------------------------------------------------------- */
-  --color-secondary-50: #FCFAF2;
-  --color-secondary-100: #F8F3E5;
-  --color-secondary-200: #F4ECD6;
-  --color-secondary-300: #F0E5C6;
-  --color-secondary-400: #ECDFB6;
-  --color-secondary-500: #E9D8A6;
-  --color-secondary-600: #CDB386;
-  --color-secondary-700: #AF8D69;
-  --color-secondary-800: #8A6D4C;
-  --color-secondary-900: #654D30;
+  --color-secondary-50: #fcfaf2;
+  --color-secondary-100: #f8f3e5;
+  --color-secondary-200: #f4ecd6;
+  --color-secondary-300: #f0e5c6;
+  --color-secondary-400: #ecdfb6;
+  --color-secondary-500: #e9d8a6;
+  --color-secondary-600: #cdb386;
+  --color-secondary-700: #af8d69;
+  --color-secondary-800: #8a6d4c;
+  --color-secondary-900: #654d30;
 
   /* -------------------------------------------------------------------------
      Color Palette - Gray
      ------------------------------------------------------------------------- */
-  --color-gray-50: #F5F6F7;
-  --color-gray-100: #ECECF1;
-  --color-gray-200: #D3D3E0;
-  --color-gray-300: #9898AE;
-  --color-gray-400: #70708A;
-  --color-gray-500: #4A4A65;
+  --color-gray-50: #f5f6f7;
+  --color-gray-100: #ececf1;
+  --color-gray-200: #d3d3e0;
+  --color-gray-300: #9898ae;
+  --color-gray-400: #70708a;
+  --color-gray-500: #4a4a65;
   --color-gray-600: #383853;
-  --color-gray-700: #27273F;
+  --color-gray-700: #27273f;
   --color-gray-800: #181829;
-  --color-gray-900: #0A0A12;
+  --color-gray-900: #0a0a12;
 
   /* -------------------------------------------------------------------------
      Radius
@@ -66,23 +76,23 @@
   /* -------------------------------------------------------------------------
      Light Theme - Semantic Colors
      ------------------------------------------------------------------------- */
-  --background: #F5F5FA;
-  --background-subtle: #FFFFFF;
+  --background: #f5f5fa;
+  --background-subtle: #ffffff;
   --foreground: #000128;
-  --foreground-secondary: rgba(0, 1, 40, 0.60);
+  --foreground-secondary: rgba(0, 1, 40, 0.6);
   --foreground-disabled: rgba(0, 1, 40, 0.38);
-  --outline: #DFDFE5;
+  --outline: #dfdfe5;
 
   /* Component colors */
-  --card: #FFFFFF;
+  --card: #ffffff;
   --card-foreground: #000128;
-  --popover: #FFFFFF;
+  --popover: #ffffff;
   --popover-foreground: #000128;
 
   /* Primary button/accent */
   --primary: var(--color-primary-500);
   --primary-hover: var(--color-primary-600);
-  --primary-foreground: #FFFFFF;
+  --primary-foreground: #ffffff;
 
   /* Secondary button */
   --secondary: var(--color-gray-100);
@@ -98,15 +108,15 @@
   --accent-foreground: var(--color-primary-700);
 
   /* Destructive */
-  --destructive: #DC2626;
-  --destructive-foreground: #FFFFFF;
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
 
   /* Success */
-  --success: #16A34A;
-  --success-foreground: #FFFFFF;
+  --success: #16a34a;
+  --success-foreground: #ffffff;
 
   /* Warning */
-  --warning: #F59E0B;
+  --warning: #f59e0b;
   --warning-foreground: #000128;
 
   /* Border & Input */
@@ -121,26 +131,26 @@
      ------------------------------------------------------------------------- */
   --background: var(--color-gray-900);
   --background-subtle: var(--color-gray-800);
-  --foreground: #FFFFFF;
-  --foreground-secondary: rgba(255, 255, 255, 0.70);
+  --foreground: #ffffff;
+  --foreground-secondary: rgba(255, 255, 255, 0.7);
   --foreground-disabled: rgba(255, 255, 255, 0.38);
   --outline: var(--color-gray-700);
 
   /* Component colors */
   --card: var(--color-gray-800);
-  --card-foreground: #FFFFFF;
+  --card-foreground: #ffffff;
   --popover: var(--color-gray-800);
-  --popover-foreground: #FFFFFF;
+  --popover-foreground: #ffffff;
 
   /* Primary button/accent */
   --primary: var(--color-primary-500);
   --primary-hover: var(--color-primary-400);
-  --primary-foreground: #FFFFFF;
+  --primary-foreground: #ffffff;
 
   /* Secondary button */
   --secondary: var(--color-gray-700);
   --secondary-hover: var(--color-gray-600);
-  --secondary-foreground: #FFFFFF;
+  --secondary-foreground: #ffffff;
 
   /* Muted */
   --muted: var(--color-gray-800);
@@ -151,15 +161,15 @@
   --accent-foreground: var(--color-primary-300);
 
   /* Destructive */
-  --destructive: #EF4444;
-  --destructive-foreground: #FFFFFF;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
 
   /* Success */
-  --success: #22C55E;
-  --success-foreground: #FFFFFF;
+  --success: #22c55e;
+  --success-foreground: #ffffff;
 
   /* Warning */
-  --warning: #FBBF24;
+  --warning: #fbbf24;
   --warning-foreground: #000128;
 
   /* Border & Input */
@@ -174,7 +184,9 @@
 
 @theme inline {
   /* Font Family */
-  --font-sans: 'Satoshi-Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-sans:
+    'Satoshi-Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    sans-serif;
 
   /* Colors - Palette */
   --color-primary-50: var(--color-primary-50);
@@ -313,7 +325,9 @@
 
   body {
     @apply m-0 bg-background text-foreground font-sans;
-    font-feature-settings: 'rlig' 1, 'calt' 1;
+    font-feature-settings:
+      'rlig' 1,
+      'calt' 1;
     font-size: 16px;
     line-height: 22px;
   }
@@ -544,18 +558,18 @@
   --tw-prose-td-borders: var(--outline);
 
   /* Dark mode */
-  --tw-prose-invert-body: #FFFFFF;
-  --tw-prose-invert-headings: #FFFFFF;
-  --tw-prose-invert-lead: rgba(255, 255, 255, 0.70);
+  --tw-prose-invert-body: #ffffff;
+  --tw-prose-invert-headings: #ffffff;
+  --tw-prose-invert-lead: rgba(255, 255, 255, 0.7);
   --tw-prose-invert-links: var(--color-primary-400);
-  --tw-prose-invert-bold: #FFFFFF;
+  --tw-prose-invert-bold: #ffffff;
   --tw-prose-invert-counters: var(--color-gray-400);
   --tw-prose-invert-bullets: var(--color-gray-500);
   --tw-prose-invert-hr: var(--color-gray-700);
-  --tw-prose-invert-quotes: #FFFFFF;
+  --tw-prose-invert-quotes: #ffffff;
   --tw-prose-invert-quote-borders: var(--color-primary-500);
-  --tw-prose-invert-captions: rgba(255, 255, 255, 0.70);
-  --tw-prose-invert-code: #FFFFFF;
+  --tw-prose-invert-captions: rgba(255, 255, 255, 0.7);
+  --tw-prose-invert-code: #ffffff;
   --tw-prose-invert-pre-code: var(--color-gray-100);
   --tw-prose-invert-pre-bg: var(--color-gray-900);
   --tw-prose-invert-th-borders: var(--color-gray-700);
@@ -564,65 +578,75 @@
 
 /* Prose typography overrides to match Satoshi font */
 .prose {
-  font-family: 'Satoshi-Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family:
+    'Satoshi-Variable',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    sans-serif;
 }
 
-.prose :where(h1):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+.prose :where(h1):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
   font-size: 32px;
   line-height: 38px;
   font-weight: 700;
   letter-spacing: -0.01em;
 }
 
-.prose :where(h2):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+.prose :where(h2):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
   font-size: 24px;
   line-height: 28px;
   font-weight: 700;
 }
 
-.prose :where(h3):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+.prose :where(h3):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
   font-size: 20px;
   line-height: 1.4;
   font-weight: 600;
 }
 
-.prose :where(h4):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+.prose :where(h4):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
   font-size: 18px;
   line-height: 1.4;
   font-weight: 600;
 }
 
-.prose :where(a):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+.prose :where(a):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
   text-decoration: underline;
   text-underline-offset: 2px;
   transition: color 0.15s ease;
 }
 
-.prose :where(a):not(:where([class~="not-prose"], [class~="not-prose"] *)):hover {
+.prose
+  :where(a):not(:where([class~='not-prose'], [class~='not-prose'] *)):hover {
   color: var(--color-primary-700);
 }
 
-.dark .prose :where(a):not(:where([class~="not-prose"], [class~="not-prose"] *)):hover {
+.dark
+  .prose
+  :where(a):not(:where([class~='not-prose'], [class~='not-prose'] *)):hover {
   color: var(--color-primary-300);
 }
 
-.prose :where(code):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+.prose :where(code):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
   background-color: var(--color-gray-100);
   padding: 0.125rem 0.375rem;
   border-radius: 4px;
   font-size: 0.875em;
 }
 
-.dark .prose :where(code):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+.dark
+  .prose
+  :where(code):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
   background-color: var(--color-gray-800);
 }
 
-.prose :where(pre):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+.prose :where(pre):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
   border-radius: 8px;
 }
 
-.prose :where(blockquote):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+.prose
+  :where(blockquote):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
   border-left-width: 3px;
   font-style: normal;
 }
-

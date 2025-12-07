@@ -9,11 +9,10 @@ import {
   InputOTPSlot,
 } from '@/components/ui/input-otp'
 import { Sparkles, Mail, ArrowLeft, Loader2 } from 'lucide-react'
-import { getSupabaseBrowserClient } from '@/libs/supabase/client'
 import { useQueryClient } from '@tanstack/react-query'
-import { authKeys } from '@/actions/auth'
+import { authKeys, sendOtpServer, verifyOtpServer } from '@/actions/auth'
 
-export const Route = createFileRoute('/__guest/sign-in')({
+export const Route = createFileRoute('/__guest/auth')({
   component: RouteComponent,
 })
 
@@ -34,12 +33,8 @@ function RouteComponent() {
     setError(null)
 
     try {
-      const supabase = getSupabaseBrowserClient()
-      const { error } = await supabase.auth.signInWithOtp({
+      const { error } = await sendOtpServer({
         email,
-        options: {
-          shouldCreateUser: true,
-        },
       })
 
       if (error) throw error
@@ -58,20 +53,15 @@ function RouteComponent() {
     setError(null)
 
     try {
-      const supabase = getSupabaseBrowserClient()
-      const { data, error } = await supabase.auth.verifyOtp({
+      const { data, error } = await verifyOtpServer({
         email,
         token: otp,
-        type: 'email',
       })
 
       if (error) throw error
 
       // Update the auth cache
-      queryClient.setQueryData(authKeys.session(), {
-        session: data.session,
-        user: data.user,
-      })
+      queryClient.setQueryData(authKeys.user(), data.user)
 
       router.invalidate()
     } catch (err: any) {

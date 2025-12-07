@@ -27,10 +27,7 @@ function RouteComponent() {
         if (error) throw error
 
         // Clear auth cache
-        queryClient.setQueryData(authKeys.session(), {
-          session: null,
-          user: null,
-        })
+        queryClient.setQueryData(authKeys.user(), null)
 
         setStatus('success')
 
@@ -108,7 +105,9 @@ function RouteComponent() {
                     <LogOut className="size-8 text-white" />
                   </div>
                 </div>
-                <h1 className="text-2xl font-bold mb-2">Something went wrong</h1>
+                <h1 className="text-2xl font-bold mb-2">
+                  Something went wrong
+                </h1>
                 <p className="text-sm text-destructive mb-6">{error}</p>
                 <Button
                   variant="gradient"

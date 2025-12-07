@@ -12,7 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as _guestRouteImport } from './routes/__guest'
 import { Route as _authedRouteImport } from './routes/__authed'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as _guestSignInRouteImport } from './routes/__guest/sign-in'
+import { Route as _guestSignInRouteImport } from './routes/__guest/auth.tsx'
 import { Route as _authedSignOutRouteImport } from './routes/__authed/sign-out'
 import { Route as _authedDashboardRouteImport } from './routes/__authed/dashboard'
 

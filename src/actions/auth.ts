@@ -8,6 +8,19 @@ import { createServerFn } from '@tanstack/react-start'
 import { getSupabaseServerClient } from '@/libs/supabase/server'
 import { getSupabaseBrowserClient } from '@/libs/supabase/client'
 import { useEffect } from 'react'
+import { z } from 'zod'
+
+// ============================================
+// Zod Schemas
+// ============================================
+
+const sendOtpSchema = z.object({
+  email: z.email(),
+})
+const verifyOtpSchema = z.object({
+  email: z.email(),
+  token: z.string().length(6),
+})
 
 // ============================================
 // Server Functions
@@ -28,6 +41,43 @@ export const signOutServer = createServerFn({ method: 'POST' }).handler(
     return { success: true }
   },
 )
+
+export const sendOtpServer = createServerFn({ method: 'POST' })
+  .inputValidator(sendOtpSchema)
+  .handler(async ({ data }) => {
+    const supabase = getSupabaseServerClient()
+    const { error } = await supabase.auth.signInWithOtp({
+      email: data.email,
+      options: {
+        shouldCreateUser: true,
+      },
+    })
+
+    if (error) {
+      return { error: error.message, success: false as const }
+    }
+
+    return { success: true as const }
+  })
+
+export const verifyOtpServer = createServerFn({ method: 'POST' })
+  .inputValidator(verifyOtpSchema)
+  .handler(async ({ data }) => {
+    const supabase = getSupabaseServerClient()
+    const { error } = await supabase.auth.verifyOtp({
+      email: data.email,
+      token: data.token,
+      type: 'email',
+    })
+
+    if (error) {
+      return { error: error.message, success: false as const }
+    }
+
+    return {
+      success: true as const,
+    }
+  })
 
 // ============================================
 // Query Keys
@@ -74,7 +124,7 @@ export function useSignOut() {
 // Auth State Listener (for client-side sync)
 // ============================================
 
-export function useAuthStateSync() {
+export function useAuthStateListener() {
   const queryClient = useQueryClient()
 
   useEffect(() => {

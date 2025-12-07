@@ -1,15 +1,12 @@
-export function seo({
-  title,
-  description,
-  keywords,
-  image,
-}: {
+export type SeoOptions = {
   title: string
   description?: string
   image?: string
   keywords?: string
-}) {
-  const tags = [
+}
+
+export function seo({ title, description, keywords, image }: SeoOptions) {
+  return [
     { title },
     { name: 'description', content: description },
     { name: 'keywords', content: keywords },
@@ -26,6 +23,4 @@ export function seo({
         ]
       : []),
   ]
-
-  return tags
 }
