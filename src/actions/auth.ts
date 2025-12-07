@@ -8,6 +8,7 @@ import { createServerFn } from '@tanstack/react-start'
 import dayjs from 'dayjs'
 import { getSupabaseServerClient } from '@/libs/supabase/server'
 import { getSupabaseBrowserClient } from '@/libs/supabase/client'
+import { useEffect } from 'react'
 
 // ============================================
 // Server Functions
@@ -111,23 +112,34 @@ export function useSignOut() {
 export function useAuthStateSync() {
   const queryClient = useQueryClient()
 
-  // Set up listener for auth state changes on the client
-  if (typeof window !== 'undefined') {
-    const supabase = getSupabaseBrowserClient()
+  useEffect(() => {
+    // Set up listener for auth state changes on the client
+    if (typeof window !== 'undefined') {
+      const supabase = getSupabaseBrowserClient()
 
-    supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-        queryClient.setQueryData(authKeys.session(), {
-          session,
-          user: session?.user ?? null,
-        })
-      } else if (event === 'SIGNED_OUT') {
-        queryClient.setQueryData(authKeys.session(), {
-          session: null,
-          user: null,
-        })
-        queryClient.invalidateQueries()
+      const {
+        data: { subscription },
+      } = supabase.auth.onAuthStateChange((event, session) => {
+        console.log('[Auth] State changed:', event)
+
+        if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+          queryClient.setQueryData(authKeys.session(), {
+            session,
+            user: session?.user ?? null,
+          })
+        } else if (event === 'SIGNED_OUT') {
+          queryClient.setQueryData(authKeys.session(), {
+            session: null,
+            user: null,
+          })
+          // Invalidate all queries to refetch with new auth state
+          void queryClient.invalidateQueries()
+        }
+      })
+
+      return () => {
+        subscription.unsubscribe()
       }
-    })
-  }
+    }
+  }, [queryClient])
 }

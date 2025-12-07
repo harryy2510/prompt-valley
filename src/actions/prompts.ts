@@ -1,29 +1,166 @@
-import { queryOptions, useMutation, useQuery } from '@tanstack/react-query'
-import { getSupabaseBrowserClient } from '@/libs/supabase/client'
-import type { Tables, TablesInsert, TablesUpdate, Enums } from '@/types/database.types'
+import { queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { createServerFn } from '@tanstack/react-start'
+import { getSupabaseServerClient } from '@/libs/supabase/server'
+import type { Tables, Enums } from '@/types/database.types'
 
 // ============================================
 // Types
 // ============================================
 
 export type Prompt = Tables<'prompts'>
-export type PromptCategory = Enums<'prompt_category'>
-export type AiPlatform = Enums<'ai_platform'>
-export type Collection = Tables<'collections'>
+export type Category = Tables<'categories'>
+export type Tag = Tables<'tags'>
+export type Tier = Enums<'tier'>
 
-export interface PromptWithCollection extends Prompt {
-  collection: Collection | null
-  is_favorited?: boolean
+export type PromptWithRelations = Prompt & {
+  category?: Category | null
+  tags?: Array<{ tag: Tag }>
+  models?: Array<{
+    model: Tables<'ai_models'> & {
+      provider?: Tables<'ai_providers'>
+    }
+  }>
 }
 
-export type CreatePromptInput = Omit<
-  TablesInsert<'prompts'>,
-  'user_id' | 'created_at' | 'updated_at' | 'use_count' | 'favorite_count'
->
+export type PromptFilters = {
+  categoryId?: string
+  tagId?: string
+  tier?: Tier
+  search?: string
+  isFeatured?: boolean
+  limit?: number
+  offset?: number
+}
 
-export type UpdatePromptInput = {
-  id: string
-} & Partial<CreatePromptInput>
+// ============================================
+// Server Functions
+// ============================================
+
+export const fetchPrompts = createServerFn({ method: 'GET' })
+  .inputValidator((filters: PromptFilters) => filters)
+  .handler(async ({ data: filters }) => {
+    const supabase = getSupabaseServerClient()
+
+    let query = supabase
+      .from('prompts')
+      .select(`
+        *,
+        category:categories(*),
+        tags:prompt_tags(tag:tags(*)),
+        models:prompt_models(model:ai_models(*, provider:ai_providers(*)))
+      `)
+      .eq('is_published', true)
+
+    if (filters.categoryId) {
+      query = query.eq('category_id', filters.categoryId)
+    }
+    if (filters.tier) {
+      query = query.eq('tier', filters.tier)
+    }
+    if (filters.isFeatured !== undefined) {
+      query = query.eq('is_featured', filters.isFeatured)
+    }
+    if (filters.search) {
+      query = query.or(`title.ilike.%${filters.search}%,description.ilike.%${filters.search}%`)
+    }
+
+    query = query
+      .order('is_featured', { ascending: false })
+      .order('sort_order', { ascending: true, nullsFirst: false })
+      .order('created_at', { ascending: false })
+
+    if (filters.limit) {
+      query = query.limit(filters.limit)
+    }
+    if (filters.offset) {
+      query = query.range(filters.offset, filters.offset + (filters.limit ?? 20) - 1)
+    }
+
+    const { data, error } = await query
+
+    if (error) throw error
+    return data as PromptWithRelations[]
+  })
+
+export const fetchPromptById = createServerFn({ method: 'GET' })
+  .inputValidator((id: string) => id)
+  .handler(async ({ data: id }) => {
+    const supabase = getSupabaseServerClient()
+
+    const { data, error } = await supabase
+      .from('prompts')
+      .select(`
+        *,
+        category:categories(*),
+        tags:prompt_tags(tag:tags(*)),
+        models:prompt_models(model:ai_models(*, provider:ai_providers(*)))
+      `)
+      .eq('id', id)
+      .eq('is_published', true)
+      .single()
+
+    if (error) throw error
+
+    // Increment view count
+    await supabase.rpc('increment_prompt_views', { prompt_text_id: id })
+
+    return data as PromptWithRelations
+  })
+
+export const fetchFeaturedPrompts = createServerFn({ method: 'GET' })
+  .inputValidator((limit?: number) => limit ?? 12)
+  .handler(async ({ data: limit }) => {
+    const supabase = getSupabaseServerClient()
+
+    const { data, error } = await supabase
+      .from('prompts')
+      .select(`
+        *,
+        category:categories(*),
+        tags:prompt_tags(tag:tags(*)),
+        models:prompt_models(model:ai_models(*, provider:ai_providers(*)))
+      `)
+      .eq('is_published', true)
+      .eq('is_featured', true)
+      .order('sort_order', { ascending: true, nullsFirst: false })
+      .order('created_at', { ascending: false })
+      .limit(limit)
+
+    if (error) throw error
+    return data as PromptWithRelations[]
+  })
+
+export const fetchPromptsByCategory = createServerFn({ method: 'GET' })
+  .inputValidator((params: { categoryId: string; limit?: number }) => params)
+  .handler(async ({ data: { categoryId, limit = 20 } }) => {
+    const supabase = getSupabaseServerClient()
+
+    const { data, error } = await supabase
+      .from('prompts')
+      .select(`
+        *,
+        category:categories(*),
+        tags:prompt_tags(tag:tags(*)),
+        models:prompt_models(model:ai_models(*, provider:ai_providers(*)))
+      `)
+      .eq('is_published', true)
+      .eq('category_id', categoryId)
+      .order('is_featured', { ascending: false })
+      .order('created_at', { ascending: false })
+      .limit(limit)
+
+    if (error) throw error
+    return data as PromptWithRelations[]
+  })
+
+export const incrementPromptCopies = createServerFn({ method: 'POST' })
+  .inputValidator((id: string) => id)
+  .handler(async ({ data: id }) => {
+    const supabase = getSupabaseServerClient()
+    const { error } = await supabase.rpc('increment_prompt_copies', { prompt_text_id: id })
+    if (error) throw error
+    return { success: true }
+  })
 
 // ============================================
 // Query Keys
@@ -32,155 +169,46 @@ export type UpdatePromptInput = {
 export const promptKeys = {
   all: ['prompts'] as const,
   lists: () => [...promptKeys.all, 'list'] as const,
-  list: (filters?: {
-    category?: PromptCategory
-    platform?: AiPlatform
-    search?: string
-    isPublic?: boolean
-    isCurated?: boolean
-    isFavorited?: boolean
-  }) => [...promptKeys.lists(), filters] as const,
+  list: (filters?: PromptFilters) => [...promptKeys.lists(), filters] as const,
   details: () => [...promptKeys.all, 'detail'] as const,
   detail: (id: string) => [...promptKeys.details(), id] as const,
-  myPrompts: () => [...promptKeys.all, 'my-prompts'] as const,
-  curatedPrompts: () => [...promptKeys.all, 'curated'] as const,
+  featured: (limit?: number) => [...promptKeys.all, 'featured', limit] as const,
+  byCategory: (categoryId: string) => [...promptKeys.all, 'category', categoryId] as const,
 }
 
 // ============================================
-// Query Options
+// Query Options (for loaders)
 // ============================================
 
-export function curatedPromptsQueryOptions() {
+export function promptsQueryOptions(filters: PromptFilters = {}) {
   return queryOptions({
-    queryKey: promptKeys.curatedPrompts(),
-    queryFn: async () => {
-      const supabase = getSupabaseBrowserClient()
-
-      const { data, error } = await supabase
-        .from('prompts')
-        .select('*')
-        .eq('is_curated', true)
-        .order('is_featured', { ascending: false })
-        .order('favorite_count', { ascending: false })
-        .order('created_at', { ascending: false })
-
-      if (error) throw error
-      return data as Prompt[]
-    },
-  })
-}
-
-export function myPromptsQueryOptions() {
-  return queryOptions({
-    queryKey: promptKeys.myPrompts(),
-    queryFn: async () => {
-      const supabase = getSupabaseBrowserClient()
-
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
-      if (!user) throw new Error('Not authenticated')
-
-      const { data, error } = await supabase
-        .from('prompts')
-        .select(
-          `
-          *,
-          collection:collections(*)
-        `,
-        )
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
-
-      if (error) throw error
-      return data as PromptWithCollection[]
-    },
+    queryKey: promptKeys.list(filters),
+    queryFn: () => fetchPrompts({ data: filters }),
+    staleTime: 1000 * 60 * 5, // 5 minutes
   })
 }
 
 export function promptDetailQueryOptions(id: string) {
   return queryOptions({
     queryKey: promptKeys.detail(id),
-    queryFn: async () => {
-      const supabase = getSupabaseBrowserClient()
-
-      const { data, error } = await supabase
-        .from('prompts')
-        .select(
-          `
-          *,
-          collection:collections(*)
-        `,
-        )
-        .eq('id', id)
-        .single()
-
-      if (error) throw error
-
-      // Check if user has favorited this prompt
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
-      if (user) {
-        const { data: favorite } = await supabase
-          .from('favorites')
-          .select('id')
-          .eq('user_id', user.id)
-          .eq('prompt_id', id)
-          .single()
-
-        return {
-          ...data,
-          is_favorited: !!favorite,
-        } as PromptWithCollection
-      }
-
-      return data as PromptWithCollection
-    },
+    queryFn: () => fetchPromptById({ data: id }),
+    staleTime: 1000 * 60 * 5,
   })
 }
 
-export function searchPromptsQueryOptions(filters: {
-  category?: PromptCategory
-  platform?: AiPlatform
-  search?: string
-  isPublic?: boolean
-  isCurated?: boolean
-}) {
+export function featuredPromptsQueryOptions(limit?: number) {
   return queryOptions({
-    queryKey: promptKeys.list(filters),
-    queryFn: async () => {
-      const supabase = getSupabaseBrowserClient()
+    queryKey: promptKeys.featured(limit),
+    queryFn: () => fetchFeaturedPrompts({ data: limit }),
+    staleTime: 1000 * 60 * 5,
+  })
+}
 
-      let query = supabase.from('prompts').select('*')
-
-      // Apply filters
-      if (filters.category) {
-        query = query.eq('category', filters.category)
-      }
-      if (filters.platform) {
-        query = query.eq('platform', filters.platform)
-      }
-      if (filters.isPublic !== undefined) {
-        query = query.eq('is_public', filters.isPublic)
-      }
-      if (filters.isCurated !== undefined) {
-        query = query.eq('is_curated', filters.isCurated)
-      }
-      if (filters.search) {
-        query = query.or(
-          `title.ilike.%${filters.search}%,description.ilike.%${filters.search}%,content.ilike.%${filters.search}%`,
-        )
-      }
-
-      const { data, error } = await query
-        .order('is_featured', { ascending: false })
-        .order('favorite_count', { ascending: false })
-        .order('created_at', { ascending: false })
-
-      if (error) throw error
-      return data as Prompt[]
-    },
+export function promptsByCategoryQueryOptions(categoryId: string, limit?: number) {
+  return queryOptions({
+    queryKey: promptKeys.byCategory(categoryId),
+    queryFn: () => fetchPromptsByCategory({ data: { categoryId, limit } }),
+    staleTime: 1000 * 60 * 5,
   })
 }
 
@@ -188,140 +216,30 @@ export function searchPromptsQueryOptions(filters: {
 // Hooks
 // ============================================
 
-export function useCuratedPrompts() {
-  return useQuery(curatedPromptsQueryOptions())
-}
-
-export function useMyPrompts() {
-  return useQuery(myPromptsQueryOptions())
+export function usePrompts(filters: PromptFilters = {}) {
+  return useQuery(promptsQueryOptions(filters))
 }
 
 export function usePromptDetail(id: string) {
   return useQuery(promptDetailQueryOptions(id))
 }
 
-export function useSearchPrompts(filters: {
-  category?: PromptCategory
-  platform?: AiPlatform
-  search?: string
-  isPublic?: boolean
-  isCurated?: boolean
-}) {
-  return useQuery(searchPromptsQueryOptions(filters))
+export function useFeaturedPrompts(limit?: number) {
+  return useQuery(featuredPromptsQueryOptions(limit))
 }
 
-// ============================================
-// Mutations
-// ============================================
-
-export function useCreatePrompt() {
-  return useMutation({
-    mutationFn: async (input: CreatePromptInput) => {
-      const supabase = getSupabaseBrowserClient()
-
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
-      if (!user) throw new Error('Not authenticated')
-
-      const { data, error } = await supabase
-        .from('prompts')
-        .insert({
-          ...input,
-          user_id: user.id,
-        })
-        .select()
-        .single()
-
-      if (error) throw error
-      return data as Prompt
-    },
-  })
+export function usePromptsByCategory(categoryId: string, limit?: number) {
+  return useQuery(promptsByCategoryQueryOptions(categoryId, limit))
 }
 
-export function useUpdatePrompt() {
-  return useMutation({
-    mutationFn: async ({ id, ...input }: UpdatePromptInput) => {
-      const supabase = getSupabaseBrowserClient()
-
-      const { data, error } = await supabase
-        .from('prompts')
-        .update(input)
-        .eq('id', id)
-        .select()
-        .single()
-
-      if (error) throw error
-      return data as Prompt
-    },
-  })
-}
-
-export function useDeletePrompt() {
-  return useMutation({
-    mutationFn: async (id: string) => {
-      const supabase = getSupabaseBrowserClient()
-
-      const { error } = await supabase.from('prompts').delete().eq('id', id)
-
-      if (error) throw error
-    },
-  })
-}
-
-export function useToggleFavorite() {
-  return useMutation({
-    mutationFn: async (promptId: string) => {
-      const supabase = getSupabaseBrowserClient()
-
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
-      if (!user) throw new Error('Not authenticated')
-
-      const { data, error } = await supabase.rpc('toggle_favorite', {
-        prompt_uuid: promptId,
-        user_uuid: user.id,
-      })
-
-      if (error) throw error
-      return data as boolean
-    },
-  })
-}
-
-export function useIncrementUseCount() {
-  return useMutation({
-    mutationFn: async (promptId: string) => {
-      const supabase = getSupabaseBrowserClient()
-
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
-      if (!user) throw new Error('Not authenticated')
-
-      const { error } = await supabase.rpc('increment_prompt_use_count', {
-        prompt_uuid: promptId,
-        user_uuid: user.id,
-      })
-
-      if (error) throw error
-    },
-  })
-}
-
-export function useCopyPrompt() {
-  const incrementUseCount = useIncrementUseCount()
+export function useIncrementCopies() {
+  const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async (prompt: Prompt) => {
-      // Copy to clipboard
-      await navigator.clipboard.writeText(prompt.content)
-
-      // Increment use count
-      await incrementUseCount.mutateAsync(prompt.id)
-
-      return prompt
+    mutationFn: (id: string) => incrementPromptCopies({ data: id }),
+    onSuccess: (_, id) => {
+      // Invalidate the prompt detail to reflect new count
+      queryClient.invalidateQueries({ queryKey: promptKeys.detail(id) })
     },
   })
 }
