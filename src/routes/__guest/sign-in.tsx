@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useRouter } from '@tanstack/react-router'
-import { useState } from 'react'
+import { useState, type FormEvent } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -28,7 +28,7 @@ function RouteComponent() {
   const router = useRouter()
   const queryClient = useQueryClient()
 
-  const handleSendOTP = async (e: React.FormEvent) => {
+  const handleSendOTP = async (e: FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError(null)
@@ -52,7 +52,7 @@ function RouteComponent() {
     }
   }
 
-  const handleVerifyOTP = async (e: React.FormEvent) => {
+  const handleVerifyOTP = async (e: FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError(null)

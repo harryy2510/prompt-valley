@@ -6,8 +6,9 @@ import {
   TriangleAlertIcon,
 } from 'lucide-react'
 import { useTheme } from 'next-themes'
-import { Toaster as Sonner  } from 'sonner'
-import type {ToasterProps} from 'sonner';
+import { Toaster as Sonner } from 'sonner'
+import type { ToasterProps } from 'sonner'
+import type { CSSProperties } from 'react'
 
 const Toaster = ({ ...props }: ToasterProps) => {
   const { theme = 'system' } = useTheme()
@@ -29,7 +30,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
           '--normal-text': 'var(--popover-foreground)',
           '--normal-border': 'var(--border)',
           '--border-radius': 'var(--radius)',
-        } as React.CSSProperties
+        } as CSSProperties
       }
       {...props}
     />

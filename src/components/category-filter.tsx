@@ -1,10 +1,10 @@
 import { Button } from '@/components/ui/button'
 import { cn } from '@/libs/cn'
-import type { ComponentProps } from 'react'
+import type { ComponentProps, ReactNode } from 'react'
 
 interface CategoryFilterProps extends Omit<ComponentProps<'button'>, 'children'> {
   active?: boolean
-  children: React.ReactNode
+  children: ReactNode
 }
 
 export function CategoryFilter({
