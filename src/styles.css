@@ -1,181 +1,467 @@
 @import 'tailwindcss';
-
+@import './fonts.css';
 @import 'tw-animate-css';
 
 @custom-variant dark (&:is(.dark *));
 
-body {
-  @apply m-0;
-  font-family:
-    'Satoshi-Variable',
-    -apple-system,
-    BlinkMacSystemFont,
-    'Segoe UI',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-code {
-  font-family:
-    source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
-}
+/* ============================================================================
+   CSS VARIABLES - DESIGN TOKENS
+   ============================================================================ */
 
 :root {
-  /* Colors from design */
-  --background: oklch(0.99 0 0); /* Light cream/white */
-  --foreground: oklch(0.15 0 0); /* Black text */
-  --card: oklch(1 0 0); /* Pure white */
-  --card-foreground: oklch(0.15 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.15 0 0);
+  /* -------------------------------------------------------------------------
+     Color Palette - Primary (Purple/Indigo)
+     ------------------------------------------------------------------------- */
+  --color-primary-50: #F2F5FF;
+  --color-primary-100: #E1E7FC;
+  --color-primary-200: #C0C8F8;
+  --color-primary-300: #9EA6F4;
+  --color-primary-400: #7C82F1;
+  --color-primary-500: #5A5AED;
+  --color-primary-600: #4D44C8;
+  --color-primary-700: #3F30A1;
+  --color-primary-800: #311F75;
+  --color-primary-900: #201147;
 
-  /* Primary = Black button */
-  --primary: oklch(0.15 0 0); /* Black */
-  --primary-foreground: oklch(0.99 0 0); /* White text */
+  /* -------------------------------------------------------------------------
+     Color Palette - Secondary (Warm/Gold)
+     ------------------------------------------------------------------------- */
+  --color-secondary-50: #FCFAF2;
+  --color-secondary-100: #F8F3E5;
+  --color-secondary-200: #F4ECD6;
+  --color-secondary-300: #F0E5C6;
+  --color-secondary-400: #ECDFB6;
+  --color-secondary-500: #E9D8A6;
+  --color-secondary-600: #CDB386;
+  --color-secondary-700: #AF8D69;
+  --color-secondary-800: #8A6D4C;
+  --color-secondary-900: #654D30;
 
-  /* Secondary = White button with border */
-  --secondary: oklch(0.99 0 0); /* White */
-  --secondary-foreground: oklch(0.15 0 0); /* Black text */
+  /* -------------------------------------------------------------------------
+     Color Palette - Gray
+     ------------------------------------------------------------------------- */
+  --color-gray-50: #F5F6F7;
+  --color-gray-100: #ECECF1;
+  --color-gray-200: #D3D3E0;
+  --color-gray-300: #9898AE;
+  --color-gray-400: #70708A;
+  --color-gray-500: #4A4A65;
+  --color-gray-600: #383853;
+  --color-gray-700: #27273F;
+  --color-gray-800: #181829;
+  --color-gray-900: #0A0A12;
 
-  /* Purple accent for "PRO" text */
-  --accent: oklch(0.55 0.25 280); /* Purple/Blue */
-  --accent-foreground: oklch(0.99 0 0);
+  /* -------------------------------------------------------------------------
+     Radius
+     ------------------------------------------------------------------------- */
+  --radius-none: 0px;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
 
-  --muted: oklch(0.96 0 0);
-  --muted-foreground: oklch(0.45 0 0);
-  --destructive: oklch(0.55 0.22 25);
-  --destructive-foreground: oklch(0.99 0 0);
+  /* -------------------------------------------------------------------------
+     Light Theme - Semantic Colors
+     ------------------------------------------------------------------------- */
+  --background: #F5F5FA;
+  --background-subtle: #FFFFFF;
+  --foreground: #000128;
+  --foreground-secondary: rgba(0, 1, 40, 0.60);
+  --foreground-disabled: rgba(0, 1, 40, 0.38);
+  --outline: #DFDFE5;
 
-  --border: oklch(0.9 0 0);
-  --input: oklch(0.95 0 0);
-  --ring: oklch(0.15 0 0);
+  /* Component colors */
+  --card: #FFFFFF;
+  --card-foreground: #000128;
+  --popover: #FFFFFF;
+  --popover-foreground: #000128;
 
-  --radius: 0.75rem; /* Rounded buttons from design */
+  /* Primary button/accent */
+  --primary: var(--color-primary-500);
+  --primary-hover: var(--color-primary-600);
+  --primary-foreground: #FFFFFF;
+
+  /* Secondary button */
+  --secondary: var(--color-gray-100);
+  --secondary-hover: var(--color-gray-200);
+  --secondary-foreground: #000128;
+
+  /* Muted */
+  --muted: var(--color-gray-100);
+  --muted-foreground: var(--color-gray-500);
+
+  /* Accent */
+  --accent: var(--color-primary-100);
+  --accent-foreground: var(--color-primary-700);
+
+  /* Destructive */
+  --destructive: #DC2626;
+  --destructive-foreground: #FFFFFF;
+
+  /* Success */
+  --success: #16A34A;
+  --success-foreground: #FFFFFF;
+
+  /* Warning */
+  --warning: #F59E0B;
+  --warning-foreground: #000128;
+
+  /* Border & Input */
+  --border: var(--outline);
+  --input: var(--color-gray-100);
+  --ring: var(--color-primary-500);
 }
 
 .dark {
-  /* Dark mode */
-  --background: oklch(0.12 0 0); /* Very dark gray/black */
-  --foreground: oklch(0.98 0 0); /* White text */
-  --card: oklch(0.18 0 0);
-  --card-foreground: oklch(0.98 0 0);
-  --popover: oklch(0.18 0 0);
-  --popover-foreground: oklch(0.98 0 0);
+  /* -------------------------------------------------------------------------
+     Dark Theme - Semantic Colors
+     ------------------------------------------------------------------------- */
+  --background: var(--color-gray-900);
+  --background-subtle: var(--color-gray-800);
+  --foreground: #FFFFFF;
+  --foreground-secondary: rgba(255, 255, 255, 0.70);
+  --foreground-disabled: rgba(255, 255, 255, 0.38);
+  --outline: var(--color-gray-700);
 
-  /* Primary = White button in dark mode */
-  --primary: oklch(0.98 0 0); /* White */
-  --primary-foreground: oklch(0.12 0 0); /* Black text */
+  /* Component colors */
+  --card: var(--color-gray-800);
+  --card-foreground: #FFFFFF;
+  --popover: var(--color-gray-800);
+  --popover-foreground: #FFFFFF;
 
-  /* Secondary = Dark button with border */
-  --secondary: oklch(0.18 0 0);
-  --secondary-foreground: oklch(0.98 0 0);
+  /* Primary button/accent */
+  --primary: var(--color-primary-500);
+  --primary-hover: var(--color-primary-400);
+  --primary-foreground: #FFFFFF;
 
-  /* Purple accent */
-  --accent: oklch(0.65 0.25 280); /* Lighter purple for dark mode */
-  --accent-foreground: oklch(0.98 0 0);
+  /* Secondary button */
+  --secondary: var(--color-gray-700);
+  --secondary-hover: var(--color-gray-600);
+  --secondary-foreground: #FFFFFF;
 
-  --muted: oklch(0.2 0 0);
-  --muted-foreground: oklch(0.6 0 0);
-  --destructive: oklch(0.6 0.22 25);
-  --destructive-foreground: oklch(0.98 0 0);
+  /* Muted */
+  --muted: var(--color-gray-800);
+  --muted-foreground: var(--color-gray-400);
 
-  --border: oklch(0.25 0 0);
-  --input: oklch(0.22 0 0);
-  --ring: oklch(0.7 0 0);
+  /* Accent */
+  --accent: var(--color-primary-900);
+  --accent-foreground: var(--color-primary-300);
+
+  /* Destructive */
+  --destructive: #EF4444;
+  --destructive-foreground: #FFFFFF;
+
+  /* Success */
+  --success: #22C55E;
+  --success-foreground: #FFFFFF;
+
+  /* Warning */
+  --warning: #FBBF24;
+  --warning-foreground: #000128;
+
+  /* Border & Input */
+  --border: var(--outline);
+  --input: var(--color-gray-700);
+  --ring: var(--color-primary-400);
 }
 
+/* ============================================================================
+   TAILWIND THEME CONFIGURATION
+   ============================================================================ */
+
 @theme inline {
+  /* Font Family */
+  --font-sans: 'Satoshi-Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  /* Colors - Palette */
+  --color-primary-50: var(--color-primary-50);
+  --color-primary-100: var(--color-primary-100);
+  --color-primary-200: var(--color-primary-200);
+  --color-primary-300: var(--color-primary-300);
+  --color-primary-400: var(--color-primary-400);
+  --color-primary-500: var(--color-primary-500);
+  --color-primary-600: var(--color-primary-600);
+  --color-primary-700: var(--color-primary-700);
+  --color-primary-800: var(--color-primary-800);
+  --color-primary-900: var(--color-primary-900);
+
+  --color-secondary-50: var(--color-secondary-50);
+  --color-secondary-100: var(--color-secondary-100);
+  --color-secondary-200: var(--color-secondary-200);
+  --color-secondary-300: var(--color-secondary-300);
+  --color-secondary-400: var(--color-secondary-400);
+  --color-secondary-500: var(--color-secondary-500);
+  --color-secondary-600: var(--color-secondary-600);
+  --color-secondary-700: var(--color-secondary-700);
+  --color-secondary-800: var(--color-secondary-800);
+  --color-secondary-900: var(--color-secondary-900);
+
+  --color-gray-50: var(--color-gray-50);
+  --color-gray-100: var(--color-gray-100);
+  --color-gray-200: var(--color-gray-200);
+  --color-gray-300: var(--color-gray-300);
+  --color-gray-400: var(--color-gray-400);
+  --color-gray-500: var(--color-gray-500);
+  --color-gray-600: var(--color-gray-600);
+  --color-gray-700: var(--color-gray-700);
+  --color-gray-800: var(--color-gray-800);
+  --color-gray-900: var(--color-gray-900);
+
+  /* Colors - Semantic */
   --color-background: var(--background);
+  --color-background-subtle: var(--background-subtle);
   --color-foreground: var(--foreground);
+  --color-foreground-secondary: var(--foreground-secondary);
+  --color-foreground-disabled: var(--foreground-disabled);
+  --color-outline: var(--outline);
+
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
+
   --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
   --color-primary-foreground: var(--primary-foreground);
+
   --color-secondary: var(--secondary);
+  --color-secondary-hover: var(--secondary-hover);
   --color-secondary-foreground: var(--secondary-foreground);
+
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
+
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
+
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
+
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --color-sidebar: var(--sidebar);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Border Radius */
+  --radius-none: var(--radius-none);
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+  --radius-full: var(--radius-full);
+
+  /* Typography - Font Sizes */
+  /* Display */
+  --font-size-display: 128px;
+  --font-size-display--line-height: 1;
+
+  /* Headings */
+  --font-size-h1: 48px;
+  --font-size-h1--line-height: 56px;
+
+  --font-size-h2: 40px;
+  --font-size-h2--line-height: 1;
+
+  --font-size-h3: 32px;
+  --font-size-h3--line-height: 38px;
+
+  --font-size-h4: 24px;
+  --font-size-h4--line-height: 28px;
+
+  --font-size-h5: 20px;
+  --font-size-h5--line-height: 1;
+
+  --font-size-h6: 18px;
+  --font-size-h6--line-height: 1;
+
+  /* Body */
+  --font-size-body1: 16px;
+  --font-size-body1--line-height: 22px;
+
+  --font-size-body2: 14px;
+  --font-size-body2--line-height: 20px;
+
+  /* Caption & Overline */
+  --font-size-caption: 12px;
+  --font-size-caption--line-height: 1;
+
+  --font-size-overline: 11px;
+  --font-size-overline--line-height: 1;
 }
+
+/* ============================================================================
+   BASE STYLES
+   ============================================================================ */
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border;
   }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
   body {
-    @apply bg-background text-foreground;
+    @apply m-0 bg-background text-foreground font-sans;
+    font-feature-settings: 'rlig' 1, 'calt' 1;
+  }
+
+  /* Focus visible outline */
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-ring;
   }
 }
 
-@keyframes fade-in-up {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
+/* ============================================================================
+   TYPOGRAPHY UTILITIES
+   ============================================================================ */
+
+@layer utilities {
+  /* Display */
+  .text-display {
+    font-size: 128px;
+    line-height: 1;
+    font-weight: 700;
+    letter-spacing: -0.02em;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+
+  /* Headings */
+  .text-h1 {
+    font-size: 48px;
+    line-height: 56px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  .text-h2 {
+    font-size: 40px;
+    line-height: 1;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  .text-h3 {
+    font-size: 32px;
+    line-height: 38px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  .text-h4 {
+    font-size: 24px;
+    line-height: 28px;
+    font-weight: 600;
+  }
+
+  .text-h5 {
+    font-size: 20px;
+    line-height: 1;
+    font-weight: 600;
+  }
+
+  .text-h6 {
+    font-size: 18px;
+    line-height: 1;
+    font-weight: 600;
+  }
+
+  /* Body 1 - 16px */
+  .text-body1 {
+    font-size: 16px;
+    line-height: 22px;
+    font-weight: 400;
+  }
+
+  .text-body1-medium {
+    font-size: 16px;
+    line-height: 22px;
+    font-weight: 500;
+  }
+
+  .text-body1-semibold {
+    font-size: 16px;
+    line-height: 22px;
+    font-weight: 600;
+  }
+
+  .text-body1-bold {
+    font-size: 16px;
+    line-height: 22px;
+    font-weight: 700;
+  }
+
+  /* Body 2 - 14px */
+  .text-body2 {
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 400;
+  }
+
+  .text-body2-medium {
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 500;
+  }
+
+  .text-body2-semibold {
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 600;
+  }
+
+  .text-body2-bold {
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 700;
+  }
+
+  /* Caption - 12px */
+  .text-caption {
+    font-size: 12px;
+    line-height: 1;
+    font-weight: 400;
+  }
+
+  .text-caption-medium {
+    font-size: 12px;
+    line-height: 1;
+    font-weight: 500;
+  }
+
+  .text-caption-bold {
+    font-size: 12px;
+    line-height: 1;
+    font-weight: 700;
+  }
+
+  /* Overline - 11px */
+  .text-overline {
+    font-size: 11px;
+    line-height: 1;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  /* Text colors */
+  .text-primary-color {
+    color: var(--foreground);
+  }
+
+  .text-secondary-color {
+    color: var(--foreground-secondary);
+  }
+
+  .text-disabled-color {
+    color: var(--foreground-disabled);
   }
 }
 
-@keyframes pulse-slow {
-  0%,
-  100% {
-    opacity: 0.4;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.6;
-    transform: scale(1.05);
-  }
-}
-
-.animate-fade-in-up {
-  animation: fade-in-up 0.6s ease-out forwards;
-}
-
-.animate-pulse-slow {
-  animation: pulse-slow 8s ease-in-out infinite;
-}
-
-.animation-delay-200 {
-  animation-delay: 200ms;
-}
-
-.animation-delay-400 {
-  animation-delay: 400ms;
-}
-
-.animation-delay-600 {
-  animation-delay: 600ms;
-}
-
-.animation-delay-1000 {
-  animation-delay: 1000ms;
-}
