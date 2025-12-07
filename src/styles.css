@@ -2,6 +2,8 @@
 @import './fonts.css';
 @import 'tw-animate-css';
 
+@plugin '@tailwindcss/typography';
+
 @custom-variant dark (&:is(.dark *));
 
 /* ============================================================================
@@ -463,5 +465,110 @@
   .text-disabled-color {
     color: var(--foreground-disabled);
   }
+}
+
+/* ============================================================================
+   PROSE / TYPOGRAPHY PLUGIN CUSTOMIZATION
+   ============================================================================ */
+
+.prose {
+  --tw-prose-body: var(--foreground);
+  --tw-prose-headings: var(--foreground);
+  --tw-prose-lead: var(--foreground-secondary);
+  --tw-prose-links: var(--color-primary-600);
+  --tw-prose-bold: var(--foreground);
+  --tw-prose-counters: var(--color-gray-500);
+  --tw-prose-bullets: var(--color-gray-400);
+  --tw-prose-hr: var(--outline);
+  --tw-prose-quotes: var(--foreground);
+  --tw-prose-quote-borders: var(--color-primary-500);
+  --tw-prose-captions: var(--foreground-secondary);
+  --tw-prose-code: var(--foreground);
+  --tw-prose-pre-code: var(--color-gray-100);
+  --tw-prose-pre-bg: var(--color-gray-800);
+  --tw-prose-th-borders: var(--outline);
+  --tw-prose-td-borders: var(--outline);
+
+  /* Dark mode */
+  --tw-prose-invert-body: #FFFFFF;
+  --tw-prose-invert-headings: #FFFFFF;
+  --tw-prose-invert-lead: rgba(255, 255, 255, 0.70);
+  --tw-prose-invert-links: var(--color-primary-400);
+  --tw-prose-invert-bold: #FFFFFF;
+  --tw-prose-invert-counters: var(--color-gray-400);
+  --tw-prose-invert-bullets: var(--color-gray-500);
+  --tw-prose-invert-hr: var(--color-gray-700);
+  --tw-prose-invert-quotes: #FFFFFF;
+  --tw-prose-invert-quote-borders: var(--color-primary-500);
+  --tw-prose-invert-captions: rgba(255, 255, 255, 0.70);
+  --tw-prose-invert-code: #FFFFFF;
+  --tw-prose-invert-pre-code: var(--color-gray-100);
+  --tw-prose-invert-pre-bg: var(--color-gray-900);
+  --tw-prose-invert-th-borders: var(--color-gray-700);
+  --tw-prose-invert-td-borders: var(--color-gray-700);
+}
+
+/* Prose typography overrides to match Satoshi font */
+.prose {
+  font-family: 'Satoshi-Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.prose :where(h1):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  font-size: 32px;
+  line-height: 38px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.prose :where(h2):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  font-size: 24px;
+  line-height: 28px;
+  font-weight: 700;
+}
+
+.prose :where(h3):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  font-size: 20px;
+  line-height: 1.4;
+  font-weight: 600;
+}
+
+.prose :where(h4):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  font-size: 18px;
+  line-height: 1.4;
+  font-weight: 600;
+}
+
+.prose :where(a):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color 0.15s ease;
+}
+
+.prose :where(a):not(:where([class~="not-prose"], [class~="not-prose"] *)):hover {
+  color: var(--color-primary-700);
+}
+
+.dark .prose :where(a):not(:where([class~="not-prose"], [class~="not-prose"] *)):hover {
+  color: var(--color-primary-300);
+}
+
+.prose :where(code):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  background-color: var(--color-gray-100);
+  padding: 0.125rem 0.375rem;
+  border-radius: 4px;
+  font-size: 0.875em;
+}
+
+.dark .prose :where(code):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  background-color: var(--color-gray-800);
+}
+
+.prose :where(pre):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  border-radius: 8px;
+}
+
+.prose :where(blockquote):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  border-left-width: 3px;
+  font-style: normal;
 }
 
