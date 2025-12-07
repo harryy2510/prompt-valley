@@ -314,11 +314,65 @@
   body {
     @apply m-0 bg-background text-foreground font-sans;
     font-feature-settings: 'rlig' 1, 'calt' 1;
+    font-size: 16px;
+    line-height: 22px;
   }
 
   /* Focus visible outline */
   :focus-visible {
     @apply outline-2 outline-offset-2 outline-ring;
+  }
+
+  /* Native heading styles */
+  h1 {
+    font-size: 48px;
+    line-height: 56px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  h2 {
+    font-size: 40px;
+    line-height: 1;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  h3 {
+    font-size: 32px;
+    line-height: 38px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  h4 {
+    font-size: 24px;
+    line-height: 28px;
+    font-weight: 600;
+  }
+
+  h5 {
+    font-size: 20px;
+    line-height: 1;
+    font-weight: 600;
+  }
+
+  h6 {
+    font-size: 18px;
+    line-height: 1;
+    font-weight: 600;
+  }
+
+  /* Paragraph inherits body styles */
+  p {
+    font-size: 16px;
+    line-height: 22px;
+  }
+
+  /* Small text */
+  small {
+    font-size: 12px;
+    line-height: 1;
   }
 }
 
