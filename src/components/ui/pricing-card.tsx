@@ -1,64 +1,108 @@
-import { useState, type ComponentProps, type ReactNode } from 'react'
-import { CheckIcon, PartyPopperIcon } from 'lucide-react'
+import { useState, type ComponentProps } from 'react'
+import NumberFlow from '@number-flow/react'
+import { SparklesIcon } from 'lucide-react'
 
 import { cn } from '@/libs/cn'
 import { Button } from '@/components/ui/button'
 import { PricingToggle, type PricingPeriod } from '@/components/ui/pricing-toggle'
+import type { Tables } from '@/types/database.types'
 
-type PricingFeature = {
-  text: string
-  included: boolean
+// Database-aligned types
+type StripeProduct = Tables<'stripe_products'>
+type StripePrice = Tables<'stripe_prices'>
+type StripeCoupon = Tables<'stripe_coupons'>
+
+// Price info extracted from database
+type PriceInfo = {
+  id: string
+  amount: number // in dollars (already converted from cents)
+  interval: 'month' | 'year'
 }
 
 type PricingCardProps = ComponentProps<'div'> & {
-  // Header
-  logo?: ReactNode
-  title: string
-  subtitle?: string
-  // Pricing
-  monthlyPrice: number
-  yearlyPrice: number
-  originalMonthlyPrice?: number
-  originalYearlyPrice?: number
-  currency?: string
-  // Features
-  features: (string | PricingFeature)[]
+  // Product with prices
+  product: StripeProduct & {
+    prices: StripePrice[]
+  }
+  // Optional coupon for discount
+  coupon?: StripeCoupon | null
+  // Features list (from product.features or manual override)
+  features?: string[]
   // CTA
   ctaText?: string
-  onCtaClick?: (period: PricingPeriod) => void
+  onCtaClick?: (priceId: string, period: PricingPeriod) => void
   ctaLoading?: boolean
-  // Badge
-  badge?: string
   // Fine print
   finePrint?: string
   // Default period
   defaultPeriod?: PricingPeriod
 }
 
+// Helper to extract and organize prices
+function extractPrices(prices: StripePrice[]): { monthly?: PriceInfo; yearly?: PriceInfo } {
+  const result: { monthly?: PriceInfo; yearly?: PriceInfo } = {}
+
+  for (const price of prices) {
+    if (!price.active) continue
+
+    const amount = price.unit_amount / 100 // Convert cents to dollars
+
+    if (price.recurring_interval === 'month') {
+      result.monthly = { id: price.id, amount, interval: 'month' }
+    } else if (price.recurring_interval === 'year') {
+      // Convert yearly to monthly equivalent for display
+      result.yearly = { id: price.id, amount: Math.round(amount / 12), interval: 'year' }
+    }
+  }
+
+  return result
+}
+
+// Apply coupon discount
+function applyDiscount(amount: number, coupon?: StripeCoupon | null): number {
+  if (!coupon?.valid) return amount
+
+  if (coupon.percent_off) {
+    return Math.round(amount * (1 - coupon.percent_off / 100))
+  }
+
+  if (coupon.amount_off) {
+    return Math.max(0, amount - coupon.amount_off / 100)
+  }
+
+  return amount
+}
+
 function PricingCard({
-  logo,
-  title,
-  subtitle,
-  monthlyPrice,
-  yearlyPrice,
-  originalMonthlyPrice,
-  originalYearlyPrice,
-  currency = '$',
-  features,
+  product,
+  coupon,
+  features: featuresProp,
   ctaText = 'Get PRO',
   onCtaClick,
   ctaLoading = false,
-  badge,
-  finePrint,
+  finePrint = 'Renews automatically • Cancel anytime',
   defaultPeriod = 'yearly',
   className,
   ...props
 }: PricingCardProps) {
   const [period, setPeriod] = useState<PricingPeriod>(defaultPeriod)
 
-  const currentPrice = period === 'yearly' ? yearlyPrice : monthlyPrice
-  const originalPrice = period === 'yearly' ? originalYearlyPrice : originalMonthlyPrice
-  const hasDiscount = originalPrice && originalPrice > currentPrice
+  const prices = extractPrices(product.prices)
+  const features = featuresProp ?? product.marketing_features ?? []
+
+  // Get current price based on period
+  const currentPriceInfo = period === 'yearly' ? prices.yearly : prices.monthly
+  if (!currentPriceInfo) return null
+
+  // Calculate prices with/without discount
+  const originalPrice = currentPriceInfo.amount
+  const discountedPrice = applyDiscount(originalPrice, coupon)
+  const hasDiscount = coupon?.valid && discountedPrice < originalPrice
+
+  // Calculate yearly discount percentage
+  const yearlyDiscountPercent = prices.monthly && prices.yearly
+    ? Math.round((1 - prices.yearly.amount / prices.monthly.amount) * 100)
+    : 0
 
   return (
     <div
@@ -69,39 +113,31 @@ function PricingCard({
       )}
       {...props}
     >
-      {/* Logo */}
-      {logo && <div className="mb-4">{logo}</div>}
-
-      {/* Title */}
-      <h2 className="text-h4 text-center">{title}</h2>
-      {subtitle && (
-        <p className="mt-1 text-body2 text-muted-foreground text-center">
-          {subtitle}
-        </p>
-      )}
-
       {/* Period toggle */}
-      <div className="mt-6">
-        <PricingToggle value={period} onChange={setPeriod} />
-      </div>
+      <PricingToggle
+        value={period}
+        onChange={setPeriod}
+        yearlyDiscount={yearlyDiscountPercent > 0 ? `${yearlyDiscountPercent}% Off` : undefined}
+      />
 
       {/* Pricing section */}
-      <div className="mt-6 flex flex-col items-center">
-        {badge && (
-          <div className="mb-3 inline-flex items-center gap-1.5 rounded-md bg-foreground px-3 py-1.5 text-xs font-semibold text-background">
-            <PartyPopperIcon className="size-3.5" />
-            <span>{badge}</span>
+      <div className="mt-8 flex flex-col items-center">
+        {/* Coupon badge */}
+        {hasDiscount && coupon?.name && (
+          <div className="mb-4 inline-flex items-center gap-1.5 rounded-md bg-foreground px-3 py-1.5 text-xs font-semibold tracking-wide text-background uppercase">
+            {coupon.name}
           </div>
         )}
 
+        {/* Price display */}
         <div className="flex items-baseline gap-2">
           {hasDiscount && (
             <span className="text-h4 text-muted-foreground line-through">
-              {currency}{originalPrice}
+              $<NumberFlow value={originalPrice} />
             </span>
           )}
           <span className="text-display text-foreground">
-            {currency}{currentPrice}
+            $<NumberFlow value={discountedPrice} />
           </span>
           <span className="text-body2 text-muted-foreground">
             per month
@@ -114,30 +150,12 @@ function PricingCard({
 
       {/* Features */}
       <ul className="mt-8 w-full space-y-3">
-        {features.map((feature, index) => {
-          const featureText = typeof feature === 'string' ? feature : feature.text
-          const isIncluded = typeof feature === 'string' ? true : feature.included
-
-          return (
-            <li
-              key={index}
-              className={cn(
-                'flex items-start gap-3 text-body2',
-                !isIncluded && 'opacity-50',
-              )}
-            >
-              <CheckIcon
-                className={cn(
-                  'size-4 shrink-0 mt-0.5',
-                  isIncluded ? 'text-primary' : 'text-muted-foreground',
-                )}
-              />
-              <span className={isIncluded ? 'text-foreground' : 'text-muted-foreground'}>
-                {featureText}
-              </span>
-            </li>
-          )
-        })}
+        {features.map((feature, index) => (
+          <li key={index} className="flex items-start gap-3 text-body2">
+            <SparklesIcon className="size-4 shrink-0 mt-0.5 text-primary" />
+            <span className="text-foreground">{feature}</span>
+          </li>
+        ))}
       </ul>
 
       {/* CTA Button */}
@@ -145,7 +163,7 @@ function PricingCard({
         variant="brand-primary"
         size="lg"
         className="mt-8 w-full"
-        onClick={() => onCtaClick?.(period)}
+        onClick={() => onCtaClick?.(currentPriceInfo.id, period)}
         disabled={ctaLoading}
       >
         {ctaLoading ? 'Processing...' : ctaText}
@@ -162,3 +180,4 @@ function PricingCard({
 }
 
 export { PricingCard }
+export type { PricingCardProps }

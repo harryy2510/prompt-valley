@@ -6,7 +6,7 @@ import type { ComponentProps } from 'react'
 import { cn } from '@/libs/cn'
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-sm text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive cursor-pointer",
   {
     variants: {
       variant: {
@@ -22,20 +22,33 @@ const buttonVariants = cva(
         link: 'text-primary underline-offset-4 hover:underline',
         gradient:
           'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg shadow-blue-500/25 dark:shadow-blue-500/20',
+        // Brand variants - main CTA buttons
         'brand-primary':
-          'bg-foreground text-background hover:bg-foreground/90 rounded-sm',
+          'bg-foreground text-background hover:bg-foreground/90 rounded-md',
         'brand-secondary':
-          'text-foreground rounded-sm border border-border hover:bg-muted',
+          'text-foreground rounded-md border border-border hover:bg-muted',
+        // Navigation variants
         'nav-link':
-          'text-sm font-semibold text-foreground hover:bg-muted rounded-sm',
+          'text-sm font-semibold text-foreground hover:bg-muted rounded-md',
         'nav-link-muted':
-          'text-sm font-medium text-muted-foreground hover:bg-muted rounded-sm',
+          'text-sm font-medium text-muted-foreground hover:bg-muted rounded-md',
+        // Inverse variants - for dark/colored backgrounds
+        'inverse':
+          'bg-white text-foreground hover:bg-white/90 shadow-sm',
+        'inverse-outline':
+          'bg-transparent text-white border border-white/40 hover:bg-white/10 hover:border-white/60',
+        // Overlay variant - for card overlays
+        'overlay':
+          'bg-foreground/80 text-white backdrop-blur-sm hover:bg-foreground/90 text-xs font-medium',
       },
       size: {
         default: 'h-9 px-4 py-2 has-[>svg]:px-3',
-        sm: 'h-8 rounded-sm gap-1.5 px-3 has-[>svg]:px-2.5',
-        lg: 'h-10 rounded-sm px-6 has-[>svg]:px-4',
+        xs: 'h-6 rounded-md gap-1 px-2 text-xs has-[>svg]:px-1.5',
+        sm: 'h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5',
+        lg: 'h-10 rounded-md px-6 has-[>svg]:px-4',
+        xl: 'h-12 rounded-md px-8 text-base has-[>svg]:px-6',
         icon: 'size-9',
+        'icon-xs': 'size-6',
         'icon-sm': 'size-8',
         'icon-lg': 'size-10',
         'nav': 'px-3 py-1.5',

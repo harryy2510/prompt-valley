@@ -1,5 +1,3 @@
-'use client'
-
 import {
   createContext,
   useCallback,
@@ -9,9 +7,9 @@ import {
   useState,
 } from 'react'
 import { Slot } from '@radix-ui/react-slot'
-import {  cva } from 'class-variance-authority'
+import { cva } from 'class-variance-authority'
 import { PanelLeftIcon } from 'lucide-react'
-import type {VariantProps} from 'class-variance-authority';
+import type { VariantProps } from 'class-variance-authority'
 import type { CSSProperties, ComponentProps } from 'react'
 
 import { useIsMobile } from '@/hooks/use-mobile'

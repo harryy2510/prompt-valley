@@ -1,8 +1,7 @@
-import { Button } from '@/components/ui/button'
 import type { ComponentProps } from 'react'
-import type { VariantProps } from 'class-variance-authority'
-import { buttonVariants } from '@/components/ui/button'
+
 import { cn } from '@/libs/cn'
+import { Button } from '@/components/ui/button'
 
 type IconButtonProps = Omit<
   ComponentProps<typeof Button>,

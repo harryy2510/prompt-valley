@@ -1,7 +1,7 @@
-import { Link } from '@tanstack/react-router'
-import { Button } from '@/components/ui/button'
 import type { ComponentProps } from 'react'
-import { cn } from '@/libs/cn'
+import { Link } from '@tanstack/react-router'
+
+import { Button } from '@/components/ui/button'
 
 type LinkButtonProps = Omit<ComponentProps<typeof Link>, 'className'> & {
   variant?:

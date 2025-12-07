@@ -10,13 +10,13 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: '13.0.5'
+    PostgrestVersion: "13.0.5"
   }
   public: {
     Tables: {
       ai_models: {
         Row: {
-          capabilities: Database['public']['Enums']['model_capability'][]
+          capabilities: Database["public"]["Enums"]["model_capability"][]
           context_window: number | null
           cost_input_per_million: number | null
           cost_output_per_million: number | null
@@ -28,7 +28,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
-          capabilities?: Database['public']['Enums']['model_capability'][]
+          capabilities?: Database["public"]["Enums"]["model_capability"][]
           context_window?: number | null
           cost_input_per_million?: number | null
           cost_output_per_million?: number | null
@@ -40,7 +40,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
-          capabilities?: Database['public']['Enums']['model_capability'][]
+          capabilities?: Database["public"]["Enums"]["model_capability"][]
           context_window?: number | null
           cost_input_per_million?: number | null
           cost_output_per_million?: number | null
@@ -53,11 +53,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'ai_models_provider_id_fkey'
-            columns: ['provider_id']
+            foreignKeyName: "ai_models_provider_id_fkey"
+            columns: ["provider_id"]
             isOneToOne: false
-            referencedRelation: 'ai_providers'
-            referencedColumns: ['id']
+            referencedRelation: "ai_providers"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -112,11 +112,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'categories_parent_id_fkey'
-            columns: ['parent_id']
+            foreignKeyName: "categories_parent_id_fkey"
+            columns: ["parent_id"]
             isOneToOne: false
-            referencedRelation: 'categories'
-            referencedColumns: ['id']
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -138,25 +138,25 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'prompt_models_model_id_fkey'
-            columns: ['model_id']
+            foreignKeyName: "prompt_models_model_id_fkey"
+            columns: ["model_id"]
             isOneToOne: false
-            referencedRelation: 'ai_models'
-            referencedColumns: ['id']
+            referencedRelation: "ai_models"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'prompt_models_prompt_id_fkey'
-            columns: ['prompt_id']
+            foreignKeyName: "prompt_models_prompt_id_fkey"
+            columns: ["prompt_id"]
             isOneToOne: false
-            referencedRelation: 'prompts'
-            referencedColumns: ['id']
+            referencedRelation: "prompts"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'prompt_models_prompt_id_fkey'
-            columns: ['prompt_id']
+            foreignKeyName: "prompt_models_prompt_id_fkey"
+            columns: ["prompt_id"]
             isOneToOne: false
-            referencedRelation: 'prompts_with_access'
-            referencedColumns: ['id']
+            referencedRelation: "prompts_with_access"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -178,25 +178,25 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'prompt_tags_prompt_id_fkey'
-            columns: ['prompt_id']
+            foreignKeyName: "prompt_tags_prompt_id_fkey"
+            columns: ["prompt_id"]
             isOneToOne: false
-            referencedRelation: 'prompts'
-            referencedColumns: ['id']
+            referencedRelation: "prompts"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'prompt_tags_prompt_id_fkey'
-            columns: ['prompt_id']
+            foreignKeyName: "prompt_tags_prompt_id_fkey"
+            columns: ["prompt_id"]
             isOneToOne: false
-            referencedRelation: 'prompts_with_access'
-            referencedColumns: ['id']
+            referencedRelation: "prompts_with_access"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'prompt_tags_tag_id_fkey'
-            columns: ['tag_id']
+            foreignKeyName: "prompt_tags_tag_id_fkey"
+            columns: ["tag_id"]
             isOneToOne: false
-            referencedRelation: 'tags'
-            referencedColumns: ['id']
+            referencedRelation: "tags"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -215,7 +215,7 @@ export type Database = {
           published_at: string | null
           saves_count: number
           sort_order: number | null
-          tier: Database['public']['Enums']['tier']
+          tier: Database["public"]["Enums"]["tier"]
           title: string
           updated_at: string
           views_count: number
@@ -234,7 +234,7 @@ export type Database = {
           published_at?: string | null
           saves_count?: number
           sort_order?: number | null
-          tier?: Database['public']['Enums']['tier']
+          tier?: Database["public"]["Enums"]["tier"]
           title: string
           updated_at?: string
           views_count?: number
@@ -253,32 +253,247 @@ export type Database = {
           published_at?: string | null
           saves_count?: number
           sort_order?: number | null
-          tier?: Database['public']['Enums']['tier']
+          tier?: Database["public"]["Enums"]["tier"]
           title?: string
           updated_at?: string
           views_count?: number
         }
         Relationships: [
           {
-            foreignKeyName: 'prompts_category_id_fkey'
-            columns: ['category_id']
+            foreignKeyName: "prompts_category_id_fkey"
+            columns: ["category_id"]
             isOneToOne: false
-            referencedRelation: 'categories'
-            referencedColumns: ['id']
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'prompts_created_by_fkey'
-            columns: ['created_by']
+            foreignKeyName: "prompts_created_by_fkey"
+            columns: ["created_by"]
             isOneToOne: false
-            referencedRelation: 'user_profiles'
-            referencedColumns: ['id']
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'prompts_created_by_fkey'
-            columns: ['created_by']
+            foreignKeyName: "prompts_created_by_fkey"
+            columns: ["created_by"]
             isOneToOne: false
-            referencedRelation: 'users'
-            referencedColumns: ['id']
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      stripe_coupons: {
+        Row: {
+          amount_off: number | null
+          applies_to_products: string[] | null
+          created_at: string
+          currency: string | null
+          duration: Database["public"]["Enums"]["coupon_duration"]
+          duration_in_months: number | null
+          id: string
+          max_redemptions: number | null
+          metadata: Json | null
+          name: string | null
+          percent_off: number | null
+          redeem_by: string | null
+          times_redeemed: number
+          updated_at: string
+          valid: boolean
+        }
+        Insert: {
+          amount_off?: number | null
+          applies_to_products?: string[] | null
+          created_at?: string
+          currency?: string | null
+          duration?: Database["public"]["Enums"]["coupon_duration"]
+          duration_in_months?: number | null
+          id: string
+          max_redemptions?: number | null
+          metadata?: Json | null
+          name?: string | null
+          percent_off?: number | null
+          redeem_by?: string | null
+          times_redeemed?: number
+          updated_at?: string
+          valid?: boolean
+        }
+        Update: {
+          amount_off?: number | null
+          applies_to_products?: string[] | null
+          created_at?: string
+          currency?: string | null
+          duration?: Database["public"]["Enums"]["coupon_duration"]
+          duration_in_months?: number | null
+          id?: string
+          max_redemptions?: number | null
+          metadata?: Json | null
+          name?: string | null
+          percent_off?: number | null
+          redeem_by?: string | null
+          times_redeemed?: number
+          updated_at?: string
+          valid?: boolean
+        }
+        Relationships: []
+      }
+      stripe_prices: {
+        Row: {
+          active: boolean
+          created_at: string
+          currency: string
+          id: string
+          metadata: Json | null
+          nickname: string | null
+          product_id: string
+          recurring_interval:
+            | Database["public"]["Enums"]["billing_interval"]
+            | null
+          recurring_interval_count: number | null
+          unit_amount: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          currency?: string
+          id: string
+          metadata?: Json | null
+          nickname?: string | null
+          product_id: string
+          recurring_interval?:
+            | Database["public"]["Enums"]["billing_interval"]
+            | null
+          recurring_interval_count?: number | null
+          unit_amount: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          currency?: string
+          id?: string
+          metadata?: Json | null
+          nickname?: string | null
+          product_id?: string
+          recurring_interval?:
+            | Database["public"]["Enums"]["billing_interval"]
+            | null
+          recurring_interval_count?: number | null
+          unit_amount?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stripe_prices_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "stripe_products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stripe_prices_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "stripe_products_with_prices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      stripe_products: {
+        Row: {
+          active: boolean
+          created_at: string
+          description: string | null
+          display_order: number | null
+          features: string[] | null
+          highlight: string | null
+          id: string
+          images: string[] | null
+          metadata: Json | null
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          description?: string | null
+          display_order?: number | null
+          features?: string[] | null
+          highlight?: string | null
+          id: string
+          images?: string[] | null
+          metadata?: Json | null
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          description?: string | null
+          display_order?: number | null
+          features?: string[] | null
+          highlight?: string | null
+          id?: string
+          images?: string[] | null
+          metadata?: Json | null
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      stripe_promotion_codes: {
+        Row: {
+          active: boolean
+          code: string
+          coupon_id: string
+          created_at: string
+          expires_at: string | null
+          first_time_transaction: boolean | null
+          id: string
+          max_redemptions: number | null
+          metadata: Json | null
+          minimum_amount: number | null
+          minimum_amount_currency: string | null
+          times_redeemed: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          code: string
+          coupon_id: string
+          created_at?: string
+          expires_at?: string | null
+          first_time_transaction?: boolean | null
+          id: string
+          max_redemptions?: number | null
+          metadata?: Json | null
+          minimum_amount?: number | null
+          minimum_amount_currency?: string | null
+          times_redeemed?: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          code?: string
+          coupon_id?: string
+          created_at?: string
+          expires_at?: string | null
+          first_time_transaction?: boolean | null
+          id?: string
+          max_redemptions?: number | null
+          metadata?: Json | null
+          minimum_amount?: number | null
+          minimum_amount_currency?: string | null
+          times_redeemed?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stripe_promotion_codes_coupon_id_fkey"
+            columns: ["coupon_id"]
+            isOneToOne: false
+            referencedRelation: "stripe_coupons"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -324,32 +539,32 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: 'user_favorites_prompt_id_fkey'
-            columns: ['prompt_id']
+            foreignKeyName: "user_favorites_prompt_id_fkey"
+            columns: ["prompt_id"]
             isOneToOne: false
-            referencedRelation: 'prompts'
-            referencedColumns: ['id']
+            referencedRelation: "prompts"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'user_favorites_prompt_id_fkey'
-            columns: ['prompt_id']
+            foreignKeyName: "user_favorites_prompt_id_fkey"
+            columns: ["prompt_id"]
             isOneToOne: false
-            referencedRelation: 'prompts_with_access'
-            referencedColumns: ['id']
+            referencedRelation: "prompts_with_access"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'user_favorites_user_id_fkey'
-            columns: ['user_id']
+            foreignKeyName: "user_favorites_user_id_fkey"
+            columns: ["user_id"]
             isOneToOne: false
-            referencedRelation: 'user_profiles'
-            referencedColumns: ['id']
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'user_favorites_user_id_fkey'
-            columns: ['user_id']
+            foreignKeyName: "user_favorites_user_id_fkey"
+            columns: ["user_id"]
             isOneToOne: false
-            referencedRelation: 'users'
-            referencedColumns: ['id']
+            referencedRelation: "users"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -360,7 +575,7 @@ export type Database = {
           email: string
           id: string
           name: string | null
-          role: Database['public']['Enums']['user_role']
+          role: Database["public"]["Enums"]["user_role"]
           stripe_cancel_at_period_end: boolean | null
           stripe_canceled_at: string | null
           stripe_current_period_end: string | null
@@ -368,7 +583,7 @@ export type Database = {
           stripe_customer_id: string | null
           stripe_subscription_id: string | null
           stripe_subscription_status: string | null
-          tier: Database['public']['Enums']['tier']
+          tier: Database["public"]["Enums"]["tier"]
           updated_at: string
         }
         Insert: {
@@ -377,7 +592,7 @@ export type Database = {
           email: string
           id: string
           name?: string | null
-          role?: Database['public']['Enums']['user_role']
+          role?: Database["public"]["Enums"]["user_role"]
           stripe_cancel_at_period_end?: boolean | null
           stripe_canceled_at?: string | null
           stripe_current_period_end?: string | null
@@ -385,7 +600,7 @@ export type Database = {
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
           stripe_subscription_status?: string | null
-          tier?: Database['public']['Enums']['tier']
+          tier?: Database["public"]["Enums"]["tier"]
           updated_at?: string
         }
         Update: {
@@ -394,7 +609,7 @@ export type Database = {
           email?: string
           id?: string
           name?: string | null
-          role?: Database['public']['Enums']['user_role']
+          role?: Database["public"]["Enums"]["user_role"]
           stripe_cancel_at_period_end?: boolean | null
           stripe_canceled_at?: string | null
           stripe_current_period_end?: string | null
@@ -402,7 +617,7 @@ export type Database = {
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
           stripe_subscription_status?: string | null
-          tier?: Database['public']['Enums']['tier']
+          tier?: Database["public"]["Enums"]["tier"]
           updated_at?: string
         }
         Relationships: []
@@ -424,7 +639,7 @@ export type Database = {
           published_at: string | null
           saves_count: number | null
           sort_order: number | null
-          tier: Database['public']['Enums']['tier'] | null
+          tier: Database["public"]["Enums"]["tier"] | null
           title: string | null
           updated_at: string | null
           views_count: number | null
@@ -443,7 +658,7 @@ export type Database = {
           published_at?: string | null
           saves_count?: number | null
           sort_order?: number | null
-          tier?: Database['public']['Enums']['tier'] | null
+          tier?: Database["public"]["Enums"]["tier"] | null
           title?: string | null
           updated_at?: string | null
           views_count?: number | null
@@ -462,34 +677,49 @@ export type Database = {
           published_at?: string | null
           saves_count?: number | null
           sort_order?: number | null
-          tier?: Database['public']['Enums']['tier'] | null
+          tier?: Database["public"]["Enums"]["tier"] | null
           title?: string | null
           updated_at?: string | null
           views_count?: number | null
         }
         Relationships: [
           {
-            foreignKeyName: 'prompts_category_id_fkey'
-            columns: ['category_id']
+            foreignKeyName: "prompts_category_id_fkey"
+            columns: ["category_id"]
             isOneToOne: false
-            referencedRelation: 'categories'
-            referencedColumns: ['id']
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'prompts_created_by_fkey'
-            columns: ['created_by']
+            foreignKeyName: "prompts_created_by_fkey"
+            columns: ["created_by"]
             isOneToOne: false
-            referencedRelation: 'user_profiles'
-            referencedColumns: ['id']
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'prompts_created_by_fkey'
-            columns: ['created_by']
+            foreignKeyName: "prompts_created_by_fkey"
+            columns: ["created_by"]
             isOneToOne: false
-            referencedRelation: 'users'
-            referencedColumns: ['id']
+            referencedRelation: "users"
+            referencedColumns: ["id"]
           },
         ]
+      }
+      stripe_products_with_prices: {
+        Row: {
+          active: boolean | null
+          description: string | null
+          display_order: number | null
+          features: string[] | null
+          highlight: string | null
+          id: string | null
+          images: string[] | null
+          metadata: Json | null
+          name: string | null
+          prices: Json | null
+        }
+        Relationships: []
       }
       user_profiles: {
         Row: {
@@ -498,7 +728,7 @@ export type Database = {
           email: string | null
           id: string | null
           name: string | null
-          tier: Database['public']['Enums']['tier'] | null
+          tier: Database["public"]["Enums"]["tier"] | null
         }
         Insert: {
           avatar_url?: string | null
@@ -506,7 +736,7 @@ export type Database = {
           email?: string | null
           id?: string | null
           name?: string | null
-          tier?: Database['public']['Enums']['tier'] | null
+          tier?: Database["public"]["Enums"]["tier"] | null
         }
         Update: {
           avatar_url?: string | null
@@ -514,13 +744,29 @@ export type Database = {
           email?: string | null
           id?: string | null
           name?: string | null
-          tier?: Database['public']['Enums']['tier'] | null
+          tier?: Database["public"]["Enums"]["tier"] | null
         }
         Relationships: []
       }
     }
     Functions: {
       get_user_billing_info: { Args: { user_id_param: string }; Returns: Json }
+      handle_stripe_coupon_webhook: {
+        Args: { payload: Json }
+        Returns: undefined
+      }
+      handle_stripe_price_webhook: {
+        Args: { payload: Json }
+        Returns: undefined
+      }
+      handle_stripe_product_webhook: {
+        Args: { payload: Json }
+        Returns: undefined
+      }
+      handle_stripe_promotion_code_webhook: {
+        Args: { payload: Json }
+        Returns: undefined
+      }
       handle_stripe_webhook: { Args: { payload: Json }; Returns: undefined }
       increment_prompt_copies: {
         Args: { prompt_text_id: string }
@@ -531,11 +777,15 @@ export type Database = {
         Returns: undefined
       }
       user_can_access_pro_content: { Args: never; Returns: boolean }
+      validate_promotion_code: { Args: { code_param: string }; Returns: Json }
     }
     Enums: {
-      model_capability: 'text' | 'image' | 'video' | 'code'
-      tier: 'free' | 'pro'
-      user_role: 'user' | 'admin'
+      billing_interval: "day" | "week" | "month" | "year"
+      coupon_duration: "once" | "repeating" | "forever"
+      model_capability: "text" | "image" | "video" | "code"
+      stripe_status: "active" | "inactive" | "archived"
+      tier: "free" | "pro"
+      user_role: "user" | "admin"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -543,33 +793,33 @@ export type Database = {
   }
 }
 
-type DatabaseWithoutInternals = Omit<Database, '__InternalSupabase'>
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
 
-type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, 'public'>]
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
 
 export type Tables<
   DefaultSchemaTableNameOrOptions extends
-    | keyof (DefaultSchema['Tables'] & DefaultSchema['Views'])
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'] &
-        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Views'])
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
     : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'] &
-      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Views'])[TableName] extends {
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
       Row: infer R
     }
     ? R
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema['Tables'] &
-        DefaultSchema['Views'])
-    ? (DefaultSchema['Tables'] &
-        DefaultSchema['Views'])[DefaultSchemaTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
         Row: infer R
       }
       ? R
@@ -578,23 +828,23 @@ export type Tables<
 
 export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
-    | keyof DefaultSchema['Tables']
+    | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables']
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'][TableName] extends {
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Insert: infer I
     }
     ? I
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema['Tables']
-    ? DefaultSchema['Tables'][DefaultSchemaTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
         Insert: infer I
       }
       ? I
@@ -603,23 +853,23 @@ export type TablesInsert<
 
 export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
-    | keyof DefaultSchema['Tables']
+    | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables']
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'][TableName] extends {
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Update: infer U
     }
     ? U
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema['Tables']
-    ? DefaultSchema['Tables'][DefaultSchemaTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
         Update: infer U
       }
       ? U
@@ -628,44 +878,47 @@ export type TablesUpdate<
 
 export type Enums<
   DefaultSchemaEnumNameOrOptions extends
-    | keyof DefaultSchema['Enums']
+    | keyof DefaultSchema["Enums"]
     | { schema: keyof DatabaseWithoutInternals },
   EnumName extends DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions['schema']]['Enums']
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
     : never = never,
 > = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions['schema']]['Enums'][EnumName]
-  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema['Enums']
-    ? DefaultSchema['Enums'][DefaultSchemaEnumNameOrOptions]
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
     : never
 
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
-    | keyof DefaultSchema['CompositeTypes']
+    | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof DatabaseWithoutInternals },
   CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes']
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
     : never = never,
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes'][CompositeTypeName]
-  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema['CompositeTypes']
-    ? DefaultSchema['CompositeTypes'][PublicCompositeTypeNameOrOptions]
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never
 
 export const Constants = {
   public: {
     Enums: {
-      model_capability: ['text', 'image', 'video', 'code'],
-      tier: ['free', 'pro'],
-      user_role: ['user', 'admin'],
+      billing_interval: ["day", "week", "month", "year"],
+      coupon_duration: ["once", "repeating", "forever"],
+      model_capability: ["text", "image", "video", "code"],
+      stripe_status: ["active", "inactive", "archived"],
+      tier: ["free", "pro"],
+      user_role: ["user", "admin"],
     },
   },
 } as const
