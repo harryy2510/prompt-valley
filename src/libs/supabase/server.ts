@@ -11,8 +11,8 @@ import { STORAGE_KEY } from './constants'
  */
 export function getSupabaseServerClient() {
   return createServerClient<Database>(
-    process.env.VITE_SUPABASE_URL,
-    process.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+    process.env.VITE_SUPABASE_URL!,
+    process.env.VITE_SUPABASE_PUBLISHABLE_KEY!,
     {
       auth: {
         storageKey: STORAGE_KEY,

@@ -1,6 +1,6 @@
 import { Slot } from '@radix-ui/react-slot'
-import {  cva } from 'class-variance-authority'
-import type {VariantProps} from 'class-variance-authority';
+import { cva } from 'class-variance-authority'
+import type { VariantProps } from 'class-variance-authority'
 import type { ComponentProps } from 'react'
 
 import { cn } from '@/libs/cn'
@@ -33,12 +33,11 @@ const buttonVariants = cva(
         'nav-link-muted':
           'text-sm font-medium text-muted-foreground hover:bg-muted rounded-md',
         // Inverse variants - for dark/colored backgrounds
-        'inverse':
-          'bg-white text-foreground hover:bg-white/90 shadow-sm',
+        inverse: 'bg-white text-foreground hover:bg-white/90 shadow-sm',
         'inverse-outline':
           'bg-transparent text-white border border-white/40 hover:bg-white/10 hover:border-white/60',
         // Overlay variant - for card overlays
-        'overlay':
+        overlay:
           'bg-foreground/80 text-white backdrop-blur-sm hover:bg-foreground/90 text-xs font-medium',
       },
       size: {
@@ -51,13 +50,13 @@ const buttonVariants = cva(
         'icon-xs': 'size-6',
         'icon-sm': 'size-8',
         'icon-lg': 'size-10',
-        'nav': 'px-3 py-1.5',
-        'cta': 'px-5 py-2',
+        nav: 'px-3 py-1.5',
+        cta: 'px-5 py-2',
         'cta-lg': 'px-6 py-3',
       },
     },
     defaultVariants: {
-      variant: 'default',
+      variant: 'brand-primary',
       size: 'default',
     },
   },

@@ -125,6 +125,26 @@ export function useSignOut() {
   })
 }
 
+export function useSendOtp() {
+  return useMutation({
+    mutationFn: (email: string) => sendOtpServer({ data: { email } }),
+  })
+}
+
+export function useVerifyOtp() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (data: { email: string; token: string }) =>
+      verifyOtpServer({ data }),
+    onSuccess: (result) => {
+      if (result.success && result.user) {
+        queryClient.setQueryData(authKeys.user(), result.user)
+      }
+    },
+  })
+}
+
 // ============================================
 // Auth State Listener (for client-side sync)
 // ============================================
