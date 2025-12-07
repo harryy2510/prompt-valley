@@ -6,8 +6,8 @@ import * as TanstackQuery from '@/libs/react-query/root-provider'
 import { routeTree } from './routeTree.gen'
 import type { ReactNode } from 'react'
 import { AuthStateProvider } from '@/libs/supabase/auth-state-provider'
-import { DefaultCatchBoundary } from '@/components/default-catch-boundary'
-import { NotFound } from '@/components/not-found'
+import { DefaultCatchBoundary } from '@/components/error/default-catch-boundary'
+import { NotFound } from '@/components/error/not-found'
 
 // Create a new router instance
 export const getRouter = () => {

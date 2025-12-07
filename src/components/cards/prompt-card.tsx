@@ -3,11 +3,11 @@ import { BookmarkIcon } from 'lucide-react'
 
 import { cn } from '@/libs/cn'
 import { Badge } from '@/components/ui/badge'
-import { CopyButton } from '@/components/ui/copy-button'
-import { ProBadge } from '@/components/ui/pro-badge'
-import { PlatformBadge, type Platform } from '@/components/ui/platform-badge'
+import { CopyButton } from '@/components/common/copy-button'
+import { ProBadge } from '@/components/common/pro-badge'
+import { PlatformBadge, type Platform } from '@/components/common/platform-badge'
 import { AspectRatio } from '@/components/ui/aspect-ratio'
-import { IconButton } from '@/components/ui/icon-button'
+import { IconButton } from '@/components/common/icon-button'
 import type { Tables, Enums } from '@/types/database.types'
 
 // Database-aligned prompt type

@@ -1,12 +1,12 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
 import { Copy, Bookmark } from 'lucide-react'
-import { LinkButton } from '@/components/ui/link-button'
-import { IconButton } from '@/components/ui/icon-button'
-import { CategoryFilterGroup } from '@/components/category-filter'
-import { ProBadge } from '@/components/pro-badge'
-import { SearchInput } from '@/components/search-input'
-import { Logo } from '@/components/logo'
+import { LinkButton } from '@/components/common/link-button'
+import { IconButton } from '@/components/common/icon-button'
+import { CategoryFilterGroup } from '@/components/layout/category-filter'
+import { ProBadge } from '@/components/common/pro-badge'
+import { SearchInput } from '@/components/common/search-input'
+import { Logo } from '@/components/layout/logo'
 
 export const Route = createFileRoute('/')({
   component: RouteComponent,

@@ -18,7 +18,7 @@ import {
   Share2,
   MoreVertical,
 } from 'lucide-react'
-import { ThemeToggle } from '@/components/theme-toggle'
+import { ThemeToggle } from '@/components/layout/theme-toggle'
 import {
   useCuratedPrompts,
   useMyPrompts,

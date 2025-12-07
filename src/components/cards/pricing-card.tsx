@@ -4,7 +4,7 @@ import { SparklesIcon } from 'lucide-react'
 
 import { cn } from '@/libs/cn'
 import { Button } from '@/components/ui/button'
-import { PricingToggle, type PricingPeriod } from '@/components/ui/pricing-toggle'
+import { PricingToggle, type PricingPeriod } from '@/components/cards/pricing-toggle'
 import type { Tables } from '@/types/database.types'
 
 // Database-aligned types
