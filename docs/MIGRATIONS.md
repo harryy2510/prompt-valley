@@ -7,10 +7,12 @@ The database schema is organized into **7 sequential migrations** that build the
 ## Migration Files
 
 ### 1. `20250130000001_create_enums.sql`
+
 **Dependencies:** None
 **Purpose:** Create all enum types
 
 **Creates:**
+
 - `access_level` - Prompt access levels (`free`, `pro`)
 - `model_capability` - AI model capabilities (`text`, `image`, `video`, `audio`, `code`, `vision`, `multimodal`)
 - `subscription_tier` - User subscription tiers (`free`, `pro`, `enterprise`)
@@ -20,16 +22,19 @@ The database schema is organized into **7 sequential migrations** that build the
 ---
 
 ### 2. `20250130000002_create_core_tables.sql`
+
 **Dependencies:** `20250130000001_create_enums.sql`
 **Purpose:** Create foundational lookup tables
 
 **Creates:**
+
 - `ai_providers` - AI companies (OpenAI, Anthropic, Google, etc.)
 - `ai_models` - Specific AI models with capabilities and pricing
 - `categories` - Hierarchical categories (self-referencing)
 - `tags` - Flexible tagging system
 
 **Indexes:** 15 indexes for performance
+
 - Provider slugs, active status, sort order
 - Model capabilities (GIN index), featured status
 - Category hierarchy, slugs
@@ -40,16 +45,19 @@ The database schema is organized into **7 sequential migrations** that build the
 ---
 
 ### 3. `20250130000003_create_prompts_tables.sql`
+
 **Dependencies:** `20250130000002_create_core_tables.sql`
 **Purpose:** Create prompt content and related tables
 
 **Creates:**
+
 - `prompts` - Main prompt content (references `categories`)
 - `prompt_images` - Multiple images per prompt
 - `prompt_tags` - Many-to-many junction (prompts ↔ tags)
 - `prompt_models` - Many-to-many junction (prompts ↔ ai_models)
 
 **Indexes:** 11 indexes for performance
+
 - Prompt slugs, categories, access levels
 - Published/featured filtering
 - Image ordering and primary flags
@@ -60,14 +68,17 @@ The database schema is organized into **7 sequential migrations** that build the
 ---
 
 ### 4. `20250130000004_create_user_tables.sql`
+
 **Dependencies:** `20250130000003_create_prompts_tables.sql`
 **Purpose:** Create user-related tables
 
 **Creates:**
+
 - `user_favorites` - User saved prompts (references `auth.users`, `prompts`)
 - `user_subscriptions` - Stripe subscription management (references `auth.users`)
 
 **Indexes:** 7 indexes for performance
+
 - User lookups
 - Prompt favorites
 - Subscription tiers and Stripe IDs
@@ -77,10 +88,12 @@ The database schema is organized into **7 sequential migrations** that build the
 ---
 
 ### 5. `20250130000005_create_triggers_functions.sql`
+
 **Dependencies:** `20250130000004_create_user_tables.sql`
 **Purpose:** Create triggers and helper functions
 
 **Creates:**
+
 - **Trigger Function:** `update_updated_at_column()`
   - Applied to: `ai_providers`, `ai_models`, `categories`, `tags`, `prompts`, `user_subscriptions`
   - Auto-updates `updated_at` timestamp on row update
@@ -104,14 +117,17 @@ The database schema is organized into **7 sequential migrations** that build the
 ---
 
 ### 6. `20250130000006_create_rls_policies.sql`
+
 **Dependencies:** `20250130000005_create_triggers_functions.sql`
 **Purpose:** Enable Row Level Security and create policies
 
 **Creates:**
+
 - Enables RLS on all 10 tables
 - Creates 20+ security policies
 
 **Policy Summary:**
+
 - **Public Read (Active Only):** `ai_providers`, `ai_models`, `categories`
 - **Public Read (All):** `tags`
 - **Public Read (Published):** `prompts`, `prompt_images`, `prompt_tags`, `prompt_models`
@@ -128,6 +144,7 @@ The database schema is organized into **7 sequential migrations** that build the
 **Purpose:** Populate initial data for development/testing
 
 **Inserts:**
+
 - **10 AI Providers:** OpenAI, Anthropic, Google, xAI, Meta, Mistral AI, Midjourney, Stability AI, Ideogram, DALL-E
 - **25+ AI Models:**
   - Text: GPT-4 Turbo, GPT-4o, Claude 3.5 Sonnet, Claude 3 Opus, Gemini 2.0 Flash, Grok 2, Llama 3.3, Mistral Large 2
@@ -220,6 +237,7 @@ supabase migration new your_feature_name
 ```
 
 **Migration Naming Convention:**
+
 - Use descriptive names: `add_user_profiles`, `update_prompt_schema`
 - Use snake_case
 - Be specific about what the migration does
@@ -229,14 +247,17 @@ supabase migration new your_feature_name
 ## Common Issues
 
 ### Issue: Migration fails with "relation does not exist"
+
 **Cause:** Migrations running out of order
 **Solution:** Check dependencies, ensure migrations run sequentially
 
 ### Issue: Constraint violation during seed data
+
 **Cause:** Foreign key references don't exist
 **Solution:** Verify previous migrations completed successfully
 
 ### Issue: RLS policies blocking queries
+
 **Cause:** User doesn't have required role or subscription
 **Solution:** Check `auth.jwt()` claims and `user_subscriptions` table
 
@@ -293,7 +314,7 @@ ORDER BY tablename;
 
 ## Related Documentation
 
-- [DATABASE.md](../DATABASE.md) - Complete schema documentation
+- [DATABASE.md](DATABASE.md) - Complete schema documentation
 - [Supabase Migrations Guide](https://supabase.com/docs/guides/cli/local-development#database-migrations)
 - [PostgreSQL Documentation](https://www.postgresql.org/docs/)
 
@@ -302,6 +323,7 @@ ORDER BY tablename;
 ## Migration History
 
 ### v2.0 (2025-01-30)
+
 - Complete schema redesign
 - Split into 7 modular migrations
 - Added AI providers and models system
@@ -310,6 +332,7 @@ ORDER BY tablename;
 - Stripe integration ready
 
 ### v1.0 (2025-01-21)
+
 - Initial schema (deprecated)
 - Single migration file
 - Basic prompt management
