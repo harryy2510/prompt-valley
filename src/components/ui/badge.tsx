@@ -23,8 +23,8 @@ const badgeVariants = cva(
         // Category variant - for category badges (Image Generation, Writing)
         category:
           'rounded-md border-border bg-muted text-muted-foreground hover:bg-muted/80',
-        // Platform variant - for AI platform badges (ChatGPT, Gemini, etc.)
-        platform:
+        // Platform variant - for AI provider badges (ChatGPT, Gemini, etc.)
+        provider:
           'rounded-md border-border bg-background text-foreground [&>svg]:size-3.5',
         // Pro variant - purple PRO badge
         pro: 'rounded-md border-transparent bg-primary text-primary-foreground font-semibold',

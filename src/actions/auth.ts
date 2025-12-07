@@ -64,18 +64,23 @@ export const verifyOtpServer = createServerFn({ method: 'POST' })
   .inputValidator(verifyOtpSchema)
   .handler(async ({ data }) => {
     const supabase = getSupabaseServerClient()
-    const { error } = await supabase.auth.verifyOtp({
+    const response = await supabase.auth.verifyOtp({
       email: data.email,
       token: data.token,
       type: 'email',
     })
 
-    if (error) {
-      return { error: error.message, success: false as const }
+    if (response.error) {
+      return {
+        error: response.error.message,
+        success: false as const,
+        user: null,
+      }
     }
 
     return {
       success: true as const,
+      user: response.data?.user,
     }
   })
 

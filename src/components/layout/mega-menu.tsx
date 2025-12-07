@@ -52,10 +52,7 @@ function MegaMenu({
       >
         {trigger}
         <ChevronDownIcon
-          className={cn(
-            'size-4 transition-transform',
-            isOpen && 'rotate-180',
-          )}
+          className={cn('size-4 transition-transform', isOpen && 'rotate-180')}
         />
       </Button>
 
@@ -90,9 +87,7 @@ function MegaMenu({
             </div>
 
             {footer && (
-              <div className="mt-4 pt-4 border-t border-border">
-                {footer}
-              </div>
+              <div className="mt-4 pt-4 border-t border-border">{footer}</div>
             )}
           </div>
         </div>
@@ -119,9 +114,7 @@ function MegaMenuCategoryItem({
       )}
     >
       {icon && (
-        <div className="shrink-0 mt-0.5 text-muted-foreground">
-          {icon}
-        </div>
+        <div className="shrink-0 mt-0.5 text-muted-foreground">{icon}</div>
       )}
       <div className="flex-1 min-w-0">
         <div className="text-body2-medium text-foreground">{title}</div>
@@ -137,14 +130,17 @@ function MegaMenuCategoryItem({
 
 // Navigation bar with mega menus
 type NavMegaMenuProps = ComponentProps<'nav'> & {
-  items: Array<{
-    trigger: string
-    sections: MegaMenuSection[]
-    footer?: ReactNode
-  } | {
-    label: string
-    href: string
-  }>
+  items: Array<
+    | {
+        trigger: string
+        sections: MegaMenuSection[]
+        footer?: ReactNode
+      }
+    | {
+        label: string
+        href: string
+      }
+  >
 }
 
 function NavMegaMenu({ items, className, ...props }: NavMegaMenuProps) {
@@ -167,12 +163,7 @@ function NavMegaMenu({ items, className, ...props }: NavMegaMenuProps) {
         }
 
         return (
-          <Button
-            key={index}
-            variant="nav-link"
-            size="nav"
-            asChild
-          >
+          <Button key={index} variant="nav-link" size="nav" asChild>
             <a href={item.href}>{item.label}</a>
           </Button>
         )
@@ -181,37 +172,5 @@ function NavMegaMenu({ items, className, ...props }: NavMegaMenuProps) {
   )
 }
 
-// Specific menu for Writing categories (from Figma)
-const writingCategories: MegaMenuSection = {
-  title: 'Categories',
-  categories: [
-    { title: 'Email sequences', href: '/category/email-sequences' },
-    { title: 'LinkedIn Post', href: '/category/linkedin-post' },
-    { title: 'Social media captions', href: '/category/social-media-captions' },
-    { title: 'Blog posts', href: '/category/blog-posts' },
-    { title: 'Ad copy', href: '/category/ad-copy' },
-    { title: 'Product descriptions', href: '/category/product-descriptions' },
-  ],
-}
-
-// Specific menu for Image Generation categories (from Figma)
-const imageGenerationCategories: MegaMenuSection = {
-  title: 'Categories',
-  categories: [
-    { title: 'Illustrations', href: '/category/illustrations' },
-    { title: 'Website hero images', href: '/category/website-hero-images' },
-    { title: 'Product photos', href: '/category/product-photos' },
-    { title: 'Portraits', href: '/category/portraits' },
-    { title: 'Landscapes', href: '/category/landscapes' },
-    { title: 'Abstract art', href: '/category/abstract-art' },
-  ],
-}
-
-export {
-  MegaMenu,
-  MegaMenuCategoryItem,
-  NavMegaMenu,
-  writingCategories,
-  imageGenerationCategories,
-}
+export { MegaMenu, MegaMenuCategoryItem, NavMegaMenu }
 export type { MegaMenuCategory, MegaMenuSection, MegaMenuProps }

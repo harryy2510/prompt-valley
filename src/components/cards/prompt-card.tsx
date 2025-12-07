@@ -5,10 +5,11 @@ import { cn } from '@/libs/cn'
 import { Badge } from '@/components/ui/badge'
 import { CopyButton } from '@/components/common/copy-button'
 import { ProBadge } from '@/components/common/pro-badge'
-import { PlatformBadge, type Platform } from '@/components/common/platform-badge'
+import { ProviderBadge } from '@/components/common/provider-badge'
 import { AspectRatio } from '@/components/ui/aspect-ratio'
 import { IconButton } from '@/components/common/icon-button'
 import type { Tables, Enums } from '@/types/database.types'
+import { compact, uniqBy } from 'lodash-es'
 
 // Database-aligned prompt type
 type Prompt = Tables<'prompts'>
@@ -30,7 +31,6 @@ type PromptCardProps = ComponentProps<'article'> & {
   imageUrl?: string
   imagePlaceholder?: ReactNode
   promptText?: string
-  platform?: Platform
   category?: string
   tags?: string[]
   tier?: Tier
@@ -47,7 +47,6 @@ function PromptCard({
   imageUrl: imageUrlProp,
   imagePlaceholder,
   promptText: promptTextProp,
-  platform: platformProp,
   category: categoryProp,
   tags: tagsProp = [],
   tier: tierProp,
@@ -72,10 +71,7 @@ function PromptCard({
     ? tagsProp
     : prompt?.tags?.map((t) => t.tag.name) ?? []
 
-  // Extract platform from first model's provider
-  const platform = platformProp ?? (
-    prompt?.models?.[0]?.model?.provider?.name?.toLowerCase() as Platform | undefined
-  )
+  const providers = compact(uniqBy(prompt?.models?.map(model => model.model.provider), 'id'))
 
   return (
     <article
@@ -157,9 +153,9 @@ function PromptCard({
 
         {/* Tags row */}
         <div className="flex flex-wrap items-center gap-1.5">
-          {platform && (
-            <PlatformBadge platform={platform} showIcon={false} />
-          )}
+          {providers.map(provider => (
+            <ProviderBadge provider={provider} showIcon={false} />
+          ))}
           {category && (
             <Badge variant="category">{category}</Badge>
           )}

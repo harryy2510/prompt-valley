@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useRouter } from '@tanstack/react-router'
-import { useState, type FormEvent } from 'react'
+import { type FormEvent, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -8,7 +8,7 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from '@/components/ui/input-otp'
-import { Sparkles, Mail, ArrowLeft, Loader2 } from 'lucide-react'
+import { ArrowLeft, Loader2, Mail, Sparkles } from 'lucide-react'
 import { useQueryClient } from '@tanstack/react-query'
 import { authKeys, sendOtpServer, verifyOtpServer } from '@/actions/auth'
 
@@ -34,7 +34,7 @@ function RouteComponent() {
 
     try {
       const { error } = await sendOtpServer({
-        email,
+        data: { email },
       })
 
       if (error) throw error
@@ -53,15 +53,14 @@ function RouteComponent() {
     setError(null)
 
     try {
-      const { data, error } = await verifyOtpServer({
-        email,
-        token: otp,
+      const { user, error } = await verifyOtpServer({
+        data: { email, token: otp },
       })
 
       if (error) throw error
 
       // Update the auth cache
-      queryClient.setQueryData(authKeys.user(), data.user)
+      queryClient.setQueryData(authKeys.user(), user)
 
       router.invalidate()
     } catch (err: any) {

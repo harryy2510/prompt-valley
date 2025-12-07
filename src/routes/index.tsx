@@ -6,7 +6,7 @@ import { IconButton } from '@/components/common/icon-button'
 import { CategoryFilterGroup } from '@/components/layout/category-filter'
 import { ProBadge } from '@/components/common/pro-badge'
 import { SearchInput } from '@/components/common/search-input'
-import { Logo } from '@/components/layout/logo'
+import { LogoWithText } from '@/components/layout/logo-with-text'
 
 export const Route = createFileRoute('/')({
   component: RouteComponent,
@@ -20,7 +20,7 @@ function RouteComponent() {
         <div className="mx-auto max-w-7xl px-6">
           <div className="flex h-[64px] items-center gap-3">
             {/* Logo */}
-            <Logo />
+            <LogoWithText />
 
             {/* Search */}
             <SearchInput containerClassName="w-[280px] ml-2" />

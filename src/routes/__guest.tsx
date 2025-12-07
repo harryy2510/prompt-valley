@@ -1,4 +1,5 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
+import { z } from 'zod'
 
 // ============================================
 // Search Schema
@@ -15,7 +16,7 @@ const guestSearchSchema = z.object({
 export const Route = createFileRoute('/__guest')({
   beforeLoad: async ({ context, search }) => {
     // Session is already in context from root route
-    if (context.session) {
+    if (context.user) {
       throw redirect({
         to: search.redirect || '/dashboard',
       })
