@@ -1,9 +1,28 @@
 import { createFileRoute } from '@tanstack/react-router'
 
+import {
+  HeroSection,
+  ExploreSection,
+  RolesSection,
+  CategoriesSection,
+  TestimonialsSection,
+  CtaSection,
+} from '@/components/home'
+import { MainLayout } from '@/components/layout'
+
 export const Route = createFileRoute('/')({
-  component: RouteComponent,
+  component: HomePage,
 })
 
-function RouteComponent() {
-  return <div className="min-h-screen bg-background"></div>
+function HomePage() {
+  return (
+    <MainLayout>
+      <HeroSection />
+      <ExploreSection />
+      <RolesSection />
+      <CategoriesSection />
+      <TestimonialsSection />
+      <CtaSection />
+    </MainLayout>
+  )
 }

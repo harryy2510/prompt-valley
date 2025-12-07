@@ -15,6 +15,9 @@ import type { PropsWithChildren } from 'react'
 import type { User } from '@supabase/supabase-js'
 import { seo } from '@/utils/seo'
 import { userQueryOptions, useAuthStateListener } from '@/actions/auth'
+import { categoriesQueryOptions } from '@/actions/categories'
+import { tagsQueryOptions } from '@/actions/tags'
+import { promptsQueryOptions } from '@/actions/prompts'
 
 // ============================================
 // Router Context Type
@@ -31,8 +34,13 @@ export interface RouterContext {
 
 export const Route = createRootRouteWithContext<RouterContext>()({
   beforeLoad: async ({ context }) => {
-    // Use React Query to fetch and cache the session
-    const user = await context.queryClient.ensureQueryData(userQueryOptions())
+    // Use React Query to fetch required data
+    const [user] = await Promise.all([
+      context.queryClient.ensureQueryData(userQueryOptions()),
+      context.queryClient.ensureQueryData(categoriesQueryOptions()),
+      context.queryClient.ensureQueryData(tagsQueryOptions()),
+      context.queryClient.ensureQueryData(promptsQueryOptions()),
+    ])
 
     return { user }
   },
@@ -99,22 +107,23 @@ export const Route = createRootRouteWithContext<RouterContext>()({
 function RootDocument({ children }: PropsWithChildren) {
   useAuthStateListener()
   return (
-    <html lang="en">
+    <html lang="en" className="light">
       <head>
         <HeadContent />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                const savedTheme = localStorage.getItem('prompt-valley-theme');
-                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
-                  document.documentElement.classList.add('dark');
-                }
-              })();
-            `,
-          }}
-        />
+        {/* TODO: Only light theme for now */}
+        {/*<script*/}
+        {/*  dangerouslySetInnerHTML={{*/}
+        {/*    __html: `*/}
+        {/*      (function() {*/}
+        {/*        const savedTheme = localStorage.getItem('prompt-valley-theme');*/}
+        {/*        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;*/}
+        {/*        if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {*/}
+        {/*          document.documentElement.classList.add('dark');*/}
+        {/*        }*/}
+        {/*      })();*/}
+        {/*    `,*/}
+        {/*  }}*/}
+        {/*/>*/}
       </head>
       <body>
         {children}

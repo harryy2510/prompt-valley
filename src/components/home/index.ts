@@ -1,0 +1,6 @@
+export { HeroSection } from './hero-section'
+export { ExploreSection } from './explore-section'
+export { RolesSection } from './roles-section'
+export { CategoriesSection } from './categories-section'
+export { TestimonialsSection } from './testimonials-section'
+export { CtaSection } from './cta-section'

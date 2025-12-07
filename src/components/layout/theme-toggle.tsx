@@ -1,9 +1,9 @@
 import { Moon, Sun } from 'lucide-react'
-import { useEffect,  } from 'react'
+import { useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { useLocalStorage } from 'usehooks-ts'
 
-type Theme = 'light' | 'dark';
+type Theme = 'light' | 'dark'
 
 function getSystemTheme(): Theme {
   if (typeof window === 'undefined') return 'light'
@@ -23,7 +23,8 @@ export function ThemeToggle() {
   )
 
   useEffect(() => {
-    applyTheme(theme)
+    // TODO: Only light theme for now
+    // applyTheme(theme)
   }, [theme])
 
   const toggleTheme = () => {
