@@ -60,7 +60,7 @@
 - [x] `PricingCard` - Pricing modal/page card
 - [x] `PricingToggle` - Yearly/Monthly toggle switch
 - [x] `TestimonialCard` - Quote with avatar and attribution
-- [x] `ProUpsellCard` - Purple gradient upsell card
+- [x] `UpsellCard` - Purple gradient upsell card (uses database types)
 - [x] `PremiumContentBlock` - Premium content block for modals
 
 ### Onboarding
@@ -111,7 +111,7 @@
 | PricingCard | `src/components/ui/pricing-card.tsx` | [x] |
 | PricingToggle | `src/components/ui/pricing-toggle.tsx` | [x] |
 | TestimonialCard | `src/components/ui/testimonial-card.tsx` | [x] |
-| ProUpsellCard | `src/components/ui/pro-upsell-card.tsx` | [x] |
+| UpsellCard | `src/components/ui/upsell-card.tsx` | [x] |
 | StepIndicator | `src/components/ui/step-indicator.tsx` | [x] |
 | ImageGallery | `src/components/ui/image-gallery.tsx` | [x] |
 | SocialButton | `src/components/ui/social-button.tsx` | [x] |
@@ -158,7 +158,7 @@
 | 2025-12-07 | PricingCard | New pricing card with toggle and features list |
 | 2025-12-07 | PricingToggle | New yearly/monthly toggle switch |
 | 2025-12-07 | TestimonialCard | New testimonial quote card with avatar |
-| 2025-12-07 | ProUpsellCard | New PRO upsell card with gradient background |
+| 2025-12-07 | UpsellCard | Upsell card with gradient background (renamed from ProUpsellCard) |
 | 2025-12-07 | StepIndicator | New onboarding step indicator (bar and numbered) |
 | 2025-12-07 | ImageGallery | New image gallery with thumbnails and lightbox |
 | 2025-12-07 | SocialButton | New OAuth buttons (Google, Apple, Email) |
@@ -181,7 +181,7 @@
 - PricingCard
 - PricingToggle
 - TestimonialCard, TestimonialGrid
-- ProUpsellCard, PremiumContentBlock
+- UpsellCard, PremiumContentBlock
 - StepIndicator, NumberedStepIndicator
 - ImageGallery, ImageLightbox
 - SocialButton, SocialButtonGroup
