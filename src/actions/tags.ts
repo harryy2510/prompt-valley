@@ -2,13 +2,19 @@ import { queryOptions, useQuery } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { getSupabaseServerClient } from '@/libs/supabase/server'
 import type { Tables } from '@/types/database.types'
-import { PromptFilters } from '@/actions/prompts'
+import { z } from 'zod'
 
 // ============================================
 // Types
 // ============================================
 
 export type Tag = Tables<'tags'>
+
+// ============================================
+// Zod Schemas
+// ============================================
+
+const tagIdSchema = z.uuid()
 
 // ============================================
 // Server Functions
@@ -27,7 +33,7 @@ export const fetchTags = createServerFn({ method: 'GET' }).handler(async () => {
 })
 
 export const fetchTagById = createServerFn({ method: 'GET' })
-  .inputValidator((id: string) => id)
+  .inputValidator(tagIdSchema)
   .handler(async ({ data: id }) => {
     const supabase = getSupabaseServerClient()
 

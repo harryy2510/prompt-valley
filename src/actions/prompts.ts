@@ -7,6 +7,7 @@ import {
 import { createServerFn } from '@tanstack/react-start'
 import { getSupabaseServerClient } from '@/libs/supabase/server'
 import type { Tables, Enums } from '@/types/database.types'
+import { z } from 'zod'
 
 // ============================================
 // Types
@@ -27,22 +28,37 @@ export type PromptWithRelations = Prompt & {
   }>
 }
 
-export type PromptFilters = {
-  categoryId?: string
-  tagId?: string
-  tier?: Tier
-  search?: string
-  isFeatured?: boolean
-  limit?: number
-  offset?: number
-}
+export type PromptFilters = z.infer<typeof promptFiltersSchema>
+
+// ============================================
+// Zod Schemas
+// ============================================
+
+const promptFiltersSchema = z.object({
+  categoryId: z.uuid().optional(),
+  tagId: z.uuid().optional(),
+  tier: z.enum(['free', 'pro']).optional(),
+  search: z.string().max(200).optional(),
+  isFeatured: z.boolean().optional(),
+  limit: z.number().int().min(1).max(100).optional(),
+  offset: z.number().int().min(0).optional(),
+})
+
+const promptIdSchema = z.uuid()
+
+const limitSchema = z.number().int().min(1).max(100).optional()
+
+const promptsByCategorySchema = z.object({
+  categoryId: z.uuid(),
+  limit: z.number().int().min(1).max(100).optional(),
+})
 
 // ============================================
 // Server Functions
 // ============================================
 
 export const fetchPrompts = createServerFn({ method: 'GET' })
-  .inputValidator((filters: PromptFilters) => filters)
+  .inputValidator(promptFiltersSchema)
   .handler(async ({ data: filters }) => {
     const supabase = getSupabaseServerClient()
 
@@ -95,7 +111,7 @@ export const fetchPrompts = createServerFn({ method: 'GET' })
   })
 
 export const fetchPromptById = createServerFn({ method: 'GET' })
-  .inputValidator((id: string) => id)
+  .inputValidator(promptIdSchema)
   .handler(async ({ data: id }) => {
     const supabase = getSupabaseServerClient()
 
@@ -122,8 +138,9 @@ export const fetchPromptById = createServerFn({ method: 'GET' })
   })
 
 export const fetchFeaturedPrompts = createServerFn({ method: 'GET' })
-  .inputValidator((limit?: number) => limit ?? 12)
-  .handler(async ({ data: limit }) => {
+  .inputValidator(limitSchema)
+  .handler(async ({ data: limitInput }) => {
+    const limit = limitInput ?? 12
     const supabase = getSupabaseServerClient()
 
     const { data, error } = await supabase
@@ -147,7 +164,7 @@ export const fetchFeaturedPrompts = createServerFn({ method: 'GET' })
   })
 
 export const fetchPromptsByCategory = createServerFn({ method: 'GET' })
-  .inputValidator((params: { categoryId: string; limit?: number }) => params)
+  .inputValidator(promptsByCategorySchema)
   .handler(async ({ data: { categoryId, limit = 20 } }) => {
     const supabase = getSupabaseServerClient()
 
@@ -172,7 +189,7 @@ export const fetchPromptsByCategory = createServerFn({ method: 'GET' })
   })
 
 export const incrementPromptCopies = createServerFn({ method: 'POST' })
-  .inputValidator((id: string) => id)
+  .inputValidator(promptIdSchema)
   .handler(async ({ data: id }) => {
     const supabase = getSupabaseServerClient()
     const { error } = await supabase.rpc('increment_prompt_copies', {
@@ -257,9 +274,9 @@ export function useIncrementCopies() {
 
   return useMutation({
     mutationFn: (id: string) => incrementPromptCopies({ data: id }),
-    onSuccess: (_, id) => {
+    onSuccess: async (_, id) => {
       // Invalidate the prompt detail to reflect new count
-      queryClient.invalidateQueries({ queryKey: promptKeys.detail(id) })
+      await queryClient.invalidateQueries({ queryKey: promptKeys.detail(id) })
     },
   })
 }

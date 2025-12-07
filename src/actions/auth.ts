@@ -62,7 +62,7 @@ export function useSignOut() {
   return useMutation({
     mutationFn: signOutServer,
     onSuccess: async () => {
-      // Clear the session from cache
+      // Clear the user from cache
       queryClient.setQueryData(authKeys.user(), null)
       // Invalidate all queries that depend on auth
       await queryClient.invalidateQueries()
@@ -88,15 +88,9 @@ export function useAuthStateSync() {
         console.log('[Auth] State changed:', event)
 
         if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-          queryClient.setQueryData(authKeys.session(), {
-            session,
-            user: session?.user ?? null,
-          })
+          queryClient.setQueryData(authKeys.user(), session?.user ?? null)
         } else if (event === 'SIGNED_OUT') {
-          queryClient.setQueryData(authKeys.session(), {
-            session: null,
-            user: null,
-          })
+          queryClient.setQueryData(authKeys.user(), null)
           // Invalidate all queries to refetch with new auth state
           void queryClient.invalidateQueries()
         }

@@ -3,6 +3,7 @@ import { createServerFn } from '@tanstack/react-start'
 import { getSupabaseServerClient } from '@/libs/supabase/server'
 import type { Tables } from '@/types/database.types'
 import partition from 'lodash-es/partition'
+import { z } from 'zod'
 
 // ============================================
 // Types
@@ -11,6 +12,12 @@ import partition from 'lodash-es/partition'
 export type Category = Tables<'categories'> & {
   children?: Category[]
 }
+
+// ============================================
+// Zod Schemas
+// ============================================
+
+const categoryIdSchema = z.uuid()
 
 // ============================================
 // Server Functions
@@ -33,7 +40,7 @@ export const fetchCategories = createServerFn({ method: 'GET' }).handler(
       (c) => c.parent_id,
     )
 
-    const nested: CategoryWithChildren[] = rootCategories.map((parent) => ({
+    const nested: Category[] = rootCategories.map((parent) => ({
       ...parent,
       children: childCategories.filter((c) => c.parent_id === parent.id),
     }))
@@ -43,7 +50,7 @@ export const fetchCategories = createServerFn({ method: 'GET' }).handler(
 )
 
 export const fetchCategoryById = createServerFn({ method: 'GET' })
-  .inputValidator((id: string) => id)
+  .inputValidator(categoryIdSchema)
   .handler(async ({ data: id }) => {
     const supabase = getSupabaseServerClient()
 

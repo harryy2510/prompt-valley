@@ -9,6 +9,7 @@ import { getSupabaseServerClient } from '@/libs/supabase/server'
 import type { Tables } from '@/types/database.types'
 import { promptKeys, type PromptWithRelations } from './prompts'
 import { useUser } from '@/actions/auth'
+import { z } from 'zod'
 
 // ============================================
 // Types
@@ -19,6 +20,17 @@ export type UserFavorite = Tables<'user_favorites'>
 export type FavoriteWithPrompt = UserFavorite & {
   prompt: PromptWithRelations
 }
+
+// ============================================
+// Zod Schemas
+// ============================================
+
+const favoriteInputSchema = z.object({
+  promptId: z.uuid(),
+  userId: z.uuid(),
+})
+
+type FavoriteInput = z.Infer<typeof favoriteInputSchema>
 
 // ============================================
 // Server Functions
@@ -62,14 +74,15 @@ export const fetchFavoriteIds = createServerFn({ method: 'GET' }).handler(
 )
 
 export const checkIsFavorite = createServerFn({ method: 'GET' })
-  .inputValidator((promptId: string) => promptId)
-  .handler(async ({ data: promptId }) => {
+  .inputValidator(favoriteInputSchema)
+  .handler(async ({ data: { promptId, userId } }) => {
     const supabase = getSupabaseServerClient()
 
     const { data, error } = await supabase
       .from('user_favorites')
       .select('id')
       .eq('prompt_id', promptId)
+      .eq('user_id', userId)
       .maybeSingle()
 
     if (error) throw error
@@ -77,10 +90,7 @@ export const checkIsFavorite = createServerFn({ method: 'GET' })
   })
 
 export const addFavorite = createServerFn({ method: 'POST' })
-  .inputValidator(
-    ({ promptId, userId }: { promptId: string; userId: string }) =>
-      promptId && userId,
-  )
+  .inputValidator(favoriteInputSchema)
   .handler(async ({ data: { promptId, userId } }) => {
     const supabase = getSupabaseServerClient()
 
@@ -105,10 +115,7 @@ export const addFavorite = createServerFn({ method: 'POST' })
   })
 
 export const removeFavorite = createServerFn({ method: 'POST' })
-  .inputValidator(
-    ({ promptId, userId }: { promptId: string; userId: string }) =>
-      promptId && userId,
-  )
+  .inputValidator(favoriteInputSchema)
   .handler(async ({ data: { promptId, userId } }) => {
     const supabase = getSupabaseServerClient()
 
@@ -132,8 +139,8 @@ export const favoriteKeys = {
   lists: () => [...favoriteKeys.all, 'list'] as const,
   list: () => [...favoriteKeys.lists()] as const,
   ids: () => [...favoriteKeys.all, 'ids'] as const,
-  check: ({ userId, promptId }: { promptId: string; userId: string }) =>
-    [...favoriteKeys.all, 'check', { userId, promptId }] as const,
+  check: (input: FavoriteInput) =>
+    [...favoriteKeys.all, 'check', input] as const,
 }
 
 // ============================================
@@ -154,16 +161,10 @@ export function favoriteIdsQueryOptions() {
   })
 }
 
-export function isFavoriteQueryOptions({
-  promptId,
-  userId,
-}: {
-  promptId: string
-  userId: string
-}) {
+export function isFavoriteQueryOptions(input: FavoriteInput) {
   return queryOptions({
-    queryKey: favoriteKeys.check({ promptId, userId }),
-    queryFn: () => checkIsFavorite({ data: { promptId, userId } }),
+    queryKey: favoriteKeys.check(input),
+    queryFn: () => checkIsFavorite({ data: input }),
   })
 }
 
@@ -181,7 +182,10 @@ export function useFavoriteIds() {
 
 export function useIsFavorite(promptId: string) {
   const { data: user } = useUser()
-  return useQuery(isFavoriteQueryOptions({ promptId, userId: user?.id }))
+  return useQuery({
+    ...isFavoriteQueryOptions({ promptId, userId: user?.id ?? '' }),
+    enabled: !!user?.id,
+  })
 }
 
 export function useAddFavorite() {
@@ -189,11 +193,17 @@ export function useAddFavorite() {
   const { data: user } = useUser()
 
   return useMutation({
-    mutationFn: (promptId: string) =>
-      addFavorite({ data: { promptId, userId: user?.id } }),
-    onSuccess: (_, promptId) => {
-      queryClient.invalidateQueries({ queryKey: favoriteKeys.all })
-      queryClient.invalidateQueries({ queryKey: promptKeys.detail(promptId) })
+    mutationFn: (promptId: string) => {
+      if (!user?.id) throw new Error('User not authenticated')
+      return addFavorite({ data: { promptId, userId: user.id } })
+    },
+    onSuccess: async (_, promptId) => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: favoriteKeys.all }),
+        queryClient.invalidateQueries({
+          queryKey: promptKeys.detail(promptId),
+        }),
+      ])
     },
   })
 }
@@ -203,11 +213,17 @@ export function useRemoveFavorite() {
   const { data: user } = useUser()
 
   return useMutation({
-    mutationFn: (promptId: string) =>
-      removeFavorite({ data: { promptId, userId: user?.id } }),
-    onSuccess: (_, promptId) => {
-      queryClient.invalidateQueries({ queryKey: favoriteKeys.all })
-      queryClient.invalidateQueries({ queryKey: promptKeys.detail(promptId) })
+    mutationFn: (promptId: string) => {
+      if (!user?.id) throw new Error('User not authenticated')
+      return removeFavorite({ data: { promptId, userId: user.id } })
+    },
+    onSuccess: async (_, promptId) => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: favoriteKeys.all }),
+        queryClient.invalidateQueries({
+          queryKey: promptKeys.detail(promptId),
+        }),
+      ])
     },
   })
 }
