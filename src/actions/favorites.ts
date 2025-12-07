@@ -8,6 +8,7 @@ import { createServerFn } from '@tanstack/react-start'
 import { getSupabaseServerClient } from '@/libs/supabase/server'
 import type { Tables } from '@/types/database.types'
 import { promptKeys, type PromptWithRelations } from './prompts'
+import { useUser } from '@/actions/auth'
 
 // ============================================
 // Types
@@ -27,14 +28,6 @@ export const fetchUserFavorites = createServerFn({ method: 'GET' }).handler(
   async () => {
     const supabase = getSupabaseServerClient()
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
-
-    if (!user) {
-      return []
-    }
-
     const { data, error } = await supabase
       .from('user_favorites')
       .select(
@@ -48,7 +41,6 @@ export const fetchUserFavorites = createServerFn({ method: 'GET' }).handler(
         )
       `,
       )
-      .eq('user_id', user.id)
       .order('created_at', { ascending: false })
 
     if (error) throw error
@@ -60,18 +52,9 @@ export const fetchFavoriteIds = createServerFn({ method: 'GET' }).handler(
   async () => {
     const supabase = getSupabaseServerClient()
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
-
-    if (!user) {
-      return []
-    }
-
     const { data, error } = await supabase
       .from('user_favorites')
       .select('prompt_id')
-      .eq('user_id', user.id)
 
     if (error) throw error
     return data.map((f) => f.prompt_id)
@@ -83,18 +66,9 @@ export const checkIsFavorite = createServerFn({ method: 'GET' })
   .handler(async ({ data: promptId }) => {
     const supabase = getSupabaseServerClient()
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
-
-    if (!user) {
-      return false
-    }
-
     const { data, error } = await supabase
       .from('user_favorites')
       .select('id')
-      .eq('user_id', user.id)
       .eq('prompt_id', promptId)
       .maybeSingle()
 
@@ -103,22 +77,17 @@ export const checkIsFavorite = createServerFn({ method: 'GET' })
   })
 
 export const addFavorite = createServerFn({ method: 'POST' })
-  .inputValidator((promptId: string) => promptId)
-  .handler(async ({ data: promptId }) => {
+  .inputValidator(
+    ({ promptId, userId }: { promptId: string; userId: string }) =>
+      promptId && userId,
+  )
+  .handler(async ({ data: { promptId, userId } }) => {
     const supabase = getSupabaseServerClient()
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
-
-    if (!user) {
-      throw new Error('Must be logged in to add favorites')
-    }
 
     const { data, error } = await supabase
       .from('user_favorites')
       .insert({
-        user_id: user.id,
+        user_id: userId,
         prompt_id: promptId,
       })
       .select()
@@ -136,68 +105,22 @@ export const addFavorite = createServerFn({ method: 'POST' })
   })
 
 export const removeFavorite = createServerFn({ method: 'POST' })
-  .inputValidator((promptId: string) => promptId)
-  .handler(async ({ data: promptId }) => {
+  .inputValidator(
+    ({ promptId, userId }: { promptId: string; userId: string }) =>
+      promptId && userId,
+  )
+  .handler(async ({ data: { promptId, userId } }) => {
     const supabase = getSupabaseServerClient()
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
-
-    if (!user) {
-      throw new Error('Must be logged in to remove favorites')
-    }
 
     const { error } = await supabase
       .from('user_favorites')
       .delete()
-      .eq('user_id', user.id)
+      .eq('user_id', userId)
       .eq('prompt_id', promptId)
 
     if (error) throw error
 
     return { success: true }
-  })
-
-export const toggleFavorite = createServerFn({ method: 'POST' })
-  .inputValidator((promptId: string) => promptId)
-  .handler(async ({ data: promptId }) => {
-    const supabase = getSupabaseServerClient()
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
-
-    if (!user) {
-      throw new Error('Must be logged in to toggle favorites')
-    }
-
-    // Check if already favorited
-    const { data: existing } = await supabase
-      .from('user_favorites')
-      .select('id')
-      .eq('user_id', user.id)
-      .eq('prompt_id', promptId)
-      .maybeSingle()
-
-    if (existing) {
-      // Remove favorite
-      await supabase
-        .from('user_favorites')
-        .delete()
-        .eq('user_id', user.id)
-        .eq('prompt_id', promptId)
-
-      return { isFavorited: false }
-    } else {
-      // Add favorite
-      await supabase.from('user_favorites').insert({
-        user_id: user.id,
-        prompt_id: promptId,
-      })
-
-      return { isFavorited: true }
-    }
   })
 
 // ============================================
@@ -209,7 +132,8 @@ export const favoriteKeys = {
   lists: () => [...favoriteKeys.all, 'list'] as const,
   list: () => [...favoriteKeys.lists()] as const,
   ids: () => [...favoriteKeys.all, 'ids'] as const,
-  check: (promptId: string) => [...favoriteKeys.all, 'check', promptId] as const,
+  check: ({ userId, promptId }: { promptId: string; userId: string }) =>
+    [...favoriteKeys.all, 'check', { userId, promptId }] as const,
 }
 
 // ============================================
@@ -220,7 +144,6 @@ export function userFavoritesQueryOptions() {
   return queryOptions({
     queryKey: favoriteKeys.list(),
     queryFn: () => fetchUserFavorites(),
-    staleTime: 1000 * 60 * 2, // 2 minutes
   })
 }
 
@@ -228,15 +151,19 @@ export function favoriteIdsQueryOptions() {
   return queryOptions({
     queryKey: favoriteKeys.ids(),
     queryFn: () => fetchFavoriteIds(),
-    staleTime: 1000 * 60 * 2,
   })
 }
 
-export function isFavoriteQueryOptions(promptId: string) {
+export function isFavoriteQueryOptions({
+  promptId,
+  userId,
+}: {
+  promptId: string
+  userId: string
+}) {
   return queryOptions({
-    queryKey: favoriteKeys.check(promptId),
-    queryFn: () => checkIsFavorite({ data: promptId }),
-    staleTime: 1000 * 60 * 2,
+    queryKey: favoriteKeys.check({ promptId, userId }),
+    queryFn: () => checkIsFavorite({ data: { promptId, userId } }),
   })
 }
 
@@ -253,14 +180,17 @@ export function useFavoriteIds() {
 }
 
 export function useIsFavorite(promptId: string) {
-  return useQuery(isFavoriteQueryOptions(promptId))
+  const { data: user } = useUser()
+  return useQuery(isFavoriteQueryOptions({ promptId, userId: user?.id }))
 }
 
 export function useAddFavorite() {
   const queryClient = useQueryClient()
+  const { data: user } = useUser()
 
   return useMutation({
-    mutationFn: (promptId: string) => addFavorite({ data: promptId }),
+    mutationFn: (promptId: string) =>
+      addFavorite({ data: { promptId, userId: user?.id } }),
     onSuccess: (_, promptId) => {
       queryClient.invalidateQueries({ queryKey: favoriteKeys.all })
       queryClient.invalidateQueries({ queryKey: promptKeys.detail(promptId) })
@@ -270,44 +200,12 @@ export function useAddFavorite() {
 
 export function useRemoveFavorite() {
   const queryClient = useQueryClient()
+  const { data: user } = useUser()
 
   return useMutation({
-    mutationFn: (promptId: string) => removeFavorite({ data: promptId }),
+    mutationFn: (promptId: string) =>
+      removeFavorite({ data: { promptId, userId: user?.id } }),
     onSuccess: (_, promptId) => {
-      queryClient.invalidateQueries({ queryKey: favoriteKeys.all })
-      queryClient.invalidateQueries({ queryKey: promptKeys.detail(promptId) })
-    },
-  })
-}
-
-export function useToggleFavorite() {
-  const queryClient = useQueryClient()
-
-  return useMutation({
-    mutationFn: (promptId: string) => toggleFavorite({ data: promptId }),
-    onMutate: async (promptId) => {
-      // Optimistic update for favorite IDs
-      await queryClient.cancelQueries({ queryKey: favoriteKeys.ids() })
-      const previousIds = queryClient.getQueryData<string[]>(favoriteKeys.ids())
-
-      if (previousIds) {
-        const isFavorited = previousIds.includes(promptId)
-        queryClient.setQueryData<string[]>(
-          favoriteKeys.ids(),
-          isFavorited
-            ? previousIds.filter((id) => id !== promptId)
-            : [...previousIds, promptId],
-        )
-      }
-
-      return { previousIds }
-    },
-    onError: (_, __, context) => {
-      if (context?.previousIds) {
-        queryClient.setQueryData(favoriteKeys.ids(), context.previousIds)
-      }
-    },
-    onSettled: (_, __, promptId) => {
       queryClient.invalidateQueries({ queryKey: favoriteKeys.all })
       queryClient.invalidateQueries({ queryKey: promptKeys.detail(promptId) })
     },

@@ -1,4 +1,9 @@
-import { queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import {
+  queryOptions,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { getSupabaseServerClient } from '@/libs/supabase/server'
 import type { Tables, Enums } from '@/types/database.types'
@@ -43,12 +48,14 @@ export const fetchPrompts = createServerFn({ method: 'GET' })
 
     let query = supabase
       .from('prompts')
-      .select(`
+      .select(
+        `
         *,
         category:categories(*),
         tags:prompt_tags(tag:tags(*)),
         models:prompt_models(model:ai_models(*, provider:ai_providers(*)))
-      `)
+      `,
+      )
       .eq('is_published', true)
 
     if (filters.categoryId) {
@@ -61,7 +68,9 @@ export const fetchPrompts = createServerFn({ method: 'GET' })
       query = query.eq('is_featured', filters.isFeatured)
     }
     if (filters.search) {
-      query = query.or(`title.ilike.%${filters.search}%,description.ilike.%${filters.search}%`)
+      query = query.or(
+        `title.ilike.%${filters.search}%,description.ilike.%${filters.search}%`,
+      )
     }
 
     query = query
@@ -73,7 +82,10 @@ export const fetchPrompts = createServerFn({ method: 'GET' })
       query = query.limit(filters.limit)
     }
     if (filters.offset) {
-      query = query.range(filters.offset, filters.offset + (filters.limit ?? 20) - 1)
+      query = query.range(
+        filters.offset,
+        filters.offset + (filters.limit ?? 20) - 1,
+      )
     }
 
     const { data, error } = await query
@@ -89,12 +101,14 @@ export const fetchPromptById = createServerFn({ method: 'GET' })
 
     const { data, error } = await supabase
       .from('prompts')
-      .select(`
+      .select(
+        `
         *,
         category:categories(*),
         tags:prompt_tags(tag:tags(*)),
         models:prompt_models(model:ai_models(*, provider:ai_providers(*)))
-      `)
+      `,
+      )
       .eq('id', id)
       .eq('is_published', true)
       .single()
@@ -114,12 +128,14 @@ export const fetchFeaturedPrompts = createServerFn({ method: 'GET' })
 
     const { data, error } = await supabase
       .from('prompts')
-      .select(`
+      .select(
+        `
         *,
         category:categories(*),
         tags:prompt_tags(tag:tags(*)),
         models:prompt_models(model:ai_models(*, provider:ai_providers(*)))
-      `)
+      `,
+      )
       .eq('is_published', true)
       .eq('is_featured', true)
       .order('sort_order', { ascending: true, nullsFirst: false })
@@ -137,12 +153,14 @@ export const fetchPromptsByCategory = createServerFn({ method: 'GET' })
 
     const { data, error } = await supabase
       .from('prompts')
-      .select(`
+      .select(
+        `
         *,
         category:categories(*),
         tags:prompt_tags(tag:tags(*)),
         models:prompt_models(model:ai_models(*, provider:ai_providers(*)))
-      `)
+      `,
+      )
       .eq('is_published', true)
       .eq('category_id', categoryId)
       .order('is_featured', { ascending: false })
@@ -157,7 +175,9 @@ export const incrementPromptCopies = createServerFn({ method: 'POST' })
   .inputValidator((id: string) => id)
   .handler(async ({ data: id }) => {
     const supabase = getSupabaseServerClient()
-    const { error } = await supabase.rpc('increment_prompt_copies', { prompt_text_id: id })
+    const { error } = await supabase.rpc('increment_prompt_copies', {
+      prompt_text_id: id,
+    })
     if (error) throw error
     return { success: true }
   })
@@ -173,7 +193,8 @@ export const promptKeys = {
   details: () => [...promptKeys.all, 'detail'] as const,
   detail: (id: string) => [...promptKeys.details(), id] as const,
   featured: (limit?: number) => [...promptKeys.all, 'featured', limit] as const,
-  byCategory: (categoryId: string) => [...promptKeys.all, 'category', categoryId] as const,
+  byCategory: (categoryId: string) =>
+    [...promptKeys.all, 'category', categoryId] as const,
 }
 
 // ============================================
@@ -184,7 +205,6 @@ export function promptsQueryOptions(filters: PromptFilters = {}) {
   return queryOptions({
     queryKey: promptKeys.list(filters),
     queryFn: () => fetchPrompts({ data: filters }),
-    staleTime: 1000 * 60 * 5, // 5 minutes
   })
 }
 
@@ -192,7 +212,6 @@ export function promptDetailQueryOptions(id: string) {
   return queryOptions({
     queryKey: promptKeys.detail(id),
     queryFn: () => fetchPromptById({ data: id }),
-    staleTime: 1000 * 60 * 5,
   })
 }
 
@@ -200,15 +219,16 @@ export function featuredPromptsQueryOptions(limit?: number) {
   return queryOptions({
     queryKey: promptKeys.featured(limit),
     queryFn: () => fetchFeaturedPrompts({ data: limit }),
-    staleTime: 1000 * 60 * 5,
   })
 }
 
-export function promptsByCategoryQueryOptions(categoryId: string, limit?: number) {
+export function promptsByCategoryQueryOptions(
+  categoryId: string,
+  limit?: number,
+) {
   return queryOptions({
     queryKey: promptKeys.byCategory(categoryId),
     queryFn: () => fetchPromptsByCategory({ data: { categoryId, limit } }),
-    staleTime: 1000 * 60 * 5,
   })
 }
 

@@ -1,8 +1,6 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
 import { Copy, Bookmark } from 'lucide-react'
-import { ThemeToggle } from '@/components/theme-toggle'
-import { useIsAuthenticated } from '@/actions/auth'
 import { LinkButton } from '@/components/ui/link-button'
 import { IconButton } from '@/components/ui/icon-button'
 import { CategoryFilterGroup } from '@/components/category-filter'
@@ -15,8 +13,6 @@ export const Route = createFileRoute('/')({
 })
 
 function RouteComponent() {
-  const { isAuthenticated } = useIsAuthenticated()
-
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}

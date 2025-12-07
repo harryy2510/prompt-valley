@@ -1,11 +1,10 @@
 import {
   queryOptions,
-  useQuery,
   useMutation,
+  useQuery,
   useQueryClient,
 } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
-import dayjs from 'dayjs'
 import { getSupabaseServerClient } from '@/libs/supabase/server'
 import { getSupabaseBrowserClient } from '@/libs/supabase/client'
 import { useEffect } from 'react'
@@ -14,23 +13,11 @@ import { useEffect } from 'react'
 // Server Functions
 // ============================================
 
-export const fetchSession = createServerFn({ method: 'GET' }).handler(
+export const getUserServer = createServerFn({ method: 'GET' }).handler(
   async () => {
     const supabase = getSupabaseServerClient()
-    const { data, error } = await supabase.auth.getSession()
-
-    if (error || !data.session?.access_token) {
-      return { session: null, user: null }
-    }
-
-    if (dayjs.unix(data.session.expires_at!).isBefore(dayjs())) {
-      return { session: null, user: null }
-    }
-
-    return {
-      session: data.session,
-      user: data.session.user,
-    }
+    const { data } = await supabase.auth.getUser()
+    return data.user
   },
 )
 
@@ -48,7 +35,6 @@ export const signOutServer = createServerFn({ method: 'POST' }).handler(
 
 export const authKeys = {
   all: ['auth'] as const,
-  session: () => [...authKeys.all, 'session'] as const,
   user: () => [...authKeys.all, 'user'] as const,
 }
 
@@ -56,36 +42,18 @@ export const authKeys = {
 // Query Options (for use in loaders and components)
 // ============================================
 
-export const sessionQueryOptions = () =>
+export const userQueryOptions = () =>
   queryOptions({
-    queryKey: authKeys.session(),
-    queryFn: () => fetchSession(),
-    staleTime: 1000 * 60 * 5, // 5 minutes
-    gcTime: 1000 * 60 * 30, // 30 minutes
+    queryKey: authKeys.user(),
+    queryFn: getUserServer,
   })
 
 // ============================================
 // Hooks
 // ============================================
 
-export function useSession() {
-  return useQuery(sessionQueryOptions())
-}
-
 export function useUser() {
-  const { data, ...rest } = useSession()
-  return {
-    ...rest,
-    data: data?.user ?? null,
-  }
-}
-
-export function useIsAuthenticated() {
-  const { data, isLoading } = useSession()
-  return {
-    isAuthenticated: !!data?.session,
-    isLoading,
-  }
+  return useQuery(userQueryOptions())
 }
 
 export function useSignOut() {
@@ -93,14 +61,11 @@ export function useSignOut() {
 
   return useMutation({
     mutationFn: signOutServer,
-    onSuccess: () => {
+    onSuccess: async () => {
       // Clear the session from cache
-      queryClient.setQueryData(authKeys.session(), {
-        session: null,
-        user: null,
-      })
-      // Optionally invalidate all queries that depend on auth
-      queryClient.invalidateQueries()
+      queryClient.setQueryData(authKeys.user(), null)
+      // Invalidate all queries that depend on auth
+      await queryClient.invalidateQueries()
     },
   })
 }
