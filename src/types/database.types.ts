@@ -360,6 +360,7 @@ export type Database = {
           email: string
           id: string
           name: string | null
+          role: Database['public']['Enums']['user_role']
           stripe_cancel_at_period_end: boolean | null
           stripe_canceled_at: string | null
           stripe_current_period_end: string | null
@@ -376,6 +377,7 @@ export type Database = {
           email: string
           id: string
           name?: string | null
+          role?: Database['public']['Enums']['user_role']
           stripe_cancel_at_period_end?: boolean | null
           stripe_canceled_at?: string | null
           stripe_current_period_end?: string | null
@@ -392,6 +394,7 @@ export type Database = {
           email?: string
           id?: string
           name?: string | null
+          role?: Database['public']['Enums']['user_role']
           stripe_cancel_at_period_end?: boolean | null
           stripe_canceled_at?: string | null
           stripe_current_period_end?: string | null
@@ -532,6 +535,7 @@ export type Database = {
     Enums: {
       model_capability: 'text' | 'image' | 'video' | 'code'
       tier: 'free' | 'pro'
+      user_role: 'user' | 'admin'
     }
     CompositeTypes: {
       [_ in never]: never
@@ -661,6 +665,7 @@ export const Constants = {
     Enums: {
       model_capability: ['text', 'image', 'video', 'code'],
       tier: ['free', 'pro'],
+      user_role: ['user', 'admin'],
     },
   },
 } as const

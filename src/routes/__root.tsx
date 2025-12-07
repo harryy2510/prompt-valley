@@ -9,14 +9,13 @@ import TanStackQueryDevtools from '@/libs/react-query/query-devtools'
 import TanStackRouterDevtools from '@/libs/react-query/router-devtools'
 
 import appCss from '../styles.css?url'
+import fontsCss from '../fonts.css?url'
 
 import type { QueryClient } from '@tanstack/react-query'
 import type { PropsWithChildren } from 'react'
 import type { Session, User } from '@supabase/supabase-js'
 import { seo } from '@/utils/seo'
 import { sessionQueryOptions } from '@/actions/auth'
-
-import '@fontsource-variable/space-grotesk'
 
 // ============================================
 // Router Context Type
@@ -66,6 +65,10 @@ export const Route = createRootRouteWithContext<RouterContext>()({
       {
         rel: 'stylesheet',
         href: appCss,
+      },
+      {
+        rel: 'stylesheet',
+        href: fontsCss,
       },
 
       // Favicon
