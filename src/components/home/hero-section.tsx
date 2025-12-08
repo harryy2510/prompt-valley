@@ -13,18 +13,22 @@ export function HeroSection() {
         <div className="space-y-6">
           <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
             High-Quality{' '}
-            <span className="text-primary">AI Prompt Templates</span>{' '}
-            for Better AI Results
+            <span className="text-primary">AI Prompt Templates</span> for Better
+            AI Results
           </h1>
 
           <p className="text-lg text-muted-foreground max-w-lg">
-            Discover and explore expert-crafted prompts for ChatGPT, Gemini, and Image models to
-            create high-quality AI output.
+            Discover and explore expert-crafted prompts for ChatGPT, Gemini, and
+            Image models to create high-quality AI output.
           </p>
 
           <div className="flex flex-wrap items-center gap-4">
             <SignInDialog>
-              <Button size="lg">Start Free</Button>
+              <Button size="xl">
+                <span>
+                  Start <span className="font-bold text-amber-200">Free</span>
+                </span>
+              </Button>
             </SignInDialog>
 
             <Button variant="ghost" size="lg" asChild>

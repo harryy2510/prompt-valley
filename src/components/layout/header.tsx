@@ -61,7 +61,11 @@ export function Header() {
                 </Button>
               </SignInDialog>
               <Button size="sm" asChild>
-                <Link to="/auth">Start Free</Link>
+                <Link to="/auth">
+                  <span>
+                    Start <span className="font-bold text-amber-200">Free</span>
+                  </span>
+                </Link>
               </Button>
             </>
           )}
