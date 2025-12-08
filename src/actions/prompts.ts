@@ -154,7 +154,7 @@ export const fetchFeaturedPrompts = createServerFn({ method: 'GET' })
       `,
       )
       .eq('is_published', true)
-      .eq('is_featured', true)
+      // .eq('is_featured', true)
       .order('sort_order', { ascending: true, nullsFirst: false })
       .order('created_at', { ascending: false })
       .limit(limit)

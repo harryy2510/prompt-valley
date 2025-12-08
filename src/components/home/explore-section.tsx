@@ -19,7 +19,7 @@ type FilterTab = 'all' | 'latest' | 'writing' | 'image'
 
 export function ExploreSection() {
   const [activeTab, setActiveTab] = useState<FilterTab>('all')
-  const { data: prompts, isLoading } = useFeaturedPrompts(12)
+  const { data: prompts, isLoading } = useFeaturedPrompts(100)
 
   // Filter prompts based on tab (for demo - in real app this would be server-side)
   const filteredPrompts = prompts ?? []

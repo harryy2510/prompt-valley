@@ -61,22 +61,35 @@ function PromptCard({
       {/* Image Container */}
       <div className="relative overflow-hidden rounded-lg bg-muted">
         <AspectRatio
-          className="grid grid-cols-3 grid-rows-2 transition-transform duration-300 group-hover:scale-105"
+          className={cn(
+            'transition-transform duration-300 group-hover:scale-105',
+            {
+              'grid grid-cols-3 grid-rows-2': (prompt.images?.length ?? 0) >= 3,
+              'grid grid-cols-2': prompt.images?.length === 2,
+            },
+          )}
           ratio={4 / 3}
         >
           {prompt.images?.length ? (
-            prompt.images.slice(0, 3).map((src, index) => (
+            prompt.images.slice(0, 3).map((src, index, array) => (
               <Image
                 src={src}
                 alt={prompt.title}
-                className={cn('size-full object-cover', {
-                  'col-span-2 row-span-2': index === 0,
-                  'col-span-1 row-span-1': index !== 0,
-                })}
+                className={cn(
+                  'size-full object-cover',
+                  array.length === 3
+                    ? {
+                        'col-span-2 row-span-2': index === 0,
+                        'col-span-1 row-span-1': index !== 0,
+                      }
+                    : array.length === 2
+                      ? 'col-span-1'
+                      : {},
+                )}
               />
             ))
           ) : (
-            <div className="size-full bg-gradient-to-br from-secondary-200 to-secondary-400" />
+            <div className="size-full bg-linear-to-br from-secondary-200 to-secondary-400" />
           )}
         </AspectRatio>
 
