@@ -1,20 +1,18 @@
-import type { ComponentProps, ReactNode } from 'react'
+import type { ComponentProps } from 'react'
 import { BookmarkIcon } from 'lucide-react'
 
 import { cn } from '@/libs/cn'
 import { Badge } from '@/components/ui/badge'
-import { CopyButton } from '@/components/common/copy-button'
 import { ProBadge } from '@/components/common/pro-badge'
 import { ProviderBadge } from '@/components/common/provider-badge'
 import { AspectRatio } from '@/components/ui/aspect-ratio'
 import { IconButton } from '@/components/common/icon-button'
-import type { Tables, Enums } from '@/types/database.types'
-import { compact, uniqBy } from 'lodash-es'
+import type { Tables } from '@/types/database.types'
+import { compact, uniq, uniqBy } from 'lodash-es'
 import { Image } from '@/components/common/image'
 
 // Database-aligned prompt type
 type Prompt = Tables<'prompts'>
-type Tier = Enums<'tier'>
 
 // Extended prompt with relations (for joined queries)
 type PromptWithRelations = Prompt & {
@@ -27,16 +25,8 @@ type PromptWithRelations = Prompt & {
 
 type PromptCardProps = ComponentProps<'article'> & {
   // Can accept either raw props or a prompt object
-  prompt?: PromptWithRelations
+  prompt: PromptWithRelations
   // Individual props (for flexibility)
-  title?: string
-  description?: string | null
-  imageUrl?: string
-  imagePlaceholder?: ReactNode
-  promptText?: string
-  category?: string
-  tags?: string[]
-  tier?: Tier
   isSaved?: boolean
   onSave?: () => void
   onCopy?: () => void
@@ -45,14 +35,6 @@ type PromptCardProps = ComponentProps<'article'> & {
 
 function PromptCard({
   prompt,
-  title: titleProp,
-  description: descriptionProp,
-  imageUrl: imageUrlProp,
-  imagePlaceholder,
-  promptText: promptTextProp,
-  category: categoryProp,
-  tags: tagsProp = [],
-  tier: tierProp,
   isSaved = false,
   onSave,
   onCopy,
@@ -60,24 +42,11 @@ function PromptCard({
   className,
   ...props
 }: PromptCardProps) {
-  // Resolve props from prompt object or individual props
-  const title = titleProp ?? prompt?.title ?? ''
-  const description = descriptionProp ?? prompt?.description
-  const imageUrl = imageUrlProp ?? prompt?.images?.[0]
-  const promptText = promptTextProp ?? prompt?.content ?? ''
-  const category = categoryProp ?? prompt?.category?.name
-  const tier = tierProp ?? prompt?.tier ?? 'free'
-  const isPro = tier === 'pro'
-
-  // Extract tag names from relations or use prop
-  const tags =
-    tagsProp.length > 0
-      ? tagsProp
-      : (prompt?.tags?.map((t) => t.tag.name) ?? [])
-
+  const isPro = prompt.tier === 'pro'
+  const tags = uniq(prompt.tags?.map((t) => t.tag.name))
   const providers = compact(
     uniqBy(
-      prompt?.models?.map((model) => model.model.provider),
+      prompt.models?.map((model) => model.model.provider),
       'id',
     ),
   )
@@ -91,35 +60,30 @@ function PromptCard({
     >
       {/* Image Container */}
       <div className="relative overflow-hidden rounded-lg bg-muted">
-        <AspectRatio ratio={4 / 3}>
-          {imageUrl ? (
-            <Image
-              src={imageUrl}
-              alt={title}
-              className="size-full object-cover transition-transform duration-300 group-hover:scale-105"
-            />
+        <AspectRatio
+          className="grid grid-cols-3 grid-rows-2 transition-transform duration-300 group-hover:scale-105"
+          ratio={4 / 3}
+        >
+          {prompt.images?.length ? (
+            prompt.images.slice(0, 3).map((src, index) => (
+              <Image
+                src={src}
+                alt={prompt.title}
+                className={cn('size-full object-cover', {
+                  'col-span-2 row-span-2': index === 0,
+                  'col-span-1 row-span-1': index !== 0,
+                })}
+              />
+            ))
           ) : (
-            imagePlaceholder || (
-              <div className="size-full bg-gradient-to-br from-secondary-200 to-secondary-400" />
-            )
+            <div className="size-full bg-gradient-to-br from-secondary-200 to-secondary-400" />
           )}
         </AspectRatio>
 
-        {/* Overlay badges */}
-        <div className="absolute inset-x-0 bottom-0 p-3 flex items-end justify-between">
-          {/* Copy button - bottom left */}
-          <CopyButton
-            textToCopy={promptText}
-            onCopied={onCopy}
-            onClick={(e) => e.stopPropagation()}
-            className="opacity-0 group-hover:opacity-100 transition-opacity"
-          />
-        </div>
-
-        {/* Pro badge - top left */}
+        {/* Pro badge - bottom left */}
         {isPro && (
-          <div className="absolute top-3 left-3">
-            <ProBadge size="sm" />
+          <div className="absolute bottom-3 left-3">
+            <ProBadge />
           </div>
         )}
       </div>
@@ -129,7 +93,7 @@ function PromptCard({
         {/* Title row with bookmark */}
         <div className="flex items-start justify-between gap-2">
           <h3 className="text-body2-semibold text-foreground line-clamp-1">
-            {title}
+            {prompt.title}
           </h3>
           <IconButton
             variant="ghost"
@@ -146,18 +110,20 @@ function PromptCard({
         </div>
 
         {/* Description */}
-        {description && (
+        {prompt.description && (
           <p className="text-caption text-muted-foreground line-clamp-2">
-            {description}
+            {prompt.description}
           </p>
         )}
 
         {/* Tags row */}
         <div className="flex flex-wrap items-center gap-1.5">
           {providers.map((provider) => (
-            <ProviderBadge provider={provider} showIcon={false} />
+            <ProviderBadge provider={provider} />
           ))}
-          {category && <Badge variant="category">{category}</Badge>}
+          {prompt.category && (
+            <Badge variant="category">{prompt.category.name}</Badge>
+          )}
           {tags.slice(0, 2).map((tag) => (
             <Badge key={tag} variant="tag">
               {tag}

@@ -16,13 +16,14 @@ export const Route = createFileRoute('/')({
 
 function HomePage() {
   return (
-    <MainLayout>
-      <HeroSection />
-      <ExploreSection />
-      <RolesSection />
-      <CategoriesSection />
-      <TestimonialsSection />
-      <CtaSection />
-    </MainLayout>
+    <>
+      <MainLayout hero={<HeroSection />}>
+        <ExploreSection />
+        <RolesSection />
+        <CategoriesSection />
+        <TestimonialsSection />
+        <CtaSection />
+      </MainLayout>
+    </>
   )
 }

@@ -32,8 +32,9 @@ export function ExploreSection() {
           Explore the Best AI Prompts
         </h2>
         <p className="mt-2 text-muted-foreground">
-          Browse 10,000+ curated prompt templates for writing, creativity, and image generation.
-          AI-fully system-wide for you to make them fully yours.
+          Browse 50,400+ curated prompt templates for writing, creativity, and
+          image generation. All fully customizable for you to make them truly
+          yours.
         </p>
       </div>
 

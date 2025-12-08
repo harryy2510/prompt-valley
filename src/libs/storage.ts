@@ -7,24 +7,28 @@ import { getSupabaseBrowserClient } from '@/libs/supabase/client'
  * @returns The full public URL or null if value is empty
  */
 export function getImageUrl(value: null | string | undefined): null | string {
-	if (!value) return null
+  if (!value) return null
 
-	// If it's already a full URL, return as-is
-	if (isFullUrl(value)) {
-		return value
-	}
+  // If it's already a full URL, return as-is
+  if (isFullUrl(value)) {
+    return value
+  }
 
-	// Use Supabase browser client to get public URL
-	const supabase = getSupabaseBrowserClient()
-	const { data } = supabase.storage.from('content-bucket').getPublicUrl(value)
-	return data.publicUrl
+  // If local path
+  if (value.startsWith('/src')) {
+    return value
+  }
+
+  // Use Supabase browser client to get public URL
+  const supabase = getSupabaseBrowserClient()
+  const { data } = supabase.storage.from('content-bucket').getPublicUrl(value)
+  return data.publicUrl
 }
 
 /**
  * Check if a string is a full URL (http/https)
  */
 export function isFullUrl(value: null | string | undefined): boolean {
-	if (!value) return false
-	return value.startsWith('http://') || value.startsWith('https://')
+  if (!value) return false
+  return value.startsWith('http://') || value.startsWith('https://')
 }
-

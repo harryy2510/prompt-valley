@@ -650,3 +650,49 @@
   border-left-width: 3px;
   font-style: normal;
 }
+
+/* ============================================================================
+   VERTICAL CAROUSEL ANIMATIONS
+   ============================================================================ */
+
+@keyframes scroll-up {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-50%);
+  }
+}
+
+@keyframes scroll-down {
+  0% {
+    transform: translateY(-50%);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+.animate-scroll-up {
+  animation: scroll-up 20s linear infinite;
+}
+
+.animate-scroll-down {
+  animation: scroll-down 20s linear infinite;
+}
+
+/* Pause animation on hover */
+.animate-scroll-up:hover,
+.animate-scroll-down:hover {
+  animation-play-state: paused;
+}
+
+/* Hide scrollbar utility */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}

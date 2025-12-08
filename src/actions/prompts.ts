@@ -63,7 +63,7 @@ export const fetchPrompts = createServerFn({ method: 'GET' })
     const supabase = getSupabaseServerClient()
 
     let query = supabase
-      .from('prompts')
+      .from('prompts_with_access')
       .select(
         `
         *,
@@ -116,7 +116,7 @@ export const fetchPromptById = createServerFn({ method: 'GET' })
     const supabase = getSupabaseServerClient()
 
     const { data, error } = await supabase
-      .from('prompts')
+      .from('prompts_with_access')
       .select(
         `
         *,
@@ -144,7 +144,7 @@ export const fetchFeaturedPrompts = createServerFn({ method: 'GET' })
     const supabase = getSupabaseServerClient()
 
     const { data, error } = await supabase
-      .from('prompts')
+      .from('prompts_with_access')
       .select(
         `
         *,
@@ -169,7 +169,7 @@ export const fetchPromptsByCategory = createServerFn({ method: 'GET' })
     const supabase = getSupabaseServerClient()
 
     const { data, error } = await supabase
-      .from('prompts')
+      .from('prompts_with_access')
       .select(
         `
         *,
