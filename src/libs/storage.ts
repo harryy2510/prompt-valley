@@ -14,11 +14,6 @@ export function getImageUrl(value: null | string | undefined): null | string {
     return value
   }
 
-  // If local path
-  if (value.startsWith('/src')) {
-    return value
-  }
-
   // Use Supabase browser client to get public URL
   const supabase = getSupabaseBrowserClient()
   const { data } = supabase.storage.from('content-bucket').getPublicUrl(value)

@@ -1,6 +1,5 @@
 import { SignInDialog } from '@/components/auth'
 import { Button } from '@/components/ui/button'
-import { Image } from '@/components/common/image'
 
 import image1 from '@/assets/landing/carousel-image-1.webp'
 import icon1 from '@/assets/landing/carousel-icon-1.webp'
@@ -15,7 +14,7 @@ import { cn } from '@/libs/cn'
 function CarouselCardItem({ src }: { src: string }) {
   return (
     <div className="w-full overflow-hidden rounded-2xl bg-muted">
-      <Image src={src || ''} className="size-full object-cover" />
+      <img src={src} className="size-full object-cover" />
     </div>
   )
 }
