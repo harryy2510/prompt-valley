@@ -2,6 +2,7 @@ import { useState, type ComponentProps } from 'react'
 
 import { cn } from '@/libs/cn'
 import { AspectRatio } from '@/components/ui/aspect-ratio'
+import { Image } from '@/components/common/image'
 
 type ImageGalleryImage = {
   src: string
@@ -56,7 +57,7 @@ function ImageGallery({
       <div className="overflow-hidden rounded-lg bg-muted">
         <AspectRatio ratio={aspectRatio}>
           {selectedImage && (
-            <img
+            <Image
               src={selectedImage.src}
               alt={selectedImage.alt}
               className="size-full object-cover"
@@ -84,7 +85,7 @@ function ImageGallery({
               aria-current={index === selectedIndex ? 'true' : undefined}
             >
               <AspectRatio ratio={thumbnailAspectRatio}>
-                <img
+                <Image
                   src={image.src}
                   alt={image.alt}
                   className="size-full object-cover"
@@ -150,7 +151,13 @@ function ImageLightbox({
         className="absolute top-4 right-4 p-2 text-white/70 hover:text-white transition-colors"
         aria-label="Close lightbox"
       >
-        <svg className="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <svg
+          className="size-6"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+        >
           <path d="M18 6L6 18M6 6l12 12" />
         </svg>
       </button>
@@ -166,7 +173,13 @@ function ImageLightbox({
           className="absolute left-4 p-2 text-white/70 hover:text-white transition-colors"
           aria-label="Previous image"
         >
-          <svg className="size-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <svg
+            className="size-8"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
             <path d="M15 18l-6-6 6-6" />
           </svg>
         </button>
@@ -178,7 +191,7 @@ function ImageLightbox({
         onClick={(e) => e.stopPropagation()}
       >
         {selectedImage && (
-          <img
+          <Image
             src={selectedImage.src}
             alt={selectedImage.alt}
             className="max-w-full max-h-[80vh] object-contain"
@@ -197,7 +210,13 @@ function ImageLightbox({
           className="absolute right-4 p-2 text-white/70 hover:text-white transition-colors"
           aria-label="Next image"
         >
-          <svg className="size-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <svg
+            className="size-8"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
             <path d="M9 18l6-6-6-6" />
           </svg>
         </button>

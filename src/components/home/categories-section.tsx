@@ -4,6 +4,7 @@ import { useRef } from 'react'
 
 import { useCategories } from '@/actions/categories'
 import { IconButton } from '@/components/common/icon-button'
+import { Image } from '@/components/common/image'
 
 // ============================================
 // Category Card Component
@@ -28,7 +29,7 @@ function CategoryCard({
       {/* Image */}
       <div className="aspect-[3/4] w-48 overflow-hidden bg-muted">
         {image ? (
-          <img
+          <Image
             src={image}
             alt={name}
             className="size-full object-cover transition-transform duration-300 group-hover:scale-105"

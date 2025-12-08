@@ -1,4 +1,5 @@
 import { Badge } from '@/components/ui/badge'
+import { Image } from '@/components/common/image'
 
 // ============================================
 // Types
@@ -61,7 +62,7 @@ function RoleCard({ role }: { role: Role }) {
   return (
     <div className="group flex flex-col gap-4">
       <div className="aspect-[4/3] overflow-hidden rounded-xl bg-muted">
-        <img
+        <Image
           src={role.image}
           alt={role.title}
           className="size-full object-cover transition-transform duration-300 group-hover:scale-105"
@@ -96,8 +97,9 @@ export function RolesSection() {
             smarter, more reliable AI output
           </h2>
           <p className="mx-auto mt-4 max-w-2xl text-muted-foreground">
-            From lean teams to product research, discover curated prompts, organized templates, and workflows that
-            improve results across ChatGPT, Gemini, and image models.
+            From lean teams to product research, discover curated prompts,
+            organized templates, and workflows that improve results across
+            ChatGPT, Gemini, and image models.
           </p>
         </div>
 

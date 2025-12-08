@@ -1,5 +1,6 @@
 import { SignInDialog } from '@/components/auth'
 import { Button } from '@/components/ui/button'
+import { Image } from '@/components/common/image'
 
 // ============================================
 // Hero Section Component
@@ -24,27 +25,23 @@ export function HeroSection() {
 
           <div className="flex flex-wrap items-center gap-4">
             <SignInDialog>
-              <Button size="xl">
+              <Button className="w-[240px] max-w-100" size="xl">
                 <span>
                   Start <span className="font-bold text-amber-200">Free</span>
                 </span>
               </Button>
             </SignInDialog>
-
-            <Button variant="ghost" size="lg" asChild>
-              <a href="#explore">See Products</a>
-            </Button>
           </div>
 
           <p className="text-sm text-muted-foreground">
-            You&apos;ll love it. Trusted by 10,000+ users.
+            Free forever. No credit card required.
           </p>
         </div>
 
         {/* Right - Hero Image */}
         <div className="relative">
           <div className="aspect-[4/3] rounded-2xl bg-muted/50 overflow-hidden">
-            <img
+            <Image
               src="/images/hero-preview.jpg"
               alt="AI Prompt Preview"
               className="size-full object-cover"

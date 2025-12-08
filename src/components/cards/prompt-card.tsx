@@ -10,6 +10,7 @@ import { AspectRatio } from '@/components/ui/aspect-ratio'
 import { IconButton } from '@/components/common/icon-button'
 import type { Tables, Enums } from '@/types/database.types'
 import { compact, uniqBy } from 'lodash-es'
+import { Image } from '@/components/common/image'
 
 // Database-aligned prompt type
 type Prompt = Tables<'prompts'>
@@ -19,7 +20,9 @@ type Tier = Enums<'tier'>
 type PromptWithRelations = Prompt & {
   category?: Tables<'categories'> | null
   tags?: Array<{ tag: Tables<'tags'> }>
-  models?: Array<{ model: Tables<'ai_models'> & { provider?: Tables<'ai_providers'> } }>
+  models?: Array<{
+    model: Tables<'ai_models'> & { provider?: Tables<'ai_providers'> }
+  }>
 }
 
 type PromptCardProps = ComponentProps<'article'> & {
@@ -67,19 +70,22 @@ function PromptCard({
   const isPro = tier === 'pro'
 
   // Extract tag names from relations or use prop
-  const tags = tagsProp.length > 0
-    ? tagsProp
-    : prompt?.tags?.map((t) => t.tag.name) ?? []
+  const tags =
+    tagsProp.length > 0
+      ? tagsProp
+      : (prompt?.tags?.map((t) => t.tag.name) ?? [])
 
-  const providers = compact(uniqBy(prompt?.models?.map(model => model.model.provider), 'id'))
+  const providers = compact(
+    uniqBy(
+      prompt?.models?.map((model) => model.model.provider),
+      'id',
+    ),
+  )
 
   return (
     <article
       data-slot="prompt-card"
-      className={cn(
-        'group flex flex-col gap-3 cursor-pointer',
-        className,
-      )}
+      className={cn('group flex flex-col gap-3 cursor-pointer', className)}
       onClick={onClick}
       {...props}
     >
@@ -87,7 +93,7 @@ function PromptCard({
       <div className="relative overflow-hidden rounded-lg bg-muted">
         <AspectRatio ratio={4 / 3}>
           {imageUrl ? (
-            <img
+            <Image
               src={imageUrl}
               alt={title}
               className="size-full object-cover transition-transform duration-300 group-hover:scale-105"
@@ -135,12 +141,7 @@ function PromptCard({
             className="shrink-0 -mr-2 -mt-1 size-7"
             aria-label={isSaved ? 'Remove from saved' : 'Save prompt'}
           >
-            <BookmarkIcon
-              className={cn(
-                'size-4',
-                isSaved && 'fill-current',
-              )}
-            />
+            <BookmarkIcon className={cn('size-4', isSaved && 'fill-current')} />
           </IconButton>
         </div>
 
@@ -153,12 +154,10 @@ function PromptCard({
 
         {/* Tags row */}
         <div className="flex flex-wrap items-center gap-1.5">
-          {providers.map(provider => (
+          {providers.map((provider) => (
             <ProviderBadge provider={provider} showIcon={false} />
           ))}
-          {category && (
-            <Badge variant="category">{category}</Badge>
-          )}
+          {category && <Badge variant="category">{category}</Badge>}
           {tags.slice(0, 2).map((tag) => (
             <Badge key={tag} variant="tag">
               {tag}
