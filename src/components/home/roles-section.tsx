@@ -1,5 +1,4 @@
-import { Badge } from '@/components/ui/badge'
-import { Image } from '@/components/common/image'
+import { ImageGrid } from '@/components/common/image-grid'
 
 // ============================================
 // Types
@@ -9,7 +8,7 @@ type Role = {
   id: string
   title: string
   description: string
-  image: string
+  images: string[]
 }
 
 // ============================================
@@ -21,36 +20,56 @@ const roles: Role[] = [
     id: 'marketers',
     title: 'Marketers',
     description:
-      'Generate SEO content, ad copy, landing page text, and campaign ideas using optimized creative templates.',
-    image: '/images/roles/marketers.jpg',
+      'Generate SEO content, ad copy, landing page text, and campaign ideas using optimized prompt templates.',
+    images: [
+      'prompts/edjsp7fxt89-1765187680324.png',
+      'prompts/3jl52goo8uo-1765189830518.png',
+      'prompts/swiss-style-abstract-vector-logo-1.webp',
+    ],
   },
   {
     id: 'designers',
     title: 'Designers',
     description:
-      'Create Midjourney, creative briefs, and image concepts with prompts built for DALL-E, SDv3, Flux, and more.',
-    image: '/images/roles/designers.jpg',
+      'Create UI microcopy, creative briefs, and image concepts with prompts built for DALL·E, Midjourney, and more.',
+    images: [
+      'prompts/a491a13w5vh-1765214996149.png',
+      'prompts/d3s1ws7560n-1765208408546.png',
+      'prompts/hzpvn5hhg4-1765183159977.png',
+    ],
   },
   {
     id: 'product-managers',
     title: 'Product Managers',
     description:
       'Speed up product research, user stories, specs, and roadmap workflows with high-quality ChatGPT prompts.',
-    image: '/images/roles/product-managers.jpg',
+    images: [
+      'prompts/beauty-skincare-portrait-1.webp',
+      'prompts/frosted-glass-icon-1.webp',
+      'prompts/vinyl-toy-3d-object-2.webp',
+    ],
   },
   {
     id: 'developers',
     title: 'Developers',
     description:
-      'Use engineering-focused prompts for code generation, refactoring, API structures, and documentation in days.',
-    image: '/images/roles/developers.jpg',
+      'Use engineering-focused prompts for code generation, refactoring, API structures, and automation scripts.',
+    images: [
+      'prompts/3d-keycap-translucent-gummy-2.webp',
+      'prompts/3d-keycap-solid-opaque-3.webp',
+      'prompts/3d-emblem-on-podium-1.webp',
+    ],
   },
   {
     id: 'entrepreneurs',
     title: 'Entrepreneurs',
     description:
-      'Validate ideas faster, create business plans, and launch with clarity using task-based prompts for founders.',
-    image: '/images/roles/entrepreneurs.jpg',
+      'Validate ideas faster, create business plans, and launch with clarity using optimized prompts for founders.',
+    images: [
+      'prompts/claymorphism-3d-sports-icon-2.webp',
+      'prompts/qzzuf0w9yx9-1765208408546.png',
+      'prompts/hand-holding-glowing-logo-3.webp',
+    ],
   },
 ]
 
@@ -60,19 +79,11 @@ const roles: Role[] = [
 
 function RoleCard({ role }: { role: Role }) {
   return (
-    <div className="group flex flex-col gap-4">
-      <div className="aspect-[4/3] overflow-hidden rounded-xl bg-muted">
-        <Image
-          src={role.image}
-          alt={role.title}
-          className="size-full object-cover transition-transform duration-300 group-hover:scale-105"
-        />
-      </div>
-      <div>
-        <h3 className="text-lg font-semibold">{role.title}</h3>
-        <p className="mt-1 text-sm text-muted-foreground line-clamp-3">
-          {role.description}
-        </p>
+    <div className="group flex flex-col rounded-2xl bg-muted/30 p-5 pb-0">
+      <h3 className="text-lg font-bold text-foreground">{role.title}</h3>
+      <p className="mt-2 text-sm leading-relaxed">{role.description}</p>
+      <div className="mt-4 max-w-100 overflow-hidden rounded-lg rounded-b-none bg-muted">
+        <ImageGrid images={role.images} title={role.title} ratio={16 / 9} />
       </div>
     </div>
   )
@@ -84,13 +95,13 @@ function RoleCard({ role }: { role: Role }) {
 
 export function RolesSection() {
   return (
-    <section className="bg-muted/30 py-16">
+    <section className="py-16">
       <div className="container">
         {/* Section Header */}
-        <div className="mb-12 text-center">
-          <Badge variant="secondary" className="mb-4">
+        <div className="mb-16 text-center">
+          <span className="mb-4 inline-block rounded-full bg-secondary-300 px-4 py-2 text-sm font-medium tracking-wide text-foreground">
             FOR EVERY ROLE
-          </Badge>
+          </span>
           <h2 className="text-2xl font-bold sm:text-3xl lg:text-4xl">
             PromptValley helps you generate clearer,
             <br />
@@ -103,9 +114,16 @@ export function RolesSection() {
           </p>
         </div>
 
-        {/* Roles Grid */}
-        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
-          {roles.map((role) => (
+        {/* Top Row - 3 cards */}
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {roles.slice(0, 3).map((role) => (
+            <RoleCard key={role.id} role={role} />
+          ))}
+        </div>
+
+        {/* Bottom Row - 2 cards */}
+        <div className="mt-6 grid gap-6 sm:grid-cols-2">
+          {roles.slice(3, 5).map((role) => (
             <RoleCard key={role.id} role={role} />
           ))}
         </div>

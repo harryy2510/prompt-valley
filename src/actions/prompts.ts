@@ -35,8 +35,9 @@ export type PromptFilters = z.infer<typeof promptFiltersSchema>
 // ============================================
 
 const promptFiltersSchema = z.object({
-  categoryId: z.uuid().optional(),
-  tagId: z.uuid().optional(),
+  categoryId: z.string().optional(),
+  tagId: z.string().optional(),
+  modelId: z.string().optional(),
   tier: z.enum(['free', 'pro']).optional(),
   search: z.string().max(200).optional(),
   isFeatured: z.boolean().optional(),
@@ -44,14 +45,7 @@ const promptFiltersSchema = z.object({
   offset: z.number().int().min(0).optional(),
 })
 
-const promptIdSchema = z.uuid()
-
-const limitSchema = z.number().int().min(1).max(100).optional()
-
-const promptsByCategorySchema = z.object({
-  categoryId: z.uuid(),
-  limit: z.number().int().min(1).max(100).optional(),
-})
+const promptIdSchema = z.string()
 
 // ============================================
 // Server Functions
@@ -62,20 +56,31 @@ export const fetchPrompts = createServerFn({ method: 'GET' })
   .handler(async ({ data: filters }) => {
     const supabase = getSupabaseServerClient()
 
+    // Use !inner join when filtering by modelId to only get prompts with that model
+    const modelsSelect = filters.modelId
+      ? 'models:prompt_models!inner(model:ai_models(*, provider:ai_providers(*)))'
+      : 'models:prompt_models(model:ai_models(*, provider:ai_providers(*)))'
+
     let query = supabase
       .from('prompts_with_access')
       .select(
         `
         *,
-        category:categories(*),
+        category:categories!category_id(*),
         tags:prompt_tags(tag:tags(*)),
-        models:prompt_models(model:ai_models(*, provider:ai_providers(*)))
+        ${modelsSelect}
       `,
       )
       .eq('is_published', true)
 
+    if (filters.modelId) {
+      query = query.eq('models.model_id', filters.modelId)
+    }
     if (filters.categoryId) {
-      query = query.eq('category_id', filters.categoryId)
+      // Match prompts where category_id matches OR parent_category_id matches
+      query = query.or(
+        `category_id.eq.${filters.categoryId},parent_category_id.eq.${filters.categoryId}`,
+      )
     }
     if (filters.tier) {
       query = query.eq('tier', filters.tier)
@@ -100,7 +105,7 @@ export const fetchPrompts = createServerFn({ method: 'GET' })
     if (filters.offset) {
       query = query.range(
         filters.offset,
-        filters.offset + (filters.limit ?? 20) - 1,
+        filters.offset + (filters.limit ?? 12) - 1,
       )
     }
 
@@ -120,7 +125,7 @@ export const fetchPromptById = createServerFn({ method: 'GET' })
       .select(
         `
         *,
-        category:categories(*),
+        category:categories!category_id(*),
         tags:prompt_tags(tag:tags(*)),
         models:prompt_models(model:ai_models(*, provider:ai_providers(*)))
       `,
@@ -137,62 +142,22 @@ export const fetchPromptById = createServerFn({ method: 'GET' })
     return data as PromptWithRelations
   })
 
-export const fetchFeaturedPrompts = createServerFn({ method: 'GET' })
-  .inputValidator(limitSchema)
-  .handler(async ({ data: limitInput }) => {
-    const limit = limitInput ?? 12
-    const supabase = getSupabaseServerClient()
-
-    const { data, error } = await supabase
-      .from('prompts_with_access')
-      .select(
-        `
-        *,
-        category:categories(*),
-        tags:prompt_tags(tag:tags(*)),
-        models:prompt_models(model:ai_models(*, provider:ai_providers(*)))
-      `,
-      )
-      .eq('is_published', true)
-      // .eq('is_featured', true)
-      .order('sort_order', { ascending: true, nullsFirst: false })
-      .order('created_at', { ascending: false })
-      .limit(limit)
-
-    if (error) throw error
-    return data as PromptWithRelations[]
-  })
-
-export const fetchPromptsByCategory = createServerFn({ method: 'GET' })
-  .inputValidator(promptsByCategorySchema)
-  .handler(async ({ data: { categoryId, limit = 20 } }) => {
-    const supabase = getSupabaseServerClient()
-
-    const { data, error } = await supabase
-      .from('prompts_with_access')
-      .select(
-        `
-        *,
-        category:categories(*),
-        tags:prompt_tags(tag:tags(*)),
-        models:prompt_models(model:ai_models(*, provider:ai_providers(*)))
-      `,
-      )
-      .eq('is_published', true)
-      .eq('category_id', categoryId)
-      .order('is_featured', { ascending: false })
-      .order('created_at', { ascending: false })
-      .limit(limit)
-
-    if (error) throw error
-    return data as PromptWithRelations[]
-  })
-
 export const incrementPromptCopies = createServerFn({ method: 'POST' })
   .inputValidator(promptIdSchema)
   .handler(async ({ data: id }) => {
     const supabase = getSupabaseServerClient()
     const { error } = await supabase.rpc('increment_prompt_copies', {
+      prompt_text_id: id,
+    })
+    if (error) throw error
+    return { success: true }
+  })
+
+export const incrementPromptViews = createServerFn({ method: 'POST' })
+  .inputValidator(promptIdSchema)
+  .handler(async ({ data: id }) => {
+    const supabase = getSupabaseServerClient()
+    const { error } = await supabase.rpc('increment_prompt_views', {
       prompt_text_id: id,
     })
     if (error) throw error
@@ -209,9 +174,6 @@ export const promptKeys = {
   list: (filters?: PromptFilters) => [...promptKeys.lists(), filters] as const,
   details: () => [...promptKeys.all, 'detail'] as const,
   detail: (id: string) => [...promptKeys.details(), id] as const,
-  featured: (limit?: number) => [...promptKeys.all, 'featured', limit] as const,
-  byCategory: (categoryId: string) =>
-    [...promptKeys.all, 'category', categoryId] as const,
 }
 
 // ============================================
@@ -232,41 +194,28 @@ export function promptDetailQueryOptions(id: string) {
   })
 }
 
-export function featuredPromptsQueryOptions(limit?: number) {
-  return queryOptions({
-    queryKey: promptKeys.featured(limit),
-    queryFn: () => fetchFeaturedPrompts({ data: limit }),
-  })
-}
-
-export function promptsByCategoryQueryOptions(
-  categoryId: string,
-  limit?: number,
-) {
-  return queryOptions({
-    queryKey: promptKeys.byCategory(categoryId),
-    queryFn: () => fetchPromptsByCategory({ data: { categoryId, limit } }),
-  })
-}
-
 // ============================================
 // Hooks
 // ============================================
 
 export function usePrompts(filters: PromptFilters = {}) {
-  return useQuery(promptsQueryOptions(filters))
+  return useQuery(promptsQueryOptions({ limit: 12, ...filters }))
 }
 
 export function usePromptDetail(id: string) {
   return useQuery(promptDetailQueryOptions(id))
 }
 
-export function useFeaturedPrompts(limit?: number) {
-  return useQuery(featuredPromptsQueryOptions(limit))
+export function useFeaturedPrompts(limit = 12) {
+  return useQuery(promptsQueryOptions({ isFeatured: true, limit }))
 }
 
-export function usePromptsByCategory(categoryId: string, limit?: number) {
-  return useQuery(promptsByCategoryQueryOptions(categoryId, limit))
+export function usePromptsByCategory(categoryId: string, limit = 12) {
+  return useQuery(promptsQueryOptions({ categoryId, limit }))
+}
+
+export function usePromptsByModel(modelId: string, limit = 12) {
+  return useQuery(promptsQueryOptions({ modelId, limit }))
 }
 
 export function useIncrementCopies() {
@@ -276,6 +225,17 @@ export function useIncrementCopies() {
     mutationFn: (id: string) => incrementPromptCopies({ data: id }),
     onSuccess: async (_, id) => {
       // Invalidate the prompt detail to reflect new count
+      await queryClient.invalidateQueries({ queryKey: promptKeys.detail(id) })
+    },
+  })
+}
+
+export function useIncrementViews() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (id: string) => incrementPromptViews({ data: id }),
+    onSuccess: async (_, id) => {
       await queryClient.invalidateQueries({ queryKey: promptKeys.detail(id) })
     },
   })

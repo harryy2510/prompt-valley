@@ -23,6 +23,13 @@ const verifyOtpSchema = z.object({
 })
 
 // ============================================
+// Types
+// ============================================
+
+export type SendOtpInput = z.infer<typeof sendOtpSchema>
+export type VerifyOtpInput = z.infer<typeof verifyOtpSchema>
+
+// ============================================
 // Server Functions
 // ============================================
 
@@ -127,7 +134,7 @@ export function useSignOut() {
 
 export function useSendOtp() {
   return useMutation({
-    mutationFn: (email: string) => sendOtpServer({ data: { email } }),
+    mutationFn: (data: SendOtpInput) => sendOtpServer({ data }),
   })
 }
 
@@ -135,8 +142,7 @@ export function useVerifyOtp() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (data: { email: string; token: string }) =>
-      verifyOtpServer({ data }),
+    mutationFn: (data: VerifyOtpInput) => verifyOtpServer({ data }),
     onSuccess: (result) => {
       if (result.success && result.user) {
         queryClient.setQueryData(authKeys.user(), result.user)

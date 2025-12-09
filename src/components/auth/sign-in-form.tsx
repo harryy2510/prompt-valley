@@ -30,15 +30,16 @@ import {
 
 const emailSchema = z.object({
   email: z.email('Please enter a valid email address'),
-  otp: z.string().optional(),
+  token: z.string().optional(),
 })
 
-const otpSchema = z.object({
+const tokenSchema = z.object({
   email: z.email('Please enter a valid email address'),
-  otp: z.string().length(6, 'Please enter the 6-digit code'),
+  token: z.string().length(6, 'Please enter the 6-digit code'),
 })
 
-type FormValues = z.infer<typeof emailSchema>
+type FormEmailValues = z.infer<typeof emailSchema>
+type FormTokenValues = z.infer<typeof tokenSchema>
 
 // ============================================
 // Types
@@ -54,7 +55,7 @@ export type SignInFormProps = {
 // ============================================
 
 export function SignInForm({ onSuccess }: SignInFormProps) {
-  const [step, setStep] = useState<'email' | 'otp'>('email')
+  const [step, setStep] = useState<'email' | 'token'>('email')
   const router = useRouter()
 
   const sendOtp = useSendOtp()
@@ -67,25 +68,22 @@ export function SignInForm({ onSuccess }: SignInFormProps) {
     (sendOtp.data && !sendOtp.data.success ? sendOtp.data.error : null) ||
     (verifyOtp.data && !verifyOtp.data.success ? verifyOtp.data.error : null)
 
-  const form = useForm<FormValues>({
+  const form = useForm<FormEmailValues | FormTokenValues>({
     defaultValues: {
       email: '',
-      otp: '',
+      token: '',
     },
-    resolver: zodResolver(step === 'email' ? emailSchema : otpSchema),
+    resolver: zodResolver(step === 'email' ? emailSchema : tokenSchema),
   })
 
-  const handleSubmit = async (data: FormValues) => {
+  const handleSubmit = async (data: FormEmailValues | FormTokenValues) => {
     if (step === 'email') {
-      const result = await sendOtp.mutateAsync(data.email)
+      const result = await sendOtp.mutateAsync(data)
       if (result.success) {
-        setStep('otp')
+        setStep('token')
       }
     } else {
-      const result = await verifyOtp.mutateAsync({
-        email: data.email,
-        token: data.otp!,
-      })
+      const result = await verifyOtp.mutateAsync(data as FormTokenValues)
       if (result.success) {
         onSuccess?.()
         router.invalidate()
@@ -95,7 +93,7 @@ export function SignInForm({ onSuccess }: SignInFormProps) {
 
   const handleBackToEmail = () => {
     setStep('email')
-    form.setValue('otp', '')
+    form.setValue('token', '')
     form.clearErrors()
     sendOtp.reset()
     verifyOtp.reset()
@@ -139,9 +137,9 @@ export function SignInForm({ onSuccess }: SignInFormProps) {
 
           {/* OTP field - hidden when on email step */}
           <FormField
-            name="otp"
+            name="token"
             render={({ field }) => (
-              <FormItem hidden={step !== 'otp'}>
+              <FormItem hidden={step !== 'token'}>
                 <FormLabel className="sr-only">One-time password</FormLabel>
                 <FormControl>
                   <div className="flex justify-center">
@@ -149,7 +147,7 @@ export function SignInForm({ onSuccess }: SignInFormProps) {
                       maxLength={6}
                       pattern={REGEXP_ONLY_DIGITS}
                       disabled={isPending}
-                      autoFocus={step === 'otp'}
+                      autoFocus={step === 'token'}
                       {...field}
                     >
                       <InputOTPGroup>
@@ -193,7 +191,7 @@ export function SignInForm({ onSuccess }: SignInFormProps) {
               )}
             </Button>
 
-            {step === 'otp' && (
+            {step === 'token' && (
               <Button
                 type="button"
                 variant="ghost"

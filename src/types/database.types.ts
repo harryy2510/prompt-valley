@@ -390,13 +390,6 @@ export type Database = {
             referencedRelation: "stripe_products"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "stripe_prices_product_id_fkey"
-            columns: ["product_id"]
-            isOneToOne: false
-            referencedRelation: "stripe_products_with_prices"
-            referencedColumns: ["id"]
-          },
         ]
       }
       stripe_products: {
@@ -405,10 +398,10 @@ export type Database = {
           created_at: string
           description: string | null
           display_order: number | null
-          features: string[] | null
           highlight: string | null
           id: string
           images: string[] | null
+          marketing_features: string[] | null
           metadata: Json | null
           name: string
           updated_at: string
@@ -418,10 +411,10 @@ export type Database = {
           created_at?: string
           description?: string | null
           display_order?: number | null
-          features?: string[] | null
           highlight?: string | null
           id: string
           images?: string[] | null
+          marketing_features?: string[] | null
           metadata?: Json | null
           name: string
           updated_at?: string
@@ -431,10 +424,10 @@ export type Database = {
           created_at?: string
           description?: string | null
           display_order?: number | null
-          features?: string[] | null
           highlight?: string | null
           id?: string
           images?: string[] | null
+          marketing_features?: string[] | null
           metadata?: Json | null
           name?: string
           updated_at?: string
@@ -636,6 +629,7 @@ export type Database = {
           images: string[] | null
           is_featured: boolean | null
           is_published: boolean | null
+          parent_category_id: string | null
           published_at: string | null
           saves_count: number | null
           sort_order: number | null
@@ -644,45 +638,14 @@ export type Database = {
           updated_at: string | null
           views_count: number | null
         }
-        Insert: {
-          category_id?: string | null
-          content?: never
-          copies_count?: number | null
-          created_at?: string | null
-          created_by?: string | null
-          description?: string | null
-          id?: string | null
-          images?: string[] | null
-          is_featured?: boolean | null
-          is_published?: boolean | null
-          published_at?: string | null
-          saves_count?: number | null
-          sort_order?: number | null
-          tier?: Database["public"]["Enums"]["tier"] | null
-          title?: string | null
-          updated_at?: string | null
-          views_count?: number | null
-        }
-        Update: {
-          category_id?: string | null
-          content?: never
-          copies_count?: number | null
-          created_at?: string | null
-          created_by?: string | null
-          description?: string | null
-          id?: string | null
-          images?: string[] | null
-          is_featured?: boolean | null
-          is_published?: boolean | null
-          published_at?: string | null
-          saves_count?: number | null
-          sort_order?: number | null
-          tier?: Database["public"]["Enums"]["tier"] | null
-          title?: string | null
-          updated_at?: string | null
-          views_count?: number | null
-        }
         Relationships: [
+          {
+            foreignKeyName: "categories_parent_id_fkey"
+            columns: ["parent_category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "prompts_category_id_fkey"
             columns: ["category_id"]
@@ -705,21 +668,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
-      stripe_products_with_prices: {
-        Row: {
-          active: boolean | null
-          description: string | null
-          display_order: number | null
-          features: string[] | null
-          highlight: string | null
-          id: string | null
-          images: string[] | null
-          metadata: Json | null
-          name: string | null
-          prices: Json | null
-        }
-        Relationships: []
       }
       user_profiles: {
         Row: {

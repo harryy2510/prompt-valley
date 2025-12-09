@@ -14,7 +14,7 @@ export type Tag = Tables<'tags'>
 // Zod Schemas
 // ============================================
 
-const tagIdSchema = z.uuid()
+const tagIdSchema = z.string()
 
 // ============================================
 // Server Functions

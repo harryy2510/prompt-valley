@@ -17,7 +17,7 @@ export type Category = Tables<'categories'> & {
 // Zod Schemas
 // ============================================
 
-const categoryIdSchema = z.uuid()
+const categoryIdSchema = z.string()
 
 // ============================================
 // Server Functions

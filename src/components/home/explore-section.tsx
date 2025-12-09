@@ -1,28 +1,39 @@
 import { Link } from '@tanstack/react-router'
 import { useState } from 'react'
 
-import { useFeaturedPrompts } from '@/actions/prompts'
+import { useCategories } from '@/actions/categories'
+import { useModels } from '@/actions/models'
+import { usePrompts } from '@/actions/prompts'
 import { PromptCard, PromptCardSkeleton } from '@/components/cards/prompt-card'
 import { UpsellCard } from '@/components/cards/upsell-card'
 import { Button } from '@/components/ui/button'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Separator } from '@/components/ui/separator'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
-
-// ============================================
-// Types
-// ============================================
-
-type FilterTab = 'all' | 'latest' | 'writing' | 'image'
+import { useProfile } from '@/actions/profile'
 
 // ============================================
 // Explore Section Component
 // ============================================
 
 export function ExploreSection() {
-  const [activeTab, setActiveTab] = useState<FilterTab>('all')
-  const { data: prompts, isLoading } = useFeaturedPrompts(100)
+  const [selectedModel, setSelectedModel] = useState<string>('all')
+  const [activeTab, setActiveTab] = useState<string>('latest')
+  const { data: profile } = useProfile()
 
-  // Filter prompts based on tab (for demo - in real app this would be server-side)
-  const filteredPrompts = prompts ?? []
+  const { data: prompts = [], isLoading } = usePrompts({
+    limit: profile?.tier === 'pro' ? 12 : 11,
+    categoryId: activeTab !== 'latest' ? activeTab : undefined,
+    modelId: selectedModel !== 'all' ? selectedModel : undefined,
+  })
+  const { data: categories } = useCategories()
+  const { data: models } = useModels()
 
   return (
     <section id="explore" className="container py-16">
@@ -38,19 +49,38 @@ export function ExploreSection() {
         </p>
       </div>
 
-      {/* Filter Tabs */}
-      <Tabs
-        value={activeTab}
-        onValueChange={(v) => setActiveTab(v as FilterTab)}
-        className="mb-8"
-      >
-        <TabsList>
-          <TabsTrigger value="all">Model</TabsTrigger>
-          <TabsTrigger value="latest">Latest</TabsTrigger>
-          <TabsTrigger value="writing">Writing</TabsTrigger>
-          <TabsTrigger value="image">Image Generation</TabsTrigger>
-        </TabsList>
-      </Tabs>
+      {/* Filter Controls: Model Dropdown + Separator + Category Tabs */}
+      <div className="mb-8 flex items-center gap-4">
+        {/* Model Dropdown */}
+        <Select value={selectedModel} onValueChange={setSelectedModel}>
+          <SelectTrigger className="min-w-20">
+            <SelectValue placeholder="Model" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Models</SelectItem>
+            {models?.map((model) => (
+              <SelectItem key={model.id} value={model.id}>
+                {model.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        {/* Vertical Separator */}
+        <Separator orientation="vertical" className="h-6" />
+
+        {/* Category Tabs */}
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList>
+            <TabsTrigger value="latest">Latest</TabsTrigger>
+            {categories?.map((category) => (
+              <TabsTrigger key={category.id} value={category.id}>
+                {category.name}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </Tabs>
+      </div>
 
       {/* Prompts Grid */}
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
@@ -62,7 +92,7 @@ export function ExploreSection() {
         ) : (
           <>
             {/* First row of prompts */}
-            {filteredPrompts.slice(0, 3).map((prompt) => (
+            {prompts.slice(0, 3).map((prompt) => (
               <PromptCard key={prompt.id} prompt={prompt} />
             ))}
 
@@ -70,12 +100,13 @@ export function ExploreSection() {
             <UpsellCard
               label="PRO"
               title="Unlock everything PromptValley has to offer."
+              description="Cancel anytime."
               ctaText="Get PRO"
               className="h-full"
             />
 
             {/* Remaining prompts */}
-            {filteredPrompts.slice(3).map((prompt) => (
+            {prompts.slice(3).map((prompt) => (
               <PromptCard key={prompt.id} prompt={prompt} />
             ))}
           </>
@@ -84,7 +115,7 @@ export function ExploreSection() {
 
       {/* Load More */}
       <div className="mt-12 text-center">
-        <Button variant="outline" size="lg" asChild>
+        <Button variant="brand-primary" size="lg" asChild>
           <Link to="/">Sign up to Continue</Link>
         </Button>
       </div>

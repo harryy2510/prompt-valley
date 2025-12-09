@@ -26,7 +26,7 @@ export type FavoriteWithPrompt = UserFavorite & {
 // ============================================
 
 const favoriteInputSchema = z.object({
-  promptId: z.uuid(),
+  promptId: z.string(),
   userId: z.uuid(),
 })
 

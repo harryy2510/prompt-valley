@@ -4,6 +4,8 @@ import { LockIcon } from 'lucide-react'
 import { cn } from '@/libs/cn'
 import { Button } from '@/components/ui/button'
 import type { Tables } from '@/types/database.types'
+import { useProfile } from '@/actions/profile'
+import proUpsellBg from '@/assets/pro-upsell-bg.webp'
 
 type StripeProduct = Tables<'stripe_products'>
 
@@ -32,9 +34,12 @@ function UpsellCard({
   className,
   ...props
 }: UpsellCardProps) {
+  const { data: profile, isLoading } = useProfile()
   // Extract from product or use props
   const title = titleProp ?? product?.name
   const description = descriptionProp ?? product?.description
+
+  if (isLoading || profile?.tier === 'pro') return null
 
   if (variant === 'inline') {
     return (
@@ -42,7 +47,7 @@ function UpsellCard({
         data-slot="upsell-card"
         data-variant="inline"
         className={cn(
-          'flex items-center justify-between gap-4 rounded-lg bg-gradient-to-r from-primary-600 to-primary-800 p-4 text-white',
+          'flex items-center justify-between gap-4 rounded-lg bg-linear-to-r from-primary-600 to-primary-800 p-4 text-white',
           className,
         )}
         {...props}
@@ -56,11 +61,7 @@ function UpsellCard({
             )}
           </div>
         </div>
-        <Button
-          variant="inverse"
-          size="sm"
-          onClick={onCtaClick}
-        >
+        <Button variant="inverse" size="sm" onClick={onCtaClick}>
           {ctaText}
         </Button>
       </div>
@@ -73,7 +74,7 @@ function UpsellCard({
         data-slot="upsell-card"
         data-variant="compact"
         className={cn(
-          'flex flex-col items-start gap-3 rounded-lg bg-gradient-to-br from-primary-500 to-primary-700 p-4 text-white',
+          'flex flex-col items-start gap-3 rounded-lg bg-linear-to-br from-primary-500 to-primary-700 p-4 text-white',
           className,
         )}
         {...props}
@@ -100,24 +101,33 @@ function UpsellCard({
     <div
       data-slot="upsell-card"
       data-variant="default"
+      style={{
+        backgroundImage: `url(${proUpsellBg})`,
+      }}
       className={cn(
-        'flex flex-col rounded-xl bg-gradient-to-br from-primary-500 via-primary-600 to-primary-800 p-6 text-white',
+        'relative flex flex-col overflow-hidden rounded-2xl bg-cover p-6 text-white',
         className,
       )}
       {...props}
     >
-      {label && <div className="text-overline text-white/80 mb-2">{label}</div>}
-      {title && <h3 className="text-h5 font-semibold mb-2">{title}</h3>}
-      {description && (
-        <p className="text-body2 text-white/80 mb-6">{description}</p>
-      )}
-      <Button
-        variant="inverse-outline"
-        className="mt-auto w-fit"
-        onClick={onCtaClick}
-      >
-        {ctaText}
-      </Button>
+      <div className="relative z-10 flex h-full flex-col">
+        {label && (
+          <div className="mb-4 font-extrabold text-primary-200">{label}</div>
+        )}
+        {title && (
+          <h3 className="mb-2 text-xl font-bold leading-tight">{title}</h3>
+        )}
+        {description && <p className="text-sm text-white/70">{description}</p>}
+        <Button
+          variant="inverse"
+          className="mt-auto w-fit"
+          onClick={onCtaClick}
+        >
+          <span>
+            Get <span className="font-extrabold text-primary-500">PRO</span>
+          </span>
+        </Button>
+      </div>
     </div>
   )
 }
@@ -142,7 +152,7 @@ function PremiumContentBlock({
     <div
       data-slot="premium-content-block"
       className={cn(
-        'rounded-lg bg-gradient-to-br from-primary-500 via-primary-600 to-primary-800 p-6 text-white',
+        'rounded-lg bg-linear-to-br from-primary-500 via-primary-600 to-primary-800 p-6 text-white',
         className,
       )}
       {...props}
