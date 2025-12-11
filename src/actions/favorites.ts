@@ -3,6 +3,7 @@ import {
   useQuery,
   useMutation,
   useQueryClient,
+  type UseQueryOptions,
 } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { getSupabaseServerClient } from '@/libs/supabase/server'
@@ -21,29 +22,39 @@ export type FavoriteWithPrompt = UserFavorite & {
   prompt: PromptWithRelations
 }
 
+export type FavoritesFilters = z.infer<typeof favoritesFiltersSchema>
+
 // ============================================
 // Zod Schemas
 // ============================================
+
+const favoritesFiltersSchema = z
+  .object({
+    limit: z.number().int().min(1).max(100).optional(),
+    offset: z.number().int().min(0).optional(),
+    orderBy: z.enum(['created_at']).optional(),
+    orderAsc: z.boolean().optional(),
+  })
+  .optional()
 
 const favoriteInputSchema = z.object({
   promptId: z.string(),
   userId: z.uuid(),
 })
 
-type FavoriteInput = z.Infer<typeof favoriteInputSchema>
+type FavoriteInput = z.infer<typeof favoriteInputSchema>
 
 // ============================================
 // Server Functions
 // ============================================
 
-export const fetchUserFavorites = createServerFn({ method: 'GET' }).handler(
-  async () => {
+export const fetchUserFavorites = createServerFn({ method: 'GET' })
+  .inputValidator(favoritesFiltersSchema)
+  .handler(async ({ data: filters }) => {
     const supabase = getSupabaseServerClient()
 
-    const { data, error } = await supabase
-      .from('user_favorites')
-      .select(
-        `
+    let query = supabase.from('user_favorites').select(
+      `
         *,
         prompt:prompts(
           *,
@@ -52,13 +63,27 @@ export const fetchUserFavorites = createServerFn({ method: 'GET' }).handler(
           models:prompt_models(model:ai_models(*, provider:ai_providers(*)))
         )
       `,
+    )
+
+    query = query.order(filters?.orderBy ?? 'created_at', {
+      ascending: filters?.orderAsc ?? false,
+    })
+
+    if (filters?.limit) {
+      query = query.limit(filters.limit)
+    }
+    if (filters?.offset) {
+      query = query.range(
+        filters.offset,
+        filters.offset + (filters.limit ?? 12) - 1,
       )
-      .order('created_at', { ascending: false })
+    }
+
+    const { data, error } = await query
 
     if (error) throw error
     return data as FavoriteWithPrompt[]
-  },
-)
+  })
 
 export const fetchFavoriteIds = createServerFn({ method: 'GET' }).handler(
   async () => {
@@ -137,7 +162,8 @@ export const removeFavorite = createServerFn({ method: 'POST' })
 export const favoriteKeys = {
   all: ['favorites'] as const,
   lists: () => [...favoriteKeys.all, 'list'] as const,
-  list: () => [...favoriteKeys.lists()] as const,
+  list: (filters?: FavoritesFilters) =>
+    [...favoriteKeys.lists(), filters] as const,
   ids: () => [...favoriteKeys.all, 'ids'] as const,
   check: (input: FavoriteInput) =>
     [...favoriteKeys.all, 'check', input] as const,
@@ -147,24 +173,35 @@ export const favoriteKeys = {
 // Query Options (for loaders)
 // ============================================
 
-export function userFavoritesQueryOptions() {
+export function userFavoritesQueryOptions(
+  filters?: FavoritesFilters,
+  options?: Partial<UseQueryOptions<FavoriteWithPrompt[]>>,
+) {
   return queryOptions({
-    queryKey: favoriteKeys.list(),
-    queryFn: () => fetchUserFavorites(),
+    queryKey: favoriteKeys.list(filters),
+    queryFn: () => fetchUserFavorites({ data: filters }),
+    ...options,
   })
 }
 
-export function favoriteIdsQueryOptions() {
+export function favoriteIdsQueryOptions(
+  options?: Partial<UseQueryOptions<string[]>>,
+) {
   return queryOptions({
     queryKey: favoriteKeys.ids(),
     queryFn: () => fetchFavoriteIds(),
+    ...options,
   })
 }
 
-export function isFavoriteQueryOptions(input: FavoriteInput) {
+export function isFavoriteQueryOptions(
+  input: FavoriteInput,
+  options?: Partial<UseQueryOptions<boolean>>,
+) {
   return queryOptions({
     queryKey: favoriteKeys.check(input),
     queryFn: () => checkIsFavorite({ data: input }),
+    ...options,
   })
 }
 
@@ -172,18 +209,24 @@ export function isFavoriteQueryOptions(input: FavoriteInput) {
 // Hooks
 // ============================================
 
-export function useUserFavorites() {
-  return useQuery(userFavoritesQueryOptions())
+export function useUserFavorites(
+  filters?: FavoritesFilters,
+  options?: Partial<UseQueryOptions<FavoriteWithPrompt[]>>,
+) {
+  return useQuery(userFavoritesQueryOptions(filters, options))
 }
 
-export function useFavoriteIds() {
-  return useQuery(favoriteIdsQueryOptions())
+export function useFavoriteIds(options?: Partial<UseQueryOptions<string[]>>) {
+  return useQuery(favoriteIdsQueryOptions(options))
 }
 
-export function useIsFavorite(promptId: string) {
+export function useIsFavorite(
+  promptId: string,
+  options?: Partial<UseQueryOptions<boolean>>,
+) {
   const { data: user } = useUser()
   return useQuery({
-    ...isFavoriteQueryOptions({ promptId, userId: user?.id ?? '' }),
+    ...isFavoriteQueryOptions({ promptId, userId: user?.id ?? '' }, options),
     enabled: !!user?.id,
   })
 }

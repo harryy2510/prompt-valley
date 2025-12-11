@@ -1,4 +1,8 @@
-import { queryOptions, useQuery } from '@tanstack/react-query'
+import {
+  queryOptions,
+  useQuery,
+  type UseQueryOptions,
+} from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { getSupabaseServerClient } from '@/libs/supabase/server'
 import type { Tables } from '@/types/database.types'
@@ -13,9 +17,21 @@ export type Category = Tables<'categories'> & {
   children?: Category[]
 }
 
+export type CategoriesFilters = z.infer<typeof categoriesFiltersSchema>
+
 // ============================================
 // Zod Schemas
 // ============================================
+
+const categoriesFiltersSchema = z
+  .object({
+    search: z.string().max(200).optional(),
+    parentId: z.string().optional(),
+    limit: z.number().int().min(1).max(100).optional(),
+    orderBy: z.enum(['name', 'created_at']).optional(),
+    orderAsc: z.boolean().optional(),
+  })
+  .optional()
 
 const categoryIdSchema = z.string()
 
@@ -23,16 +39,32 @@ const categoryIdSchema = z.string()
 // Server Functions
 // ============================================
 
-export const fetchCategories = createServerFn({ method: 'GET' }).handler(
-  async () => {
+export const fetchCategories = createServerFn({ method: 'GET' })
+  .inputValidator(categoriesFiltersSchema)
+  .handler(async ({ data: filters }) => {
     const supabase = getSupabaseServerClient()
 
-    const { data, error } = await supabase
-      .from('categories')
-      .select('*')
-      .order('name', { ascending: true })
+    let query = supabase.from('categories').select('*')
+
+    if (filters?.search) {
+      query = query.ilike('name', `%${filters.search}%`)
+    }
+    if (filters?.parentId) {
+      query = query.eq('parent_id', filters.parentId)
+    }
+
+    query = query.order(filters?.orderBy ?? 'name', {
+      ascending: filters?.orderAsc ?? true,
+    })
+
+    if (filters?.limit) {
+      query = query.limit(filters.limit)
+    }
+
+    const { data, error } = await query
 
     if (error) throw error
+
     // Build nested structure
     const categories = data as Category[]
     const [childCategories, rootCategories] = partition(
@@ -46,8 +78,7 @@ export const fetchCategories = createServerFn({ method: 'GET' }).handler(
     }))
 
     return nested
-  },
-)
+  })
 
 export const fetchCategoryById = createServerFn({ method: 'GET' })
   .inputValidator(categoryIdSchema)
@@ -70,7 +101,9 @@ export const fetchCategoryById = createServerFn({ method: 'GET' })
 
 export const categoryKeys = {
   all: ['categories'] as const,
-  list: () => [...categoryKeys.all, 'list'] as const,
+  lists: () => [...categoryKeys.all, 'list'] as const,
+  list: (filters?: CategoriesFilters) =>
+    [...categoryKeys.lists(), filters] as const,
   details: () => [...categoryKeys.all, 'detail'] as const,
   detail: (id: string) => [...categoryKeys.details(), id] as const,
 }
@@ -79,17 +112,25 @@ export const categoryKeys = {
 // Query Options (for loaders)
 // ============================================
 
-export function categoriesQueryOptions() {
+export function categoriesQueryOptions(
+  filters?: CategoriesFilters,
+  options?: Partial<UseQueryOptions<Category[]>>,
+) {
   return queryOptions({
-    queryKey: categoryKeys.list(),
-    queryFn: () => fetchCategories(),
+    queryKey: categoryKeys.list(filters),
+    queryFn: () => fetchCategories({ data: filters }),
+    ...options,
   })
 }
 
-export function categoryQueryOptions(id: string) {
+export function categoryQueryOptions(
+  id: string,
+  options?: Partial<UseQueryOptions<Category>>,
+) {
   return queryOptions({
     queryKey: categoryKeys.detail(id),
     queryFn: () => fetchCategoryById({ data: id }),
+    ...options,
   })
 }
 
@@ -97,10 +138,16 @@ export function categoryQueryOptions(id: string) {
 // Hooks
 // ============================================
 
-export function useCategories() {
-  return useQuery(categoriesQueryOptions())
+export function useCategories(
+  filters?: CategoriesFilters,
+  options?: Partial<UseQueryOptions<Category[]>>,
+) {
+  return useQuery(categoriesQueryOptions(filters, options))
 }
 
-export function useCategory(id: string) {
-  return useQuery(categoryQueryOptions(id))
+export function useCategory(
+  id: string,
+  options?: Partial<UseQueryOptions<Category>>,
+) {
+  return useQuery(categoryQueryOptions(id, options))
 }

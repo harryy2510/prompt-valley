@@ -101,7 +101,7 @@ function PromptCard({
         {/* Tags row */}
         <div className="flex flex-wrap items-center gap-1.5">
           {providers.map((provider) => (
-            <ProviderBadge provider={provider} />
+            <ProviderBadge key={provider.id} provider={provider} />
           ))}
           {prompt.category && (
             <Badge variant="category">{prompt.category.name}</Badge>

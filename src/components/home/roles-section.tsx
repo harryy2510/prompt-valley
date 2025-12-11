@@ -79,10 +79,10 @@ const roles: Role[] = [
 
 function RoleCard({ role }: { role: Role }) {
   return (
-    <div className="group flex flex-col rounded-2xl bg-muted/30 p-5 pb-0">
+    <div className="group flex flex-col rounded-2xl bg-muted p-5 pb-0 overflow-hidden">
       <h3 className="text-lg font-bold text-foreground">{role.title}</h3>
       <p className="mt-2 text-sm leading-relaxed">{role.description}</p>
-      <div className="mt-4 max-w-100 overflow-hidden rounded-lg rounded-b-none bg-muted">
+      <div className="mt-4 max-w-100 overflow-hidden rounded-lg rounded-b-none shadow-xs">
         <ImageGrid images={role.images} title={role.title} ratio={16 / 9} />
       </div>
     </div>

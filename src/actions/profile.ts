@@ -1,4 +1,8 @@
-import { queryOptions, useQuery } from '@tanstack/react-query'
+import {
+  queryOptions,
+  useQuery,
+  type UseQueryOptions,
+} from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { getSupabaseServerClient } from '@/libs/supabase/server'
 import type { Tables } from '@/types/database.types'
@@ -51,10 +55,13 @@ export const profileKeys = {
 // Query Options (for loaders)
 // ============================================
 
-export function profileQueryOptions() {
+export function profileQueryOptions(
+  options?: Partial<UseQueryOptions<UserProfile | null>>,
+) {
   return queryOptions({
     queryKey: profileKeys.current(),
     queryFn: () => fetchProfile(),
+    ...options,
   })
 }
 
@@ -62,8 +69,10 @@ export function profileQueryOptions() {
 // Hooks
 // ============================================
 
-export function useProfile() {
-  return useQuery(profileQueryOptions())
+export function useProfile(
+  options?: Partial<UseQueryOptions<UserProfile | null>>,
+) {
+  return useQuery(profileQueryOptions(options))
 }
 
 // ============================================

@@ -1,10 +1,49 @@
 import { Link } from '@tanstack/react-router'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { useRef } from 'react'
+import {
+  Brush,
+  Sparkles,
+  FileText,
+  Share2,
+  Megaphone,
+  Code,
+  Mail,
+  PenTool,
+  MessageSquare,
+  Lightbulb,
+  type LucideIcon,
+} from 'lucide-react'
 
 import { useCategories } from '@/actions/categories'
-import { IconButton } from '@/components/common/icon-button'
 import { Image } from '@/components/common/image'
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselPrevious,
+  CarouselNext,
+} from '@/components/ui/carousel'
+
+// ============================================
+// Icon Mapping
+// ============================================
+
+const categoryIcons: Record<string, LucideIcon> = {
+  illustrations: Brush,
+  logo: Sparkles,
+  'landing page copy': FileText,
+  'social media': Share2,
+  'ad copy': Megaphone,
+  code: Code,
+  email: Mail,
+  design: PenTool,
+  chat: MessageSquare,
+  ideas: Lightbulb,
+}
+
+function getCategoryIcon(name: string): LucideIcon {
+  const lowerName = name.toLowerCase()
+  return categoryIcons[lowerName] ?? Sparkles
+}
 
 // ============================================
 // Category Card Component
@@ -14,20 +53,28 @@ function CategoryCard({
   name,
   image,
   href,
-  color,
 }: {
   name: string
   image?: string
   href: string
-  color?: string
 }) {
+  const Icon = getCategoryIcon(name)
+
   return (
     <Link
       to={href}
-      className="group relative flex shrink-0 flex-col overflow-hidden rounded-xl"
+      className="group flex flex-col overflow-hidden rounded-xl bg-muted transition-shadow hover:shadow-xs"
     >
+      {/* Header with Icon and Name */}
+      <div className="flex items-center gap-2 p-3">
+        <div className="flex size-6 items-center justify-center rounded-md bg-primary">
+          <Icon className="size-4 text-primary-foreground" />
+        </div>
+        <span className="font-bold text-foreground">{name}</span>
+      </div>
+
       {/* Image */}
-      <div className="aspect-[3/4] w-48 overflow-hidden bg-muted">
+      <div className="aspect-4/3 overflow-hidden">
         {image ? (
           <Image
             src={image}
@@ -35,16 +82,8 @@ function CategoryCard({
             className="size-full object-cover transition-transform duration-300 group-hover:scale-105"
           />
         ) : (
-          <div
-            className="size-full"
-            style={{ backgroundColor: color ?? '#e5e5e5' }}
-          />
+          <div className="size-full bg-muted" />
         )}
-      </div>
-
-      {/* Label Overlay */}
-      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-4 pt-12">
-        <span className="text-sm font-medium text-white">{name}</span>
       </div>
     </Link>
   )
@@ -55,63 +94,47 @@ function CategoryCard({
 // ============================================
 
 export function CategoriesSection() {
-  const scrollRef = useRef<HTMLDivElement>(null)
   const { data: categories } = useCategories()
 
   // Flatten child categories for display
   const displayCategories =
     categories?.flatMap((cat) => cat.children ?? []).slice(0, 10) ?? []
 
-  const scroll = (direction: 'left' | 'right') => {
-    if (!scrollRef.current) return
-    const scrollAmount = 400
-    scrollRef.current.scrollBy({
-      left: direction === 'left' ? -scrollAmount : scrollAmount,
-      behavior: 'smooth',
-    })
-  }
-
   return (
     <section className="py-16">
       <div className="container">
-        {/* Section Header */}
-        <div className="mb-8 flex items-center justify-between">
-          <h2 className="text-2xl font-bold sm:text-3xl">
-            Prompts for everything
-          </h2>
-
-          {/* Navigation Arrows */}
-          <div className="flex gap-2">
-            <IconButton
-              variant="outline"
-              onClick={() => scroll('left')}
-              aria-label="Scroll left"
-            >
-              <ChevronLeft className="size-4" />
-            </IconButton>
-            <IconButton
-              variant="outline"
-              onClick={() => scroll('right')}
-              aria-label="Scroll right"
-            >
-              <ChevronRight className="size-4" />
-            </IconButton>
-          </div>
-        </div>
-
-        {/* Horizontal Scroll */}
-        <div
-          ref={scrollRef}
-          className="-mx-4 flex gap-4 overflow-x-auto px-4 pb-4 scrollbar-hide"
+        <Carousel
+          opts={{
+            align: 'start',
+            dragFree: true,
+          }}
         >
-          {displayCategories.map((category) => (
-            <CategoryCard
-              key={category.id}
-              name={category.name}
-              href={`/?category=${category.id}`}
-            />
-          ))}
-        </div>
+          {/* Section Header */}
+          <div className="mb-8 flex items-end justify-between">
+            <h2 className="text-2xl font-bold sm:text-3xl">
+              Prompts for everything
+            </h2>
+
+            {/* Navigation Arrows */}
+            <div className="flex gap-2">
+              <CarouselPrevious className="static translate-y-0" />
+              <CarouselNext className="static translate-y-0" />
+            </div>
+          </div>
+
+          <CarouselContent>
+            {displayCategories.map((category) => (
+              <CarouselItem key={category.id} className="basis-auto">
+                <div className="w-56">
+                  <CategoryCard
+                    name={category.name}
+                    href={`/?category=${category.id}`}
+                  />
+                </div>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+        </Carousel>
       </div>
     </section>
   )

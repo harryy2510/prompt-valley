@@ -29,6 +29,7 @@ export function ImageGrid({
           <Image
             src={src}
             alt={title}
+            key={index}
             className={cn(
               'size-full object-cover object-center',
               array.length === 3

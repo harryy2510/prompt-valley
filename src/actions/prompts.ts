@@ -3,6 +3,7 @@ import {
   useMutation,
   useQuery,
   useQueryClient,
+  type UseQueryOptions,
 } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { getSupabaseServerClient } from '@/libs/supabase/server'
@@ -41,8 +42,13 @@ const promptFiltersSchema = z.object({
   tier: z.enum(['free', 'pro']).optional(),
   search: z.string().max(200).optional(),
   isFeatured: z.boolean().optional(),
+  isPublished: z.boolean().optional(),
   limit: z.number().int().min(1).max(100).optional(),
   offset: z.number().int().min(0).optional(),
+  orderBy: z
+    .enum(['created_at', 'sort_order', 'title', 'view_count', 'copy_count'])
+    .optional(),
+  orderAsc: z.boolean().optional(),
 })
 
 const promptIdSchema = z.string()
@@ -71,7 +77,11 @@ export const fetchPrompts = createServerFn({ method: 'GET' })
         ${modelsSelect}
       `,
       )
-      .eq('is_published', true)
+
+    // Default to published only
+    if (filters.isPublished !== false) {
+      query = query.eq('is_published', true)
+    }
 
     if (filters.modelId) {
       query = query.eq('models.model_id', filters.modelId)
@@ -94,10 +104,17 @@ export const fetchPrompts = createServerFn({ method: 'GET' })
       )
     }
 
-    query = query
-      .order('is_featured', { ascending: false })
-      .order('sort_order', { ascending: true, nullsFirst: false })
-      .order('created_at', { ascending: false })
+    // Custom ordering or default
+    if (filters.orderBy) {
+      query = query.order(filters.orderBy, {
+        ascending: filters.orderAsc ?? false,
+      })
+    } else {
+      query = query
+        .order('is_featured', { ascending: false })
+        .order('sort_order', { ascending: true, nullsFirst: false })
+        .order('created_at', { ascending: false })
+    }
 
     if (filters.limit) {
       query = query.limit(filters.limit)
@@ -180,17 +197,25 @@ export const promptKeys = {
 // Query Options (for loaders)
 // ============================================
 
-export function promptsQueryOptions(filters: PromptFilters = {}) {
+export function promptsQueryOptions(
+  filters: PromptFilters = {},
+  options?: Partial<UseQueryOptions<PromptWithRelations[]>>,
+) {
   return queryOptions({
     queryKey: promptKeys.list(filters),
     queryFn: () => fetchPrompts({ data: filters }),
+    ...options,
   })
 }
 
-export function promptDetailQueryOptions(id: string) {
+export function promptDetailQueryOptions(
+  id: string,
+  options?: Partial<UseQueryOptions<PromptWithRelations>>,
+) {
   return queryOptions({
     queryKey: promptKeys.detail(id),
     queryFn: () => fetchPromptById({ data: id }),
+    ...options,
   })
 }
 
@@ -198,24 +223,41 @@ export function promptDetailQueryOptions(id: string) {
 // Hooks
 // ============================================
 
-export function usePrompts(filters: PromptFilters = {}) {
-  return useQuery(promptsQueryOptions({ limit: 12, ...filters }))
+export function usePrompts(
+  filters: PromptFilters = {},
+  options?: Partial<UseQueryOptions<PromptWithRelations[]>>,
+) {
+  return useQuery(promptsQueryOptions({ limit: 12, ...filters }, options))
 }
 
-export function usePromptDetail(id: string) {
-  return useQuery(promptDetailQueryOptions(id))
+export function usePromptDetail(
+  id: string,
+  options?: Partial<UseQueryOptions<PromptWithRelations>>,
+) {
+  return useQuery(promptDetailQueryOptions(id, options))
 }
 
-export function useFeaturedPrompts(limit = 12) {
-  return useQuery(promptsQueryOptions({ isFeatured: true, limit }))
+export function useFeaturedPrompts(
+  limit = 12,
+  options?: Partial<UseQueryOptions<PromptWithRelations[]>>,
+) {
+  return useQuery(promptsQueryOptions({ isFeatured: true, limit }, options))
 }
 
-export function usePromptsByCategory(categoryId: string, limit = 12) {
-  return useQuery(promptsQueryOptions({ categoryId, limit }))
+export function usePromptsByCategory(
+  categoryId: string,
+  limit = 12,
+  options?: Partial<UseQueryOptions<PromptWithRelations[]>>,
+) {
+  return useQuery(promptsQueryOptions({ categoryId, limit }, options))
 }
 
-export function usePromptsByModel(modelId: string, limit = 12) {
-  return useQuery(promptsQueryOptions({ modelId, limit }))
+export function usePromptsByModel(
+  modelId: string,
+  limit = 12,
+  options?: Partial<UseQueryOptions<PromptWithRelations[]>>,
+) {
+  return useQuery(promptsQueryOptions({ modelId, limit }, options))
 }
 
 export function useIncrementCopies() {
