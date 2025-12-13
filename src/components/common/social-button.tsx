@@ -7,7 +7,11 @@ import { Button } from '@/components/ui/button'
 // Google icon
 function GoogleIcon({ className }: { className?: string }) {
   return (
-    <svg className={className} viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
       <path
         d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
         fill="#4285F4"
@@ -31,7 +35,12 @@ function GoogleIcon({ className }: { className?: string }) {
 // Apple icon
 function AppleIcon({ className }: { className?: string }) {
   return (
-    <svg className={className} viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      xmlns="http://www.w3.org/2000/svg"
+    >
       <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
     </svg>
   )
@@ -58,7 +67,7 @@ const providerConfig = {
   email: {
     icon: MailIcon,
     label: 'Continue with Email',
-    className: 'bg-background hover:bg-muted text-foreground border border-border',
+    className: 'bg-white hover:bg-gray-50 text-foreground border border-border',
   },
 } as const
 
@@ -79,6 +88,7 @@ function SocialButton({
         config.className,
         className,
       )}
+      size="lg"
       {...props}
     >
       <Icon className="size-5" />
@@ -89,16 +99,20 @@ function SocialButton({
 
 // Social buttons group
 type SocialButtonGroupProps = ComponentProps<'div'> & {
-  providers: SocialProvider[]
+  providers?: SocialProvider[]
   onProviderClick?: (provider: SocialProvider) => void
   dividerText?: string
+  showDivider?: boolean
+  buttonClassName?: string
 }
 
 function SocialButtonGroup({
-  providers,
+  providers = ['google', 'apple', 'email'],
   onProviderClick,
   dividerText = 'or',
+  showDivider,
   className,
+  buttonClassName,
   ...props
 }: SocialButtonGroupProps) {
   return (
@@ -110,13 +124,16 @@ function SocialButtonGroup({
       {providers.map((provider, index) => (
         <div key={provider}>
           <SocialButton
+            className={buttonClassName}
             provider={provider}
             onClick={() => onProviderClick?.(provider)}
           />
-          {dividerText && index < providers.length - 1 && (
+          {showDivider && dividerText && index < providers.length - 1 && (
             <div className="flex items-center gap-3 my-3">
               <div className="h-px flex-1 bg-border" />
-              <span className="text-caption text-muted-foreground">{dividerText}</span>
+              <span className="text-caption text-muted-foreground">
+                {dividerText}
+              </span>
               <div className="h-px flex-1 bg-border" />
             </div>
           )}

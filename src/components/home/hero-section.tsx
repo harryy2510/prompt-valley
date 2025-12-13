@@ -62,7 +62,7 @@ function VerticalCarousel({
 
 export function HeroSection() {
   return (
-    <section className="relative overflow-hidden bg-secondary-100">
+    <section className="relative overflow-hidden bg-linear-to-b from-secondary-100 to-transparent">
       <div className="container mx-auto px-2">
         <div className="grid gap-8 lg:grid-cols-2 lg:gap-12 items-center">
           {/* Left Content */}
@@ -80,7 +80,7 @@ export function HeroSection() {
 
             <div className="flex flex-wrap items-center gap-4">
               <SignInDialog>
-                <Button className="w-[240px] max-w-100" size="xl">
+                <Button className="w-60 max-w-100" size="xl">
                   <span>
                     Start <span className="font-bold text-amber-200">Free</span>
                   </span>

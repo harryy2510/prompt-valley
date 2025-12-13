@@ -7,6 +7,7 @@ import {
   CategoriesSection,
   TestimonialsSection,
   CtaSection,
+  UpsellBanner,
 } from '@/components/home'
 import { MainLayout } from '@/components/layout'
 
@@ -17,12 +18,16 @@ export const Route = createFileRoute('/')({
 function HomePage() {
   return (
     <>
-      <MainLayout hero={<HeroSection />}>
-        <ExploreSection />
-        <RolesSection />
-        <CategoriesSection />
-        <TestimonialsSection />
+      <MainLayout>
+        <HeroSection />
+        <div className="container mx-auto px-2">
+          <ExploreSection />
+          <RolesSection />
+          <CategoriesSection />
+          <TestimonialsSection />
+        </div>
         <CtaSection />
+        <UpsellBanner />
       </MainLayout>
     </>
   )

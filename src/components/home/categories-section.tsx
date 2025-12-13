@@ -13,8 +13,10 @@ import {
   type LucideIcon,
 } from 'lucide-react'
 
-import { useCategories } from '@/actions/categories'
-import { Image } from '@/components/common/image'
+import {
+  CategoryWithPrompts,
+  useCategoriesWithPrompts,
+} from '@/actions/categories'
 import {
   Carousel,
   CarouselContent,
@@ -22,6 +24,8 @@ import {
   CarouselPrevious,
   CarouselNext,
 } from '@/components/ui/carousel'
+import { compact } from 'lodash-es'
+import { ImageGrid } from '@/components/common/image-grid'
 
 // ============================================
 // Icon Mapping
@@ -49,20 +53,16 @@ function getCategoryIcon(name: string): LucideIcon {
 // Category Card Component
 // ============================================
 
-function CategoryCard({
-  name,
-  image,
-  href,
-}: {
-  name: string
-  image?: string
-  href: string
-}) {
-  const Icon = getCategoryIcon(name)
+function CategoryCard({ category }: { category: CategoryWithPrompts }) {
+  const Icon = getCategoryIcon(category.name)
+  const images = compact(
+    category.prompts?.map((prompt) => prompt.images?.[0]),
+  ).slice(0, 3)
 
   return (
     <Link
-      to={href}
+      // @ts-ignore
+      to={`/categories/${category.id}`}
       className="group flex flex-col overflow-hidden rounded-xl bg-muted transition-shadow hover:shadow-xs"
     >
       {/* Header with Icon and Name */}
@@ -70,21 +70,11 @@ function CategoryCard({
         <div className="flex size-6 items-center justify-center rounded-md bg-primary">
           <Icon className="size-4 text-primary-foreground" />
         </div>
-        <span className="font-bold text-foreground">{name}</span>
+        <span className="font-bold text-foreground">{category.name}</span>
       </div>
 
-      {/* Image */}
-      <div className="aspect-4/3 overflow-hidden">
-        {image ? (
-          <Image
-            src={image}
-            alt={name}
-            className="size-full object-cover transition-transform duration-300 group-hover:scale-105"
-          />
-        ) : (
-          <div className="size-full bg-muted" />
-        )}
-      </div>
+      {/* Images */}
+      <ImageGrid images={images} />
     </Link>
   )
 }
@@ -94,13 +84,11 @@ function CategoryCard({
 // ============================================
 
 export function CategoriesSection() {
-  const { data: categories } = useCategories()
+  const { data: categories } = useCategoriesWithPrompts()
 
   // Flatten child categories for display
   const displayCategories =
     categories?.flatMap((cat) => cat.children ?? []) ?? []
-
-  console.log(displayCategories)
 
   return (
     <section className="py-16">
@@ -128,10 +116,7 @@ export function CategoriesSection() {
             {displayCategories.map((category) => (
               <CarouselItem key={category.id} className="basis-auto">
                 <div className="w-56">
-                  <CategoryCard
-                    name={category.name}
-                    href={`/?category=${category.id}`}
-                  />
+                  <CategoryCard category={category} />
                 </div>
               </CarouselItem>
             ))}

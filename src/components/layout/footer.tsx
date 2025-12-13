@@ -1,8 +1,4 @@
 import { Link } from '@tanstack/react-router'
-import { X } from 'lucide-react'
-import { useState } from 'react'
-
-import { Button } from '@/components/ui/button'
 import { LogoWithText } from './logo-with-text'
 
 // ============================================
@@ -31,28 +27,6 @@ const footerLinks: FooterLink[] = [
 // ============================================
 // Components
 // ============================================
-
-function PromoBanner({ onDismiss }: { onDismiss?: () => void }) {
-  return (
-    <div className="relative bg-primary px-4 py-3 text-center text-primary-foreground">
-      <p className="text-sm">
-        <span className="font-semibold">Upgrade to PromptValley Pro:</span> Get
-        premium AI prompt templates that instantly improve your AI results.
-      </p>
-      {onDismiss && (
-        <Button
-          variant="ghost"
-          size="icon"
-          className="absolute right-2 top-1/2 -translate-y-1/2 size-8 text-primary-foreground hover:bg-primary-foreground/10"
-          onClick={onDismiss}
-        >
-          <X className="size-4" />
-          <span className="sr-only">Dismiss</span>
-        </Button>
-      )}
-    </div>
-  )
-}
 
 function FooterLinks({ links }: { links: FooterLink[] }) {
   return (
@@ -87,14 +61,10 @@ function FooterLinks({ links }: { links: FooterLink[] }) {
 // ============================================
 
 export function Footer() {
-  const [showPromo, setShowPromo] = useState(true)
   const currentYear = new Date().getFullYear()
 
   return (
     <footer className="mt-auto border-t">
-      {/* Promo Banner */}
-      {showPromo && <PromoBanner onDismiss={() => setShowPromo(false)} />}
-
       {/* Main Footer */}
       <div className="container mx-auto px-2 py-8">
         <div className="flex flex-col items-center gap-6 md:flex-row md:justify-between">

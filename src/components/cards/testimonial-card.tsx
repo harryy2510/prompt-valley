@@ -1,5 +1,4 @@
 import type { ComponentProps } from 'react'
-import { QuoteIcon } from 'lucide-react'
 
 import { cn } from '@/libs/cn'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
@@ -10,7 +9,6 @@ type TestimonialCardProps = ComponentProps<'blockquote'> & {
   authorRole?: string
   authorCompany?: string
   authorImage?: string
-  variant?: 'default' | 'minimal' | 'featured'
 }
 
 function TestimonialCard({
@@ -19,7 +17,6 @@ function TestimonialCard({
   authorRole,
   authorCompany,
   authorImage,
-  variant = 'default',
   className,
   ...props
 }: TestimonialCardProps) {
@@ -33,56 +30,32 @@ function TestimonialCard({
   return (
     <blockquote
       data-slot="testimonial-card"
-      className={cn(
-        'flex flex-col',
-        variant === 'featured' && 'items-center text-center',
-        className,
-      )}
+      className={cn('flex flex-col', className)}
       {...props}
     >
-      {/* Quote icon for featured variant */}
-      {variant === 'featured' && (
-        <QuoteIcon className="size-8 text-muted-foreground/30 mb-4" />
-      )}
-
-      {/* Quote text */}
-      <p
-        className={cn(
-          'text-foreground',
-          variant === 'featured' ? 'text-h5 italic' : 'text-body1',
-          variant === 'minimal' && 'text-body2',
-        )}
-      >
-        {variant !== 'featured' && '"'}
-        {quote}
-        {variant !== 'featured' && '"'}
-      </p>
-
       {/* Author */}
-      <footer
-        className={cn(
-          'flex items-center gap-3 mt-4',
-          variant === 'featured' && 'flex-col gap-2 mt-6',
-        )}
-      >
-        <Avatar className={variant === 'featured' ? 'size-12' : 'size-10'}>
+      <header className={cn('flex items-center gap-3 mb-4')}>
+        <Avatar className="size-10">
           {authorImage && <AvatarImage src={authorImage} alt={authorName} />}
           <AvatarFallback className="text-xs">{initials}</AvatarFallback>
         </Avatar>
 
-        <div className={variant === 'featured' ? 'text-center' : ''}>
-          <cite className="text-body2-semibold not-italic text-foreground block">
+        <div>
+          <cite className="text-body1-semibold not-italic text-foreground block">
             {authorName}
           </cite>
           {(authorRole || authorCompany) && (
-            <span className="text-caption text-muted-foreground">
+            <span className="text-body2 text-muted-foreground">
               {authorRole}
               {authorRole && authorCompany && ' at '}
               {authorCompany}
             </span>
           )}
         </div>
-      </footer>
+      </header>
+
+      {/* Quote text */}
+      <p className={cn('text-foreground')}>{quote}</p>
     </blockquote>
   )
 }
@@ -96,10 +69,7 @@ function TestimonialGrid({
   return (
     <div
       data-slot="testimonial-grid"
-      className={cn(
-        'grid gap-6 md:grid-cols-2 lg:grid-cols-3',
-        className,
-      )}
+      className={cn('grid gap-6 md:grid-cols-2 lg:grid-cols-3', className)}
       {...props}
     >
       {children}
