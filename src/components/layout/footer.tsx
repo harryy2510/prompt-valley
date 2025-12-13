@@ -11,48 +11,66 @@ type FooterLink = {
   external?: boolean
 }
 
+type FooterSection = {
+  title: string
+  links: FooterLink[]
+}
+
 // ============================================
 // Data
 // ============================================
 
-const footerLinks: FooterLink[] = [
-  { label: 'Explore', href: '/' },
-  { label: 'Pricing', href: '/pricing' },
-  { label: 'LinkedIn', href: 'https://linkedin.com', external: true },
-  { label: 'Blog', href: '/blog' },
-  { label: 'Contact', href: '/contact' },
-  { label: 'AI Chatbot', href: '/chatbot' },
+const footerSections: FooterSection[] = [
+  {
+    title: 'Quick Links',
+    links: [
+      { label: 'Explore', href: '/' },
+      { label: 'Pricing', href: '/pricing' },
+      { label: 'Blog', href: '/blog' },
+    ],
+  },
+  {
+    title: 'Support',
+    links: [
+      { label: 'Contact', href: '/contact' },
+      { label: 'FAQ', href: '/faq' },
+      { label: 'Help Center', href: '/help' },
+    ],
+  },
 ]
 
 // ============================================
 // Components
 // ============================================
 
-function FooterLinks({ links }: { links: FooterLink[] }) {
+function FooterLinkSection({ section }: { section: FooterSection }) {
   return (
-    <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
-      {links.map((link) =>
-        link.external ? (
-          <a
-            key={link.label}
-            href={link.href}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm text-muted-foreground transition-colors hover:text-foreground"
-          >
-            {link.label}
-          </a>
-        ) : (
-          <Link
-            key={link.label}
-            to={link.href}
-            className="text-sm text-muted-foreground transition-colors hover:text-foreground"
-          >
-            {link.label}
-          </Link>
-        ),
-      )}
-    </nav>
+    <div>
+      <h3 className="mb-4 text-sm font-semibold text-white">{section.title}</h3>
+      <ul className="space-y-3">
+        {section.links.map((link) => (
+          <li key={link.label}>
+            {link.external ? (
+              <a
+                href={link.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-gray-400 transition-colors hover:text-white"
+              >
+                {link.label}
+              </a>
+            ) : (
+              <Link
+                to={link.href}
+                className="text-sm text-gray-400 transition-colors hover:text-white"
+              >
+                {link.label}
+              </Link>
+            )}
+          </li>
+        ))}
+      </ul>
+    </div>
   )
 }
 
@@ -64,23 +82,26 @@ export function Footer() {
   const currentYear = new Date().getFullYear()
 
   return (
-    <footer className="mt-auto border-t">
-      {/* Main Footer */}
-      <div className="container mx-auto px-2 py-8">
-        <div className="flex flex-col items-center gap-6 md:flex-row md:justify-between">
-          {/* Logo */}
-          <Link to="/" className="shrink-0">
-            <LogoWithText className="h-6 w-20" />
-          </Link>
+    <footer className="bg-gray-950">
+      <div className="container mx-auto">
+        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-5 pt-8 pb-20">
+          {/* Logo & Description */}
+          <div className="lg:col-span-2">
+            <Link to="/" className="inline-block">
+              <LogoWithText className="h-8 w-27 brightness-0 invert" />
+            </Link>
+          </div>
 
-          {/* Links */}
-          <FooterLinks links={footerLinks} />
+          {/* Link Sections */}
+          {footerSections.map((section) => (
+            <FooterLinkSection key={section.title} section={section} />
+          ))}
         </div>
 
-        {/* Copyright */}
-        <div className="mt-8 border-t pt-6 text-center">
-          <p className="text-sm text-muted-foreground">
-            &copy; PromptValley {currentYear}. All rights reserved.
+        {/* Bottom Bar */}
+        <div className="flex flex-col items-center justify-between gap-4 border-t border-gray-600 pt-6 pb-8 md:flex-row">
+          <p className="text-sm text-gray-300">
+            © PromptValley {currentYear}. All rights reserved
           </p>
         </div>
       </div>
