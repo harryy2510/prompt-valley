@@ -42,8 +42,7 @@ function TabsList({
         variant === 'default' &&
           'h-9 rounded-lg bg-muted p-[3px] text-muted-foreground justify-center',
         // Filter variant - transparent with gaps
-        variant === 'filter' &&
-          'gap-1 bg-transparent',
+        variant === 'filter' && 'gap-1 bg-transparent',
         // Underline variant - with bottom border
         variant === 'underline' &&
           'gap-4 border-b border-border bg-transparent',
@@ -64,7 +63,7 @@ function TabsTrigger({
     <TabsPrimitive.Trigger
       data-slot="tabs-trigger"
       className={cn(
-        'inline-flex items-center justify-center gap-1.5 text-sm font-medium whitespace-nowrap transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*="size-"])]:size-4',
+        'cursor-pointer inline-flex items-center justify-center gap-1.5 text-sm font-medium whitespace-nowrap transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*="size-"])]:size-4',
         // Default variant
         variant === 'default' &&
           'h-[calc(100%-1px)] flex-1 rounded-md border border-transparent px-2 py-1 data-[state=active]:bg-background data-[state=active]:shadow-sm dark:data-[state=active]:bg-input/30 dark:data-[state=active]:border-input text-foreground dark:text-muted-foreground dark:data-[state=active]:text-foreground',

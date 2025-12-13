@@ -66,7 +66,7 @@ export function HeroSection() {
       <div className="container mx-auto px-2">
         <div className="grid gap-8 lg:grid-cols-2 lg:gap-12 items-center">
           {/* Left Content */}
-          <div className="space-y-6">
+          <div className="space-y-6 py-12">
             <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
               High-Quality{' '}
               <span className="text-primary">AI Prompt Templates</span> for

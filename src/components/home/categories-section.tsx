@@ -98,7 +98,9 @@ export function CategoriesSection() {
 
   // Flatten child categories for display
   const displayCategories =
-    categories?.flatMap((cat) => cat.children ?? []).slice(0, 10) ?? []
+    categories?.flatMap((cat) => cat.children ?? []) ?? []
+
+  console.log(displayCategories)
 
   return (
     <section className="py-16">
