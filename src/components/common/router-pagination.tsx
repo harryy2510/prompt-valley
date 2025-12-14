@@ -1,8 +1,13 @@
 import { Link } from '@tanstack/react-router'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeftIcon, ChevronRightIcon, MoreHorizontalIcon } from 'lucide-react'
 
 import { cn } from '@/libs/cn'
 import { buttonVariants } from '@/components/ui/button'
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+} from '@/components/ui/pagination'
 
 // ============================================
 // Types
@@ -76,72 +81,97 @@ export function RouterPagination({
   }
 
   return (
-    <nav
-      role="navigation"
-      aria-label="Pagination"
-      className={cn('flex items-center justify-center gap-1', className)}
-    >
-      {/* Previous */}
-      {currentPage > 1 && (
-        <Link
-          to={baseUrl}
-          params={params}
-          search={buildSearch(currentPage - 1)}
-          className={cn(
-            buttonVariants({ variant: 'ghost', size: 'icon' }),
-            'size-9',
+    <Pagination className={className}>
+      <PaginationContent>
+        {/* Previous */}
+        <PaginationItem>
+          {currentPage > 1 ? (
+            <Link
+              to={baseUrl}
+              params={params}
+              search={buildSearch(currentPage - 1)}
+              className={cn(
+                buttonVariants({ variant: 'ghost', size: 'default' }),
+                'gap-1 px-2.5 sm:pl-2.5',
+              )}
+              aria-label="Go to previous page"
+            >
+              <ChevronLeftIcon className="size-4" />
+              <span className="hidden sm:block">Previous</span>
+            </Link>
+          ) : (
+            <span
+              className={cn(
+                buttonVariants({ variant: 'ghost', size: 'default' }),
+                'pointer-events-none gap-1 px-2.5 opacity-50 sm:pl-2.5',
+              )}
+            >
+              <ChevronLeftIcon className="size-4" />
+              <span className="hidden sm:block">Previous</span>
+            </span>
           )}
-          aria-label="Previous page"
-        >
-          <ChevronLeft className="size-4" />
-        </Link>
-      )}
+        </PaginationItem>
 
-      {/* Page numbers */}
-      {pages.map((page, idx) =>
-        page === 'ellipsis' ? (
-          <span
-            key={`ellipsis-${idx}`}
-            className="flex size-9 items-center justify-center text-muted-foreground"
-          >
-            ...
-          </span>
-        ) : (
-          <Link
-            key={page}
-            to={baseUrl}
-            params={params}
-            search={buildSearch(page)}
-            className={cn(
-              buttonVariants({
-                variant: page === currentPage ? 'outline' : 'ghost',
-                size: 'icon',
-              }),
-              'size-9',
-              page === currentPage && 'pointer-events-none',
+        {/* Page numbers */}
+        {pages.map((page, idx) => (
+          <PaginationItem key={page === 'ellipsis' ? `ellipsis-${idx}` : page}>
+            {page === 'ellipsis' ? (
+              <span
+                aria-hidden
+                className="flex size-9 items-center justify-center"
+              >
+                <MoreHorizontalIcon className="size-4" />
+                <span className="sr-only">More pages</span>
+              </span>
+            ) : (
+              <Link
+                to={baseUrl}
+                params={params}
+                search={buildSearch(page)}
+                className={cn(
+                  buttonVariants({
+                    variant: page === currentPage ? 'outline' : 'ghost',
+                    size: 'icon',
+                  }),
+                  page === currentPage && 'pointer-events-none',
+                )}
+                aria-current={page === currentPage ? 'page' : undefined}
+              >
+                {page}
+              </Link>
             )}
-            aria-current={page === currentPage ? 'page' : undefined}
-          >
-            {page}
-          </Link>
-        ),
-      )}
+          </PaginationItem>
+        ))}
 
-      {/* Next */}
-      {currentPage < totalPages && (
-        <Link
-          to={baseUrl}
-          params={params}
-          search={buildSearch(currentPage + 1)}
-          className={cn(
-            buttonVariants({ variant: 'ghost', size: 'icon' }),
-            'size-9',
+        {/* Next */}
+        <PaginationItem>
+          {currentPage < totalPages ? (
+            <Link
+              to={baseUrl}
+              params={params}
+              search={buildSearch(currentPage + 1)}
+              className={cn(
+                buttonVariants({ variant: 'ghost', size: 'default' }),
+                'gap-1 px-2.5 sm:pr-2.5',
+              )}
+              aria-label="Go to next page"
+            >
+              <span className="hidden sm:block">Next</span>
+              <ChevronRightIcon className="size-4" />
+            </Link>
+          ) : (
+            <span
+              className={cn(
+                buttonVariants({ variant: 'ghost', size: 'default' }),
+                'pointer-events-none gap-1 px-2.5 opacity-50 sm:pr-2.5',
+              )}
+            >
+              <span className="hidden sm:block">Next</span>
+              <ChevronRightIcon className="size-4" />
+            </span>
           )}
-          aria-label="Next page"
-        >
-          <ChevronRight className="size-4" />
-        </Link>
-      )}
-    </nav>
+        </PaginationItem>
+      </PaginationContent>
+    </Pagination>
   )
 }
