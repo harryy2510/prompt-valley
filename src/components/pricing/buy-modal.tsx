@@ -1,11 +1,8 @@
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-} from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { PricingCard } from './pricing-card'
 import { useStripeProduct } from '@/actions/stripe'
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
+import { LogoPro } from '@/components/layout/logo-pro'
 
 // ============================================
 // Types
@@ -54,26 +51,12 @@ export function BuyModal({
         {/* Pro Badge and Header */}
         <div className="text-center">
           <div className="mx-auto mb-4 flex size-16 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500 to-purple-600">
-            <svg
-              className="size-8 text-white"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M5 3l14 9-14 9V3z"
-              />
-            </svg>
+            <LogoPro className="size-16" />
           </div>
           <h2 className="text-2xl font-bold">
             One simple plan unlocks everything.
           </h2>
-          <p className="mt-1 text-muted-foreground">
-            No bundles. No add-ons.
-          </p>
+          <p className="mt-1 text-muted-foreground">No bundles. No add-ons.</p>
         </div>
 
         {/* Pricing Card */}
