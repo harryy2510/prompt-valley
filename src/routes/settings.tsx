@@ -100,7 +100,6 @@ function SettingsPage() {
     try {
       const filename = await uploadAvatar.mutateAsync(file)
       form.setValue('avatar_url', filename, { shouldDirty: true })
-      toast.success('Avatar uploaded')
     } catch {
       toast.error('Failed to upload avatar')
       setAvatarPreview(null)
@@ -168,8 +167,14 @@ function SettingsPage() {
                   {/* Avatar */}
                   <div className="flex flex-col items-center gap-4">
                     <div className="relative">
-                      <Avatar className="size-24 cursor-pointer" onClick={handleAvatarClick}>
-                        <AvatarImage src={displayAvatarUrl} alt={profile?.name ?? ''} />
+                      <Avatar
+                        className="size-24 cursor-pointer"
+                        onClick={handleAvatarClick}
+                      >
+                        <AvatarImage
+                          src={displayAvatarUrl}
+                          alt={profile?.name ?? ''}
+                        />
                         <AvatarFallback className="text-2xl">
                           {initials}
                         </AvatarFallback>
@@ -203,7 +208,9 @@ function SettingsPage() {
                           type="button"
                           onClick={() => {
                             setAvatarPreview(null)
-                            form.setValue('avatar_url', null, { shouldDirty: true })
+                            form.setValue('avatar_url', null, {
+                              shouldDirty: true,
+                            })
                           }}
                           className="text-sm text-destructive hover:underline"
                         >
@@ -249,7 +256,9 @@ function SettingsPage() {
                   <Button
                     type="submit"
                     className="w-full"
-                    disabled={updateProfile.isPending || !form.formState.isDirty}
+                    disabled={
+                      updateProfile.isPending || !form.formState.isDirty
+                    }
                   >
                     {updateProfile.isPending ? (
                       <>
