@@ -255,6 +255,7 @@ function PromptDetailPage() {
               isPremium={isPremium}
               isLoading={isLoading}
               onCopy={handleCopy}
+              url={prompt.models?.[0].model?.provider?.website_url}
             />
 
             {/* Stats */}
@@ -332,6 +333,7 @@ type PromptContentProps = {
   isPremium: boolean
   isLoading: boolean
   onCopy: () => void
+  url?: string | null
 }
 
 function PromptContent({
@@ -341,6 +343,7 @@ function PromptContent({
   isPremium,
   isLoading,
   onCopy,
+  url,
 }: PromptContentProps) {
   // Loading state
   if (isLoading) {
@@ -410,10 +413,14 @@ function PromptContent({
           <Copy className="size-4" />
           Copy
         </Button>
-        <Button variant="outline">
-          Try Out
-          <ExternalLink className="size-4" />
-        </Button>
+        {url && (
+          <Button variant="outline" asChild>
+            <a target="_blank" href={url}>
+              Try Out
+              <ExternalLink className="size-4" />
+            </a>
+          </Button>
+        )}
       </div>
     </div>
   )
