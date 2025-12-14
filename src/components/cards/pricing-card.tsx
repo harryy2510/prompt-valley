@@ -155,7 +155,7 @@ export function PricingCard({ product, className }: PricingCardProps) {
         {/* CTA Button */}
         <AuthGate
           loadingFallback={
-            <Button size="lg" variant="gradient" className="w-full">
+            <Button size="xl" variant="gradient" className="w-full">
               <span>
                 Get <span className="font-bold">PRO</span>
               </span>
@@ -163,7 +163,7 @@ export function PricingCard({ product, className }: PricingCardProps) {
           }
           fallback={
             <Button
-              size="lg"
+              size="xl"
               variant="gradient"
               className="w-full"
               onClick={showSignInDialog}
@@ -175,7 +175,7 @@ export function PricingCard({ product, className }: PricingCardProps) {
           }
         >
           <Button
-            size="lg"
+            size="xl"
             variant="gradient"
             className="w-full"
             disabled={checkout.isPending}

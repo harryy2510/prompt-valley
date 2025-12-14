@@ -6,7 +6,6 @@ import { getSupabaseBrowserClient } from '@/libs/supabase/client'
 import bgImage from '@/assets/landing/cta-section-background.webp'
 import { showSignInDialog } from '@/stores/app'
 import { AuthGate } from '@/components/common/gate'
-import { Image } from '@/components/common/image'
 
 // ============================================
 // CTA Section Component
@@ -32,7 +31,7 @@ export function CtaSection() {
       silent
       fallback={
         <section className="relative overflow-hidden bg-secondary-50">
-          <Image
+          <img
             alt=""
             src={bgImage}
             className="absolute top-[50%] translate-y-[-50%] left-0 max-w-40 hidden sm:block"
@@ -51,7 +50,7 @@ export function CtaSection() {
               />
             </div>
           </div>
-          <Image
+          <img
             alt=""
             src={bgImage}
             className="absolute top-[50%] translate-y-[-50%] right-0 max-w-40 -scale-x-100 hidden sm:block"

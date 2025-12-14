@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound } from '@tanstack/react-router'
-import { Heart, Bookmark, Copy, ExternalLink, Sparkles } from 'lucide-react'
+import { Heart, Bookmark, Copy, ExternalLink, LucideLock } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 import { MainLayout } from '@/components/layout'
@@ -18,7 +18,7 @@ import {
   useIncrementViews,
 } from '@/actions/prompts'
 import { AuthGate, useGate } from '@/components/common/gate'
-import { showSignInDialog } from '@/stores/app'
+import { showBuyDialog, showSignInDialog } from '@/stores/app'
 import {
   useIsFavorite,
   useAddFavorite,
@@ -28,7 +28,6 @@ import { useIsLiked, useAddLike, useRemoveLike } from '@/actions/likes'
 import { cn } from '@/libs/cn'
 import { compact, uniqBy } from 'lodash-es'
 import { toast } from 'sonner'
-import { BuyModal } from '@/components/pricing/buy-modal'
 import { Image } from '@/components/common/image'
 
 export const Route = createFileRoute('/prompts/$id')({
@@ -75,8 +74,6 @@ function PromptDetailPage() {
   // Engagement tracking
   const incrementViews = useIncrementViews()
   const incrementCopies = useIncrementCopies()
-
-  const [buyModalOpen, setBuyModalOpen] = useState(false)
 
   // Track view on mount (only once per session)
   useEffect(() => {
@@ -265,7 +262,6 @@ function PromptDetailPage() {
               isPremium={isPremium}
               isLoading={isLoading}
               onCopy={handleCopy}
-              onGetPro={() => setBuyModalOpen(true)}
             />
 
             {/* Stats */}
@@ -328,8 +324,6 @@ function PromptDetailPage() {
           </div>
         </div>
       </div>
-
-      <BuyModal open={buyModalOpen} onOpenChange={setBuyModalOpen} />
     </MainLayout>
   )
 }
@@ -345,7 +339,6 @@ type PromptContentProps = {
   isPremium: boolean
   isLoading: boolean
   onCopy: () => void
-  onGetPro: () => void
 }
 
 function PromptContent({
@@ -355,7 +348,6 @@ function PromptContent({
   isPremium,
   isLoading,
   onCopy,
-  onGetPro,
 }: PromptContentProps) {
   // Loading state
   if (isLoading) {
@@ -373,23 +365,21 @@ function PromptContent({
   // State 3: Logged in but no PRO access for premium content
   if (isAuthenticated && isPremium && !hasAccess) {
     return (
-      <div className="rounded-xl border bg-gradient-to-br from-violet-500/10 to-purple-600/10 p-6">
-        <div className="mb-2 flex items-center gap-2">
-          <Sparkles className="size-4 text-primary" />
-          <span className="text-xs font-semibold uppercase tracking-wide text-primary">
+      <div className="rounded-xl border bg-[url(@/assets/pro-upsell-bg.webp)] bg-size-[100%_200%] bg-center p-6">
+        <div className="mb-4 select-none flex items-center gap-2">
+          <LucideLock className="size-4 text-white" />
+          <span className="text-xs font-semibold uppercase tracking-wide text-white">
             Premium Content
           </span>
         </div>
-        <p className="text-sm text-muted-foreground">
+        <p className="mb-8 select-none text-white">
           Join PromptValley Pro to access this prompt along with hundreds of
           expert-crafted templates that deliver better AI results.
         </p>
-        <Button
-          variant="outline"
-          className="mt-4 bg-background"
-          onClick={onGetPro}
-        >
-          Get <span className="ml-1 font-bold">PRO</span>
+        <Button variant="outline" size="xl" onClick={showBuyDialog}>
+          <span>
+            Get <span className="font-bold">PRO</span>
+          </span>
         </Button>
       </div>
     )
@@ -397,17 +387,19 @@ function PromptContent({
 
   // State 2: Not logged in (show truncated content with sign in)
   if (!isAuthenticated) {
-    const truncatedContent =
-      content.slice(0, 200) + (content.length > 200 ? '...' : '')
+    const dummyContent =
+      "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
 
     return (
       <div className="rounded-xl border bg-card p-6">
-        <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+        <p className="text-xs mb-4 select-none font-semibold uppercase tracking-wide text-muted-foreground">
           Prompt Details
-        </span>
-        <p className="mt-4 text-sm text-muted-foreground">{truncatedContent}</p>
-        <Button asChild className="mt-4">
-          <Link to="/auth">Sign in to continue</Link>
+        </p>
+        <p className="mb-8 select-none text-sm text-muted-foreground blur-xs">
+          {dummyContent}
+        </p>
+        <Button onClick={showSignInDialog} size="xl">
+          Sign in to continue
         </Button>
       </div>
     )
@@ -416,18 +408,18 @@ function PromptContent({
   // State 1: Full access - show complete content with actions
   return (
     <div className="rounded-xl border bg-card p-6">
-      <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+      <p className="text-xs mb-4 select-none font-semibold uppercase tracking-wide text-muted-foreground">
         Prompt Details
-      </span>
-      <p className="mt-4 select-none whitespace-pre-wrap text-sm">{content}</p>
-      <div className="mt-4 flex items-center gap-3">
+      </p>
+      <p className="mb-8 select-none whitespace-pre-wrap text-sm">{content}</p>
+      <div className="flex items-center gap-3">
         <Button onClick={onCopy}>
-          <Copy className="mr-2 size-4" />
+          <Copy className="size-4" />
           Copy
         </Button>
         <Button variant="outline">
           Try Out
-          <ExternalLink className="ml-2 size-4" />
+          <ExternalLink className="size-4" />
         </Button>
       </div>
     </div>
