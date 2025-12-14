@@ -7,6 +7,7 @@ import icon3 from '@/assets/landing/carousel-icon-3.webp'
 import { cn } from '@/libs/cn'
 import { Link } from '@tanstack/react-router'
 import { AuthGate } from '@/components/common/gate'
+import { Image } from '@/components/common/image'
 
 // ============================================
 // Carousel Card Component
@@ -15,7 +16,7 @@ import { AuthGate } from '@/components/common/gate'
 function CarouselCardItem({ src }: { src: string }) {
   return (
     <div className="w-full overflow-hidden rounded-2xl bg-muted">
-      <img alt="" src={src} className="size-full object-cover" />
+      <Image alt="" src={src} className="size-full object-cover" />
     </div>
   )
 }

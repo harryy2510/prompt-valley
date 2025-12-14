@@ -11,6 +11,13 @@ import { IconButton } from '@/components/common/icon-button'
 import type { Tables } from '@/types/database.types'
 import { compact, uniqBy } from 'lodash-es'
 import { ImageGrid } from '@/components/common/image-grid'
+import {
+  useIsFavorite,
+  useAddFavorite,
+  useRemoveFavorite,
+} from '@/actions/favorites'
+import { useGate } from '@/components/common/gate'
+import { showSignInDialog } from '@/stores/app'
 
 // Database-aligned prompt type
 type Prompt = Tables<'prompts'>
@@ -25,20 +32,12 @@ type PromptWithRelations = Prompt & {
 }
 
 type PromptCardProps = ComponentProps<'article'> & {
-  // Can accept either raw props or a prompt object
   prompt: PromptWithRelations
-  // Individual props (for flexibility)
-  isSaved?: boolean
-  onSave?: () => void
-  onCopy?: () => void
   onClick?: () => void
 }
 
 function PromptCard({
   prompt,
-  isSaved = false,
-  onSave,
-  onCopy,
   onClick,
   className,
   ...props
@@ -51,6 +50,24 @@ function PromptCard({
       'id',
     ),
   )
+
+  // Save functionality (self-contained)
+  const { isAuthenticated, isLoading: isAuthLoading } = useGate()
+  const { data: isSaved } = useIsFavorite(prompt.id)
+  const addSave = useAddFavorite()
+  const removeSave = useRemoveFavorite()
+
+  const handleSave = () => {
+    if (!isAuthenticated) {
+      showSignInDialog()
+      return
+    }
+    if (isSaved) {
+      removeSave.mutate(prompt.id)
+    } else {
+      addSave.mutate(prompt.id)
+    }
+  }
 
   return (
     <Link
@@ -88,9 +105,11 @@ function PromptCard({
             size="icon-sm"
             onClick={(e) => {
               e.stopPropagation()
-              onSave?.()
+              e.preventDefault()
+              handleSave()
             }}
             className="shrink-0 -mr-2 -mt-1 size-7"
+            disabled={isAuthLoading || addSave.isPending || removeSave.isPending}
             aria-label={isSaved ? 'Remove from saved' : 'Save prompt'}
           >
             <BookmarkIcon className={cn('size-4', isSaved && 'fill-current')} />

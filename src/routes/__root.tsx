@@ -21,6 +21,7 @@ import { promptsQueryOptions } from '@/actions/prompts'
 import { SignInDialog } from '@/components/auth'
 import { BuyModal } from '@/components/pricing'
 import { profileQueryOptions } from '@/actions/profile'
+import { Toaster } from '@/components/ui/sonner'
 
 // ============================================
 // Router Context Type
@@ -136,6 +137,7 @@ function RootDocument({ children }: PropsWithChildren) {
       </head>
       <body>
         {children}
+        <Toaster position="bottom-center" />
         <SignInDialog />
         <BuyModal />
         <TanStackDevtools

@@ -212,6 +212,7 @@ export type Database = {
           images: string[] | null
           is_featured: boolean
           is_published: boolean
+          likes_count: number
           published_at: string | null
           saves_count: number
           sort_order: number | null
@@ -231,6 +232,7 @@ export type Database = {
           images?: string[] | null
           is_featured?: boolean
           is_published?: boolean
+          likes_count?: number
           published_at?: string | null
           saves_count?: number
           sort_order?: number | null
@@ -250,6 +252,7 @@ export type Database = {
           images?: string[] | null
           is_featured?: boolean
           is_published?: boolean
+          likes_count?: number
           published_at?: string | null
           saves_count?: number
           sort_order?: number | null
@@ -561,6 +564,56 @@ export type Database = {
           },
         ]
       }
+      user_likes: {
+        Row: {
+          created_at: string
+          id: string
+          prompt_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          prompt_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          prompt_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_likes_prompt_id_fkey"
+            columns: ["prompt_id"]
+            isOneToOne: false
+            referencedRelation: "prompts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_likes_prompt_id_fkey"
+            columns: ["prompt_id"]
+            isOneToOne: false
+            referencedRelation: "prompts_with_access"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_likes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_likes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       users: {
         Row: {
           avatar_url: string | null
@@ -629,6 +682,7 @@ export type Database = {
           images: string[] | null
           is_featured: boolean | null
           is_published: boolean | null
+          likes_count: number | null
           parent_category_id: string | null
           published_at: string | null
           saves_count: number | null

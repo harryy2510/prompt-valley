@@ -11,6 +11,7 @@ import {
   promptsCountQueryOptions,
   usePromptsCount,
 } from '@/actions/prompts'
+import { Image } from '@/components/common/image'
 
 // ============================================
 // Search Params Schema
@@ -107,10 +108,10 @@ function ModelPage() {
         {/* Title */}
         <div className="mb-8">
           <div className="flex items-center gap-3">
-            {model.icon_url && (
-              <img
-                src={model.icon_url}
-                alt={model.name}
+            {model.provider?.logo_url && (
+              <Image
+                src={model.provider.logo_url}
+                alt={model.provider.name}
                 className="size-10 rounded-lg"
               />
             )}

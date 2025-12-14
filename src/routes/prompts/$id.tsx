@@ -1,20 +1,32 @@
 import { createFileRoute, Link, notFound } from '@tanstack/react-router'
 import { Heart, Bookmark, Copy, ExternalLink, Sparkles } from 'lucide-react'
+import { useEffect, useState } from 'react'
 
 import { MainLayout } from '@/components/layout'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
 import { ProviderBadge } from '@/components/common/provider-badge'
-import { promptDetailQueryOptions, usePromptDetail } from '@/actions/prompts'
-import { useGate } from '@/components/common/gate'
+import {
+  promptDetailQueryOptions,
+  usePromptDetail,
+  useIncrementCopies,
+  useIncrementViews,
+} from '@/actions/prompts'
+import { AuthGate, useGate } from '@/components/common/gate'
+import { showSignInDialog } from '@/stores/app'
 import {
   useIsFavorite,
   useAddFavorite,
   useRemoveFavorite,
 } from '@/actions/favorites'
+import { useIsLiked, useAddLike, useRemoveLike } from '@/actions/likes'
 import { cn } from '@/libs/cn'
 import { compact, uniqBy } from 'lodash-es'
-import { useState } from 'react'
 import { toast } from 'sonner'
 import { BuyModal } from '@/components/pricing/buy-modal'
 import { Image } from '@/components/common/image'
@@ -49,10 +61,30 @@ function PromptDetailPage() {
   const { id } = Route.useParams()
   const { data: prompt } = usePromptDetail(id)
   const { isAuthenticated, isPro, isLoading } = useGate()
-  const { data: isFavorited } = useIsFavorite(id)
-  const addFavorite = useAddFavorite()
-  const removeFavorite = useRemoveFavorite()
+
+  // Saves (bookmark icon)
+  const { data: isSaved } = useIsFavorite(id)
+  const addSave = useAddFavorite()
+  const removeSave = useRemoveFavorite()
+
+  // Likes (heart icon)
+  const { data: isLiked } = useIsLiked(id)
+  const addLike = useAddLike()
+  const removeLike = useRemoveLike()
+
+  // Engagement tracking
+  const incrementViews = useIncrementViews()
+  const incrementCopies = useIncrementCopies()
+
   const [buyModalOpen, setBuyModalOpen] = useState(false)
+
+  // Track view on mount (only once per session)
+  useEffect(() => {
+    if (id) {
+      incrementViews.mutate(id)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id])
 
   if (!prompt) return null
 
@@ -68,7 +100,11 @@ function PromptDetailPage() {
   )
 
   // Get tags (full objects for linking)
-  const tagsList = uniqBy(prompt.tags?.map((t) => t.tag), 'id') ?? []
+  const tagsList =
+    uniqBy(
+      prompt.tags?.map((t) => t.tag),
+      'id',
+    ) ?? []
 
   // Main image is first, rest are thumbnails
   const images = prompt.images ?? []
@@ -77,18 +113,23 @@ function PromptDetailPage() {
   const handleCopy = async () => {
     if (!prompt.content) return
     await navigator.clipboard.writeText(prompt.content)
+    incrementCopies.mutate(id)
     toast.success('Prompt copied to clipboard!')
   }
 
-  const handleFavorite = () => {
-    if (!isAuthenticated) {
-      toast.error('Please sign in to save prompts')
-      return
-    }
-    if (isFavorited) {
-      removeFavorite.mutate(id)
+  const handleLike = () => {
+    if (isLiked) {
+      removeLike.mutate(id)
     } else {
-      addFavorite.mutate(id)
+      addLike.mutate(id)
+    }
+  }
+
+  const handleSave = () => {
+    if (isSaved) {
+      removeSave.mutate(id)
+    } else {
+      addSave.mutate(id)
     }
   }
 
@@ -99,22 +140,79 @@ function PromptDetailPage() {
         <div className="mb-6 flex items-start justify-between">
           <h1 className="text-3xl font-bold">{prompt.title}</h1>
           <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleFavorite}
-              disabled={addFavorite.isPending || removeFavorite.isPending}
-            >
-              <Heart
-                className={cn(
-                  'size-5',
-                  isFavorited && 'fill-current text-red-500',
-                )}
-              />
-            </Button>
-            <Button variant="ghost" size="icon">
-              <Bookmark className="size-5" />
-            </Button>
+            {/* Like button (Heart) */}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div>
+                  <AuthGate
+                    fallback={
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={showSignInDialog}
+                      >
+                        <Heart className="size-5" />
+                      </Button>
+                    }
+                    loadingFallback={
+                      <Button variant="ghost" size="icon" disabled>
+                        <Heart className="size-5" />
+                      </Button>
+                    }
+                  >
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={handleLike}
+                      disabled={addLike.isPending || removeLike.isPending}
+                    >
+                      <Heart
+                        className={cn(
+                          'size-5',
+                          isLiked && 'fill-current text-red-500',
+                        )}
+                      />
+                    </Button>
+                  </AuthGate>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>{isLiked ? 'Unlike' : 'Like'}</TooltipContent>
+            </Tooltip>
+            {/* Save button (Bookmark) */}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div>
+                  <AuthGate
+                    fallback={
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={showSignInDialog}
+                      >
+                        <Bookmark className="size-5" />
+                      </Button>
+                    }
+                    loadingFallback={
+                      <Button variant="ghost" size="icon" disabled>
+                        <Bookmark className="size-5" />
+                      </Button>
+                    }
+                  >
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={handleSave}
+                      disabled={addSave.isPending || removeSave.isPending}
+                    >
+                      <Bookmark
+                        className={cn('size-5', isSaved && 'fill-current')}
+                      />
+                    </Button>
+                  </AuthGate>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>{isSaved ? 'Unsave' : 'Save'}</TooltipContent>
+            </Tooltip>
           </div>
         </div>
 
@@ -173,10 +271,10 @@ function PromptDetailPage() {
             {/* Stats */}
             <div className="flex items-center gap-6 text-sm">
               <span>
-                <strong>{prompt.saves_count ?? 0}</strong> Saves
+                <strong>{prompt.likes_count ?? 0}</strong> Likes
               </span>
               <span>
-                <strong>{prompt.views_count ?? 0}</strong> Likes
+                <strong>{prompt.saves_count ?? 0}</strong> Saves
               </span>
             </div>
 
@@ -188,7 +286,11 @@ function PromptDetailPage() {
                 </span>
                 <div className="flex flex-wrap items-center gap-2">
                   {models.map((model) => (
-                    <Link key={model.id} to="/models/$id" params={{ id: model.id }}>
+                    <Link
+                      key={model.id}
+                      to="/models/$id"
+                      params={{ id: model.id }}
+                    >
                       {model.provider ? (
                         <ProviderBadge provider={model.provider} />
                       ) : (
@@ -317,7 +419,7 @@ function PromptContent({
       <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
         Prompt Details
       </span>
-      <p className="mt-4 whitespace-pre-wrap text-sm">{content}</p>
+      <p className="mt-4 select-none whitespace-pre-wrap text-sm">{content}</p>
       <div className="mt-4 flex items-center gap-3">
         <Button onClick={onCopy}>
           <Copy className="mr-2 size-4" />
