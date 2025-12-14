@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useRouter } from '@tanstack/react-router'
+import { Link, useRouter } from '@tanstack/react-router'
 import { REGEXP_ONLY_DIGITS } from 'input-otp'
 import { Loader2 } from 'lucide-react'
 import { useState } from 'react'
@@ -209,19 +209,19 @@ export function SignInForm({ onSuccess }: SignInFormProps) {
       {/* Footer */}
       <p className="text-center text-caption text-muted-foreground">
         By continuing, you agree to our{' '}
-        <a
-          href="/terms"
+        <Link
+          to="/terms"
           className="underline underline-offset-2 hover:text-foreground"
         >
           Terms
-        </a>{' '}
+        </Link>{' '}
         and{' '}
-        <a
-          href="/privacy"
+        <Link
+          to="/privacy"
           className="underline underline-offset-2 hover:text-foreground"
         >
           Privacy Policy
-        </a>
+        </Link>
       </p>
     </div>
   )

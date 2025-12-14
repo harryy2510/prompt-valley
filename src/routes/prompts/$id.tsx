@@ -67,8 +67,8 @@ function PromptDetailPage() {
     ),
   )
 
-  // Get tags
-  const tags = prompt.tags?.map((t) => t.tag.name) ?? []
+  // Get tags (full objects for linking)
+  const tagsList = uniqBy(prompt.tags?.map((t) => t.tag), 'id') ?? []
 
   // Main image is first, rest are thumbnails
   const images = prompt.images ?? []
@@ -194,19 +194,21 @@ function PromptDetailPage() {
             {prompt.category && (
               <div className="flex items-center gap-2">
                 <span className="text-sm text-muted-foreground">Category</span>
-                <Badge variant="category">{prompt.category.name}</Badge>
+                <Link to="/categories/$id" params={{ id: prompt.category.id }}>
+                  <Badge variant="category">{prompt.category.name}</Badge>
+                </Link>
               </div>
             )}
 
             {/* Tags */}
-            {tags.length > 0 && (
+            {tagsList.length > 0 && (
               <div className="flex items-center gap-2">
                 <span className="text-sm text-muted-foreground">Tags</span>
                 <div className="flex flex-wrap gap-2">
-                  {tags.map((tag) => (
-                    <Badge key={tag} variant="tag">
-                      {tag}
-                    </Badge>
+                  {tagsList.map((tag) => (
+                    <Link key={tag.id} to="/tags/$id" params={{ id: tag.id }}>
+                      <Badge variant="tag">{tag.name}</Badge>
+                    </Link>
                   ))}
                 </div>
               </div>

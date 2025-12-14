@@ -15,7 +15,9 @@ import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as _guestRouteImport } from './routes/__guest'
 import { Route as _authedRouteImport } from './routes/__authed'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as TagsIdRouteImport } from './routes/tags/$id'
 import { Route as PromptsIdRouteImport } from './routes/prompts/$id'
+import { Route as CategoriesIdRouteImport } from './routes/categories/$id'
 import { Route as _guestAuthRouteImport } from './routes/__guest/auth'
 import { Route as _authedDashboardRouteImport } from './routes/__authed/dashboard'
 
@@ -47,9 +49,19 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TagsIdRoute = TagsIdRouteImport.update({
+  id: '/tags/$id',
+  path: '/tags/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PromptsIdRoute = PromptsIdRouteImport.update({
   id: '/prompts/$id',
   path: '/prompts/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CategoriesIdRoute = CategoriesIdRouteImport.update({
+  id: '/categories/$id',
+  path: '/categories/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 const _guestAuthRoute = _guestAuthRouteImport.update({
@@ -70,7 +82,9 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/dashboard': typeof _authedDashboardRoute
   '/auth': typeof _guestAuthRoute
+  '/categories/$id': typeof CategoriesIdRoute
   '/prompts/$id': typeof PromptsIdRoute
+  '/tags/$id': typeof TagsIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -79,7 +93,9 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/dashboard': typeof _authedDashboardRoute
   '/auth': typeof _guestAuthRoute
+  '/categories/$id': typeof CategoriesIdRoute
   '/prompts/$id': typeof PromptsIdRoute
+  '/tags/$id': typeof TagsIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -91,7 +107,9 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/__authed/dashboard': typeof _authedDashboardRoute
   '/__guest/auth': typeof _guestAuthRoute
+  '/categories/$id': typeof CategoriesIdRoute
   '/prompts/$id': typeof PromptsIdRoute
+  '/tags/$id': typeof TagsIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -102,7 +120,9 @@ export interface FileRouteTypes {
     | '/terms'
     | '/dashboard'
     | '/auth'
+    | '/categories/$id'
     | '/prompts/$id'
+    | '/tags/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -111,7 +131,9 @@ export interface FileRouteTypes {
     | '/terms'
     | '/dashboard'
     | '/auth'
+    | '/categories/$id'
     | '/prompts/$id'
+    | '/tags/$id'
   id:
     | '__root__'
     | '/'
@@ -122,7 +144,9 @@ export interface FileRouteTypes {
     | '/terms'
     | '/__authed/dashboard'
     | '/__guest/auth'
+    | '/categories/$id'
     | '/prompts/$id'
+    | '/tags/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -132,7 +156,9 @@ export interface RootRouteChildren {
   PricingRoute: typeof PricingRoute
   PrivacyRoute: typeof PrivacyRoute
   TermsRoute: typeof TermsRoute
+  CategoriesIdRoute: typeof CategoriesIdRoute
   PromptsIdRoute: typeof PromptsIdRoute
+  TagsIdRoute: typeof TagsIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -179,11 +205,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tags/$id': {
+      id: '/tags/$id'
+      path: '/tags/$id'
+      fullPath: '/tags/$id'
+      preLoaderRoute: typeof TagsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/prompts/$id': {
       id: '/prompts/$id'
       path: '/prompts/$id'
       fullPath: '/prompts/$id'
       preLoaderRoute: typeof PromptsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/categories/$id': {
+      id: '/categories/$id'
+      path: '/categories/$id'
+      fullPath: '/categories/$id'
+      preLoaderRoute: typeof CategoriesIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/__guest/auth': {
@@ -232,7 +272,9 @@ const rootRouteChildren: RootRouteChildren = {
   PricingRoute: PricingRoute,
   PrivacyRoute: PrivacyRoute,
   TermsRoute: TermsRoute,
+  CategoriesIdRoute: CategoriesIdRoute,
   PromptsIdRoute: PromptsIdRoute,
+  TagsIdRoute: TagsIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -86,7 +86,7 @@ function buildNavItems(categories: Category[]) {
           {
             categories: category.children.map((child) => ({
               title: child.name,
-              href: `/category/${child.id}`,
+              href: `/categories/${child.id}`,
             })),
           },
         ],

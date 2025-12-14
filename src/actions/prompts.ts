@@ -62,10 +62,14 @@ export const fetchPrompts = createServerFn({ method: 'GET' })
   .handler(async ({ data: filters }) => {
     const supabase = getSupabaseServerClient()
 
-    // Use !inner join when filtering by modelId to only get prompts with that model
+    // Use !inner join when filtering by modelId or tagId to only get matching prompts
     const modelsSelect = filters.modelId
       ? 'models:prompt_models!inner(model:ai_models(*, provider:ai_providers(*)))'
       : 'models:prompt_models(model:ai_models(*, provider:ai_providers(*)))'
+
+    const tagsSelect = filters.tagId
+      ? 'tags:prompt_tags!inner(tag:tags(*))'
+      : 'tags:prompt_tags(tag:tags(*))'
 
     let query = supabase
       .from('prompts_with_access')
@@ -73,7 +77,7 @@ export const fetchPrompts = createServerFn({ method: 'GET' })
         `
         *,
         category:categories!category_id(*),
-        tags:prompt_tags(tag:tags(*)),
+        ${tagsSelect},
         ${modelsSelect}
       `,
       )
@@ -85,6 +89,9 @@ export const fetchPrompts = createServerFn({ method: 'GET' })
 
     if (filters.modelId) {
       query = query.eq('models.model_id', filters.modelId)
+    }
+    if (filters.tagId) {
+      query = query.eq('tags.tag_id', filters.tagId)
     }
     if (filters.categoryId) {
       // Match prompts where category_id matches OR parent_category_id matches
@@ -181,6 +188,49 @@ export const incrementPromptViews = createServerFn({ method: 'POST' })
     return { success: true }
   })
 
+export const fetchPromptsCount = createServerFn({ method: 'GET' })
+  .inputValidator(promptFiltersSchema)
+  .handler(async ({ data: filters }) => {
+    const supabase = getSupabaseServerClient()
+
+    // For tag filtering, we need to join with prompt_tags
+    const selectClause = filters.tagId
+      ? 'id, tags:prompt_tags!inner(tag_id)'
+      : 'id'
+
+    let query = supabase
+      .from('prompts_with_access')
+      .select(selectClause, { count: 'exact', head: true })
+
+    if (filters.isPublished !== false) {
+      query = query.eq('is_published', true)
+    }
+    if (filters.categoryId) {
+      query = query.or(
+        `category_id.eq.${filters.categoryId},parent_category_id.eq.${filters.categoryId}`,
+      )
+    }
+    if (filters.tagId) {
+      query = query.eq('tags.tag_id', filters.tagId)
+    }
+    if (filters.tier) {
+      query = query.eq('tier', filters.tier)
+    }
+    if (filters.isFeatured !== undefined) {
+      query = query.eq('is_featured', filters.isFeatured)
+    }
+    if (filters.search) {
+      query = query.or(
+        `title.ilike.%${filters.search}%,description.ilike.%${filters.search}%`,
+      )
+    }
+
+    const { count, error } = await query
+
+    if (error) throw error
+    return count ?? 0
+  })
+
 // ============================================
 // Query Keys
 // ============================================
@@ -189,6 +239,8 @@ export const promptKeys = {
   all: ['prompts'] as const,
   lists: () => [...promptKeys.all, 'list'] as const,
   list: (filters?: PromptFilters) => [...promptKeys.lists(), filters] as const,
+  counts: () => [...promptKeys.all, 'count'] as const,
+  count: (filters?: PromptFilters) => [...promptKeys.counts(), filters] as const,
   details: () => [...promptKeys.all, 'detail'] as const,
   detail: (id: string) => [...promptKeys.details(), id] as const,
 }
@@ -215,6 +267,17 @@ export function promptDetailQueryOptions(
   return queryOptions({
     queryKey: promptKeys.detail(id),
     queryFn: () => fetchPromptById({ data: id }),
+    ...options,
+  })
+}
+
+export function promptsCountQueryOptions(
+  filters: PromptFilters = {},
+  options?: Partial<UseQueryOptions<number>>,
+) {
+  return queryOptions({
+    queryKey: promptKeys.count(filters),
+    queryFn: () => fetchPromptsCount({ data: filters }),
     ...options,
   })
 }
@@ -258,6 +321,21 @@ export function usePromptsByModel(
   options?: Partial<UseQueryOptions<PromptWithRelations[]>>,
 ) {
   return useQuery(promptsQueryOptions({ modelId, limit }, options))
+}
+
+export function usePromptsByTag(
+  tagId: string,
+  limit = 12,
+  options?: Partial<UseQueryOptions<PromptWithRelations[]>>,
+) {
+  return useQuery(promptsQueryOptions({ tagId, limit }, options))
+}
+
+export function usePromptsCount(
+  filters: PromptFilters = {},
+  options?: Partial<UseQueryOptions<number>>,
+) {
+  return useQuery(promptsCountQueryOptions(filters, options))
 }
 
 export function useIncrementCopies() {

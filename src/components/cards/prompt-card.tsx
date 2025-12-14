@@ -9,7 +9,7 @@ import { ProviderBadge } from '@/components/common/provider-badge'
 import { AspectRatio } from '@/components/ui/aspect-ratio'
 import { IconButton } from '@/components/common/icon-button'
 import type { Tables } from '@/types/database.types'
-import { compact, uniq, uniqBy } from 'lodash-es'
+import { compact, uniqBy } from 'lodash-es'
 import { ImageGrid } from '@/components/common/image-grid'
 
 // Database-aligned prompt type
@@ -44,7 +44,7 @@ function PromptCard({
   ...props
 }: PromptCardProps) {
   const isPro = prompt.tier === 'pro'
-  const tags = uniq(prompt.tags?.map((t) => t.tag.name))
+  const tagsList = uniqBy(prompt.tags?.map((t) => t.tag), 'id')
   const providers = compact(
     uniqBy(
       prompt.models?.map((model) => model.model.provider),
@@ -110,12 +110,23 @@ function PromptCard({
             <ProviderBadge key={provider.id} provider={provider} />
           ))}
           {prompt.category && (
-            <Badge variant="category">{prompt.category.name}</Badge>
+            <Link
+              to="/categories/$id"
+              params={{ id: prompt.category.id }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <Badge variant="category">{prompt.category.name}</Badge>
+            </Link>
           )}
-          {tags.slice(0, 2).map((tag) => (
-            <Badge key={tag} variant="tag">
-              {tag}
-            </Badge>
+          {tagsList.slice(0, 2).map((tag) => (
+            <Link
+              key={tag.id}
+              to="/tags/$id"
+              params={{ id: tag.id }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <Badge variant="tag">{tag.name}</Badge>
+            </Link>
           ))}
         </div>
       </div>

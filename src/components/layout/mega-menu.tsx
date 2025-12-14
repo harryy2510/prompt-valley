@@ -104,16 +104,13 @@ function MegaMenuCategoryItem({
   description,
   icon,
 }: MegaMenuCategory) {
-  const Comp = href ? 'a' : 'button'
+  const baseClassName = cn(
+    'flex items-start gap-3 w-full rounded-md p-2 text-left transition-colors',
+    'hover:bg-muted focus:bg-muted focus:outline-none',
+  )
 
-  return (
-    <Comp
-      href={href}
-      className={cn(
-        'flex items-start gap-3 w-full rounded-md p-2 text-left transition-colors',
-        'hover:bg-muted focus:bg-muted focus:outline-none',
-      )}
-    >
+  const content = (
+    <>
       {icon && (
         <div className="shrink-0 mt-0.5 text-muted-foreground">{icon}</div>
       )}
@@ -125,8 +122,18 @@ function MegaMenuCategoryItem({
           </div>
         )}
       </div>
-    </Comp>
+    </>
   )
+
+  if (href) {
+    return (
+      <Link to={href} className={baseClassName}>
+        {content}
+      </Link>
+    )
+  }
+
+  return <button className={baseClassName}>{content}</button>
 }
 
 // Navigation bar with mega menus
