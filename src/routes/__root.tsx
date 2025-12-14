@@ -20,6 +20,7 @@ import { tagsQueryOptions } from '@/actions/tags'
 import { promptsQueryOptions } from '@/actions/prompts'
 import { SignInDialog } from '@/components/auth'
 import { BuyModal } from '@/components/pricing'
+import { profileQueryOptions } from '@/actions/profile'
 
 // ============================================
 // Router Context Type
@@ -39,6 +40,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
     // Use React Query to fetch required data
     const [user] = await Promise.all([
       context.queryClient.ensureQueryData(userQueryOptions()),
+      context.queryClient.ensureQueryData(profileQueryOptions()),
       context.queryClient.ensureQueryData(categoriesQueryOptions()),
       context.queryClient.ensureQueryData(tagsQueryOptions()),
       context.queryClient.ensureQueryData(promptsQueryOptions()),

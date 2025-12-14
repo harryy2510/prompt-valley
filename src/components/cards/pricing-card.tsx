@@ -9,6 +9,7 @@ import {
 } from '@/actions/stripe'
 import { AuthGate } from '@/components/common/gate'
 import { showSignInDialog } from '@/stores/app'
+import { useStableCallback } from '@tanstack/react-router'
 
 // ============================================
 // Types
@@ -19,6 +20,7 @@ type BillingInterval = 'month' | 'year'
 type PricingCardProps = {
   product: StripeProductWithPricesAndCoupon
   className?: string
+  onSuccess?: () => void
 }
 
 // ============================================
@@ -63,19 +65,15 @@ export function PricingCard({ product, className }: PricingCardProps) {
     (p) => p.recurring_interval === 'year',
   )
 
-  if (!monthlyPrice || !yearlyPrice) {
-    return null
-  }
-
-  const monthlyAmount = monthlyPrice.unit_amount ?? 0
-  const yearlyAmount = yearlyPrice.unit_amount ?? 0
+  const monthlyAmount = monthlyPrice?.unit_amount ?? 0
+  const yearlyAmount = yearlyPrice?.unit_amount ?? 0
 
   // Calculate savings percentage for yearly
   const yearlySavings = getYearlySavingsPercent(monthlyAmount, yearlyAmount)
 
   // Get current price based on selection
   const currentPrice = billingInterval === 'month' ? monthlyPrice : yearlyPrice
-  const currentUnitAmount = currentPrice.unit_amount ?? 0
+  const currentUnitAmount = currentPrice?.unit_amount ?? 0
 
   // Calculate per-month cost (for yearly, divide by 12)
   const perMonthAmount =
@@ -91,9 +89,11 @@ export function PricingCard({ product, className }: PricingCardProps) {
   )
   const hasDiscount = coupon && discountedPerMonth < perMonthAmount
 
-  const handleCheckout = () => {
-    checkout.mutate({ priceId: currentPrice.id, couponId: coupon?.id })
-  }
+  const handleCheckout = useStableCallback(() => {
+    if (currentPrice) {
+      checkout.mutate({ priceId: currentPrice.id, couponId: coupon?.id })
+    }
+  })
 
   return (
     <div className={cn('w-full max-w-md', className)}>

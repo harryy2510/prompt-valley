@@ -39,7 +39,7 @@ export function SignInDialog({
       {children && <DialogTrigger asChild>{children}</DialogTrigger>}
       <DialogContent className="max-w-md p-8">
         <DialogTitle className="sr-only">Sign In</DialogTitle>
-        <SignInForm onSuccess={() => onOpenChange?.(false)} />
+        <SignInForm onSuccess={() => setControlledOpenState(false)} />
       </DialogContent>
     </Dialog>
   )
