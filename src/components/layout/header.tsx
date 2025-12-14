@@ -1,6 +1,11 @@
 import { useState, useEffect } from 'react'
-import { Link, useNavigate, useSearch, useLocation } from '@tanstack/react-router'
-import { Heart, Bookmark, LogOut, User } from 'lucide-react'
+import {
+  Link,
+  useNavigate,
+  useSearch,
+  useLocation,
+} from '@tanstack/react-router'
+import { Heart, Bookmark, LogOut } from 'lucide-react'
 import { useDebounceCallback } from 'usehooks-ts'
 
 import { useCategories, type Category } from '@/actions/categories'
@@ -78,8 +83,11 @@ function HeaderSearch() {
   const location = useLocation()
 
   // Get current search query from URL if on search page
-  const searchParams = useSearch({ strict: false }) as { q?: string } | undefined
-  const currentQuery = location.pathname === '/search' ? (searchParams?.q ?? '') : ''
+  const searchParams = useSearch({ strict: false }) as
+    | { q?: string }
+    | undefined
+  const currentQuery =
+    location.pathname === '/search' ? (searchParams?.q ?? '') : ''
 
   const [value, setValue] = useState(currentQuery)
 
@@ -190,7 +198,7 @@ function UserMenu() {
         .join('')
         .toUpperCase()
         .slice(0, 2)
-    : profile?.email?.slice(0, 2).toUpperCase() ?? 'U'
+    : (profile?.email?.slice(0, 2).toUpperCase() ?? 'U')
 
   return (
     <DropdownMenu>
@@ -218,23 +226,16 @@ function UserMenu() {
           <DropdownMenuItem asChild>
             <Link to="/saved">
               <Bookmark className="size-4" />
-              Saved Prompts
+              Saved
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
             <Link to="/liked">
               <Heart className="size-4" />
-              Liked Prompts
+              Liked
             </Link>
           </DropdownMenuItem>
         </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem asChild>
-          <Link to="/dashboard">
-            <User className="size-4" />
-            Dashboard
-          </Link>
-        </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem
           variant="destructive"

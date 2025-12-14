@@ -16,14 +16,12 @@ import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as LikedRouteImport } from './routes/liked'
 import { Route as _guestRouteImport } from './routes/__guest'
-import { Route as _authedRouteImport } from './routes/__authed'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TagsIdRouteImport } from './routes/tags/$id'
 import { Route as PromptsIdRouteImport } from './routes/prompts/$id'
 import { Route as ModelsIdRouteImport } from './routes/models/$id'
 import { Route as CategoriesIdRouteImport } from './routes/categories/$id'
 import { Route as _guestAuthRouteImport } from './routes/__guest/auth'
-import { Route as _authedDashboardRouteImport } from './routes/__authed/dashboard'
 
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
@@ -59,10 +57,6 @@ const _guestRoute = _guestRouteImport.update({
   id: '/__guest',
   getParentRoute: () => rootRouteImport,
 } as any)
-const _authedRoute = _authedRouteImport.update({
-  id: '/__authed',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -93,11 +87,6 @@ const _guestAuthRoute = _guestAuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => _guestRoute,
 } as any)
-const _authedDashboardRoute = _authedDashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => _authedRoute,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -107,7 +96,6 @@ export interface FileRoutesByFullPath {
   '/saved': typeof SavedRoute
   '/search': typeof SearchRoute
   '/terms': typeof TermsRoute
-  '/dashboard': typeof _authedDashboardRoute
   '/auth': typeof _guestAuthRoute
   '/categories/$id': typeof CategoriesIdRoute
   '/models/$id': typeof ModelsIdRoute
@@ -122,7 +110,6 @@ export interface FileRoutesByTo {
   '/saved': typeof SavedRoute
   '/search': typeof SearchRoute
   '/terms': typeof TermsRoute
-  '/dashboard': typeof _authedDashboardRoute
   '/auth': typeof _guestAuthRoute
   '/categories/$id': typeof CategoriesIdRoute
   '/models/$id': typeof ModelsIdRoute
@@ -132,7 +119,6 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/__authed': typeof _authedRouteWithChildren
   '/__guest': typeof _guestRouteWithChildren
   '/liked': typeof LikedRoute
   '/pricing': typeof PricingRoute
@@ -140,7 +126,6 @@ export interface FileRoutesById {
   '/saved': typeof SavedRoute
   '/search': typeof SearchRoute
   '/terms': typeof TermsRoute
-  '/__authed/dashboard': typeof _authedDashboardRoute
   '/__guest/auth': typeof _guestAuthRoute
   '/categories/$id': typeof CategoriesIdRoute
   '/models/$id': typeof ModelsIdRoute
@@ -157,7 +142,6 @@ export interface FileRouteTypes {
     | '/saved'
     | '/search'
     | '/terms'
-    | '/dashboard'
     | '/auth'
     | '/categories/$id'
     | '/models/$id'
@@ -172,7 +156,6 @@ export interface FileRouteTypes {
     | '/saved'
     | '/search'
     | '/terms'
-    | '/dashboard'
     | '/auth'
     | '/categories/$id'
     | '/models/$id'
@@ -181,7 +164,6 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
-    | '/__authed'
     | '/__guest'
     | '/liked'
     | '/pricing'
@@ -189,7 +171,6 @@ export interface FileRouteTypes {
     | '/saved'
     | '/search'
     | '/terms'
-    | '/__authed/dashboard'
     | '/__guest/auth'
     | '/categories/$id'
     | '/models/$id'
@@ -199,7 +180,6 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  _authedRoute: typeof _authedRouteWithChildren
   _guestRoute: typeof _guestRouteWithChildren
   LikedRoute: typeof LikedRoute
   PricingRoute: typeof PricingRoute
@@ -264,13 +244,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof _guestRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/__authed': {
-      id: '/__authed'
-      path: ''
-      fullPath: ''
-      preLoaderRoute: typeof _authedRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/': {
       id: '/'
       path: '/'
@@ -313,26 +286,8 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof _guestAuthRouteImport
       parentRoute: typeof _guestRoute
     }
-    '/__authed/dashboard': {
-      id: '/__authed/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof _authedDashboardRouteImport
-      parentRoute: typeof _authedRoute
-    }
   }
 }
-
-interface _authedRouteChildren {
-  _authedDashboardRoute: typeof _authedDashboardRoute
-}
-
-const _authedRouteChildren: _authedRouteChildren = {
-  _authedDashboardRoute: _authedDashboardRoute,
-}
-
-const _authedRouteWithChildren =
-  _authedRoute._addFileChildren(_authedRouteChildren)
 
 interface _guestRouteChildren {
   _guestAuthRoute: typeof _guestAuthRoute
@@ -347,7 +302,6 @@ const _guestRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  _authedRoute: _authedRouteWithChildren,
   _guestRoute: _guestRouteWithChildren,
   LikedRoute: LikedRoute,
   PricingRoute: PricingRoute,
