@@ -21,11 +21,7 @@ import {
   useAddFavorite,
   useRemoveFavorite,
 } from '@/actions/favorites'
-import {
-  useIsLiked,
-  useAddLike,
-  useRemoveLike,
-} from '@/actions/likes'
+import { useIsLiked, useAddLike, useRemoveLike } from '@/actions/likes'
 import { useGate } from '@/components/common/gate'
 import { showSignInDialog } from '@/stores/app'
 
@@ -46,14 +42,12 @@ type PromptCardProps = ComponentProps<'article'> & {
   onClick?: () => void
 }
 
-function PromptCard({
-  prompt,
-  onClick,
-  className,
-  ...props
-}: PromptCardProps) {
+function PromptCard({ prompt, onClick, className, ...props }: PromptCardProps) {
   const isPro = prompt.tier === 'pro'
-  const tagsList = uniqBy(prompt.tags?.map((t) => t.tag), 'id')
+  const tagsList = uniqBy(
+    prompt.tags?.map((t) => t.tag),
+    'id',
+  )
   const models = compact(
     uniqBy(
       prompt.models?.map((m) => m.model),
@@ -110,116 +104,122 @@ function PromptCard({
         className={cn('group flex flex-col gap-3 cursor-pointer', className)}
         {...props}
       >
-      {/* Image Container */}
-      <div className="relative overflow-hidden rounded-lg bg-muted">
-        <ImageGrid images={prompt.images} title={prompt.title} />
+        {/* Image Container */}
+        <div className="relative overflow-hidden rounded-lg bg-muted">
+          <ImageGrid images={prompt.images} title={prompt.title} />
 
-        {/* Pro badge - bottom left */}
-        {isPro && (
-          <div className="absolute bottom-3 left-3">
-            <ProBadge />
-          </div>
-        )}
-      </div>
-
-      {/* Content */}
-      <div className="flex flex-col gap-2">
-        {/* Title row with like and bookmark */}
-        <div className="flex items-start justify-between gap-2">
-          <h3 className="text-body2-semibold text-foreground line-clamp-1">
-            {prompt.title}
-          </h3>
-          <div className="flex shrink-0 -mr-2 -mt-1">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <IconButton
-                  variant="ghost"
-                  size="icon-sm"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    e.preventDefault()
-                    handleLike()
-                  }}
-                  className="size-7"
-                  disabled={isAuthLoading || addLike.isPending || removeLike.isPending}
-                  aria-label={isLiked ? 'Unlike' : 'Like'}
-                >
-                  <Heart
-                    className={cn(
-                      'size-4',
-                      isLiked && 'fill-current text-red-500',
-                    )}
-                  />
-                </IconButton>
-              </TooltipTrigger>
-              <TooltipContent>{isLiked ? 'Unlike' : 'Like'}</TooltipContent>
-            </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <IconButton
-                  variant="ghost"
-                  size="icon-sm"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    e.preventDefault()
-                    handleSave()
-                  }}
-                  className="size-7"
-                  disabled={isAuthLoading || addSave.isPending || removeSave.isPending}
-                  aria-label={isSaved ? 'Unsave' : 'Save'}
-                >
-                  <BookmarkIcon className={cn('size-4', isSaved && 'fill-current')} />
-                </IconButton>
-              </TooltipTrigger>
-              <TooltipContent>{isSaved ? 'Unsave' : 'Save'}</TooltipContent>
-            </Tooltip>
-          </div>
-        </div>
-
-        {/* Description */}
-        {prompt.description && (
-          <p className="text-caption text-muted-foreground line-clamp-2">
-            {prompt.description}
-          </p>
-        )}
-
-        {/* Tags row */}
-        <div className="flex flex-wrap items-center gap-1.5">
-          {models.map((model) => (
-            <Link
-              key={model.id}
-              to="/models/$id"
-              params={{ id: model.id }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              {model.provider ? (
-                <ProviderBadge provider={model.provider} />
-              ) : (
-                <span className="text-xs text-muted-foreground">{model.name}</span>
-              )}
-            </Link>
-          ))}
-          {prompt.category && (
-            <Link
-              to="/categories/$id"
-              params={{ id: prompt.category.id }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <Badge variant="category">{prompt.category.name}</Badge>
-            </Link>
+          {/* Pro badge - bottom left */}
+          {isPro && (
+            <div className="absolute bottom-3 left-3">
+              <ProBadge />
+            </div>
           )}
-          {tagsList.slice(0, 2).map((tag) => (
-            <Link
-              key={tag.id}
-              to="/tags/$id"
-              params={{ id: tag.id }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <Badge variant="tag">{tag.name}</Badge>
-            </Link>
-          ))}
         </div>
-      </div>
+
+        {/* Content */}
+        <div className="flex flex-col gap-2">
+          {/* Title row with like and bookmark */}
+          <div className="flex items-start justify-between gap-2">
+            <h3 className="text-body2-semibold text-foreground line-clamp-1">
+              {prompt.title}
+            </h3>
+            <div className="flex shrink-0 -mr-2 -mt-1">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <IconButton
+                    variant="ghost"
+                    size="icon-sm"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      e.preventDefault()
+                      handleLike()
+                    }}
+                    className="size-7"
+                    disabled={
+                      isAuthLoading || addLike.isPending || removeLike.isPending
+                    }
+                    aria-label={isLiked ? 'Unlike' : 'Like'}
+                  >
+                    <Heart
+                      className={cn(
+                        'size-4',
+                        isLiked && 'fill-current text-red-500',
+                      )}
+                    />
+                  </IconButton>
+                </TooltipTrigger>
+                <TooltipContent>{isLiked ? 'Unlike' : 'Like'}</TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <IconButton
+                    variant="ghost"
+                    size="icon-sm"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      e.preventDefault()
+                      handleSave()
+                    }}
+                    className="size-7"
+                    disabled={
+                      isAuthLoading || addSave.isPending || removeSave.isPending
+                    }
+                    aria-label={isSaved ? 'Unsave' : 'Save'}
+                  >
+                    <BookmarkIcon
+                      className={cn('size-4', isSaved && 'fill-current')}
+                    />
+                  </IconButton>
+                </TooltipTrigger>
+                <TooltipContent>{isSaved ? 'Unsave' : 'Save'}</TooltipContent>
+              </Tooltip>
+            </div>
+          </div>
+
+          {/* Description */}
+          {prompt.description && (
+            <p className="text-caption text-muted-foreground line-clamp-2">
+              {prompt.description}
+            </p>
+          )}
+
+          {/* Tags row */}
+          <div className="flex flex-wrap items-center gap-1.5">
+            {models.map((model) => (
+              <Link
+                key={model.id}
+                to="/models/$id"
+                params={{ id: model.id }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                {model.provider ? (
+                  <ProviderBadge provider={model.provider} />
+                ) : (
+                  <Badge variant="secondary">{model.name}</Badge>
+                )}
+              </Link>
+            ))}
+            {prompt.category && (
+              <Link
+                to="/categories/$id"
+                params={{ id: prompt.category.id }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <Badge variant="secondary">{prompt.category.name}</Badge>
+              </Link>
+            )}
+            {tagsList.slice(0, 2).map((tag) => (
+              <Link
+                key={tag.id}
+                to="/tags/$id"
+                params={{ id: tag.id }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <Badge variant="secondary">{tag.name}</Badge>
+              </Link>
+            ))}
+          </div>
+        </div>
       </article>
     </Link>
   )

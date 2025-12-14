@@ -283,7 +283,7 @@ function PromptDetailPage() {
                       {model.provider ? (
                         <ProviderBadge provider={model.provider} />
                       ) : (
-                        <Badge variant="outline">{model.name}</Badge>
+                        <Badge variant="secondary">{model.name}</Badge>
                       )}
                     </Link>
                   ))}
@@ -296,7 +296,7 @@ function PromptDetailPage() {
               <div className="flex items-center gap-2">
                 <span className="text-sm text-muted-foreground">Category</span>
                 <Link to="/categories/$id" params={{ id: prompt.category.id }}>
-                  <Badge variant="category">{prompt.category.name}</Badge>
+                  <Badge variant="secondary">{prompt.category.name}</Badge>
                 </Link>
               </div>
             )}
@@ -308,7 +308,7 @@ function PromptDetailPage() {
                 <div className="flex flex-wrap gap-2">
                   {tagsList.map((tag) => (
                     <Link key={tag.id} to="/tags/$id" params={{ id: tag.id }}>
-                      <Badge variant="tag">{tag.name}</Badge>
+                      <Badge variant="secondary">{tag.name}</Badge>
                     </Link>
                   ))}
                 </div>

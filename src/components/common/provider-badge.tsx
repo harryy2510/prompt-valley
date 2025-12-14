@@ -20,11 +20,17 @@ function ProviderBadge({
 }: PlatformBadgeProps) {
   return (
     <Badge
-      variant="provider"
+      variant="secondary"
       className={cn(comingSoon && 'opacity-60', className)}
       {...props}
     >
-      {showIcon && <Image alt={provider.name} src={provider.logo_url}  className="size-3.5" />}
+      {showIcon && (
+        <Image
+          alt={provider.name}
+          src={provider.logo_url}
+          className="size-3.5 -ml-1"
+        />
+      )}
       <span>{provider.name}</span>
       {comingSoon && (
         <span className="text-[10px] text-muted-foreground ml-1">
