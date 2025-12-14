@@ -1,12 +1,24 @@
-import { Link } from '@tanstack/react-router'
-import { Search } from 'lucide-react'
+import { Link, useNavigate } from '@tanstack/react-router'
+import { Search, Heart, Bookmark, LogOut, User } from 'lucide-react'
 
 import { useCategories, type Category } from '@/actions/categories'
+import { useProfile } from '@/actions/profile'
+import { useSignOut } from '@/actions/auth'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { LogoWithText } from './logo-with-text'
 import { NavMegaMenu, type MegaMenuSection } from './mega-menu'
 import { AuthGate, ProGate } from '@/components/common/gate'
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 
 // ============================================
 // Header Component
@@ -43,12 +55,6 @@ export function Header() {
         <div className="ml-auto flex items-center gap-2">
           <ProGate />
 
-          <AuthGate>
-            <Button variant="ghost" size="sm" asChild>
-              <Link to="/dashboard">Dashboard</Link>
-            </Button>
-          </AuthGate>
-
           <AuthGate
             fallback={
               <Button size="sm" asChild>
@@ -59,7 +65,9 @@ export function Header() {
                 </Link>
               </Button>
             }
-          />
+          >
+            <UserMenu />
+          </AuthGate>
         </div>
       </div>
     </header>
@@ -95,4 +103,88 @@ function buildNavItems(categories: Category[]) {
   })
 
   return items
+}
+
+// ============================================
+// User Menu Component
+// ============================================
+
+function UserMenu() {
+  const { data: profile } = useProfile()
+  const signOut = useSignOut()
+  const navigate = useNavigate()
+
+  const handleSignOut = () => {
+    signOut.mutate(undefined, {
+      onSuccess: () => {
+        navigate({ to: '/' })
+      },
+    })
+  }
+
+  // Get initials for fallback
+  const initials = profile?.name
+    ? profile.name
+        .split(' ')
+        .map((n) => n[0])
+        .join('')
+        .toUpperCase()
+        .slice(0, 2)
+    : profile?.email?.slice(0, 2).toUpperCase() ?? 'U'
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="icon" className="rounded-full">
+          <Avatar className="size-8">
+            {profile?.avatar_url && (
+              <AvatarImage src={profile.avatar_url} alt={profile.name ?? ''} />
+            )}
+            <AvatarFallback className="text-xs">{initials}</AvatarFallback>
+          </Avatar>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-56">
+        <DropdownMenuLabel>
+          <div className="flex flex-col space-y-1">
+            {profile?.name && (
+              <p className="text-sm font-medium">{profile.name}</p>
+            )}
+            <p className="text-xs text-muted-foreground">{profile?.email}</p>
+          </div>
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuGroup>
+          <DropdownMenuItem asChild>
+            <Link to="/saved">
+              <Bookmark className="size-4" />
+              Saved Prompts
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link to="/liked">
+              <Heart className="size-4" />
+              Liked Prompts
+            </Link>
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
+          <Link to="/dashboard">
+            <User className="size-4" />
+            Dashboard
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem
+          variant="destructive"
+          onClick={handleSignOut}
+          disabled={signOut.isPending}
+        >
+          <LogOut className="size-4" />
+          Sign out
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
 }

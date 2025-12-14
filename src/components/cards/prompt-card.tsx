@@ -1,5 +1,5 @@
 import type { ComponentProps } from 'react'
-import { BookmarkIcon } from 'lucide-react'
+import { BookmarkIcon, Heart } from 'lucide-react'
 import { Link } from '@tanstack/react-router'
 
 import { cn } from '@/libs/cn'
@@ -8,6 +8,11 @@ import { ProBadge } from '@/components/common/pro-badge'
 import { ProviderBadge } from '@/components/common/provider-badge'
 import { AspectRatio } from '@/components/ui/aspect-ratio'
 import { IconButton } from '@/components/common/icon-button'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
 import type { Tables } from '@/types/database.types'
 import { compact, uniqBy } from 'lodash-es'
 import { ImageGrid } from '@/components/common/image-grid'
@@ -16,6 +21,11 @@ import {
   useAddFavorite,
   useRemoveFavorite,
 } from '@/actions/favorites'
+import {
+  useIsLiked,
+  useAddLike,
+  useRemoveLike,
+} from '@/actions/likes'
 import { useGate } from '@/components/common/gate'
 import { showSignInDialog } from '@/stores/app'
 
@@ -51,11 +61,18 @@ function PromptCard({
     ),
   )
 
-  // Save functionality (self-contained)
+  // Auth state
   const { isAuthenticated, isLoading: isAuthLoading } = useGate()
+
+  // Save functionality (self-contained)
   const { data: isSaved } = useIsFavorite(prompt.id)
   const addSave = useAddFavorite()
   const removeSave = useRemoveFavorite()
+
+  // Like functionality (self-contained)
+  const { data: isLiked } = useIsLiked(prompt.id)
+  const addLike = useAddLike()
+  const removeLike = useRemoveLike()
 
   const handleSave = () => {
     if (!isAuthenticated) {
@@ -66,6 +83,18 @@ function PromptCard({
       removeSave.mutate(prompt.id)
     } else {
       addSave.mutate(prompt.id)
+    }
+  }
+
+  const handleLike = () => {
+    if (!isAuthenticated) {
+      showSignInDialog()
+      return
+    }
+    if (isLiked) {
+      removeLike.mutate(prompt.id)
+    } else {
+      addLike.mutate(prompt.id)
     }
   }
 
@@ -95,25 +124,56 @@ function PromptCard({
 
       {/* Content */}
       <div className="flex flex-col gap-2">
-        {/* Title row with bookmark */}
+        {/* Title row with like and bookmark */}
         <div className="flex items-start justify-between gap-2">
           <h3 className="text-body2-semibold text-foreground line-clamp-1">
             {prompt.title}
           </h3>
-          <IconButton
-            variant="ghost"
-            size="icon-sm"
-            onClick={(e) => {
-              e.stopPropagation()
-              e.preventDefault()
-              handleSave()
-            }}
-            className="shrink-0 -mr-2 -mt-1 size-7"
-            disabled={isAuthLoading || addSave.isPending || removeSave.isPending}
-            aria-label={isSaved ? 'Remove from saved' : 'Save prompt'}
-          >
-            <BookmarkIcon className={cn('size-4', isSaved && 'fill-current')} />
-          </IconButton>
+          <div className="flex shrink-0 -mr-2 -mt-1">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <IconButton
+                  variant="ghost"
+                  size="icon-sm"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    e.preventDefault()
+                    handleLike()
+                  }}
+                  className="size-7"
+                  disabled={isAuthLoading || addLike.isPending || removeLike.isPending}
+                  aria-label={isLiked ? 'Unlike' : 'Like'}
+                >
+                  <Heart
+                    className={cn(
+                      'size-4',
+                      isLiked && 'fill-current text-red-500',
+                    )}
+                  />
+                </IconButton>
+              </TooltipTrigger>
+              <TooltipContent>{isLiked ? 'Unlike' : 'Like'}</TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <IconButton
+                  variant="ghost"
+                  size="icon-sm"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    e.preventDefault()
+                    handleSave()
+                  }}
+                  className="size-7"
+                  disabled={isAuthLoading || addSave.isPending || removeSave.isPending}
+                  aria-label={isSaved ? 'Unsave' : 'Save'}
+                >
+                  <BookmarkIcon className={cn('size-4', isSaved && 'fill-current')} />
+                </IconButton>
+              </TooltipTrigger>
+              <TooltipContent>{isSaved ? 'Unsave' : 'Save'}</TooltipContent>
+            </Tooltip>
+          </div>
         </div>
 
         {/* Description */}

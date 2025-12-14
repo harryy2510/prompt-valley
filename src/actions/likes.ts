@@ -8,7 +8,7 @@ import {
 import { createServerFn } from '@tanstack/react-start'
 import { getSupabaseServerClient } from '@/libs/supabase/server'
 import type { Tables } from '@/types/database.types'
-import { promptKeys } from './prompts'
+import { promptKeys, type PromptWithRelations } from './prompts'
 import { useUser } from '@/actions/auth'
 import { z } from 'zod'
 
@@ -18,9 +18,22 @@ import { z } from 'zod'
 
 export type UserLike = Tables<'user_likes'>
 
+export type LikeWithPrompt = UserLike & {
+  prompt: PromptWithRelations
+}
+
 // ============================================
 // Zod Schemas
 // ============================================
+
+const likesFiltersSchema = z
+  .object({
+    limit: z.number().int().min(1).max(100).optional(),
+    offset: z.number().int().min(0).optional(),
+    orderBy: z.enum(['created_at']).optional(),
+    orderAsc: z.boolean().optional(),
+  })
+  .optional()
 
 const likeInputSchema = z.object({
   promptId: z.string(),
@@ -28,10 +41,48 @@ const likeInputSchema = z.object({
 })
 
 export type LikeInput = z.infer<typeof likeInputSchema>
+export type LikesFilters = z.infer<typeof likesFiltersSchema>
 
 // ============================================
 // Server Functions
 // ============================================
+
+export const fetchUserLikes = createServerFn({ method: 'GET' })
+  .inputValidator(likesFiltersSchema)
+  .handler(async ({ data: filters }) => {
+    const supabase = getSupabaseServerClient()
+
+    let query = supabase.from('user_likes').select(
+      `
+        *,
+        prompt:prompts(
+          *,
+          category:categories(*),
+          tags:prompt_tags(tag:tags(*)),
+          models:prompt_models(model:ai_models(*, provider:ai_providers(*)))
+        )
+      `,
+    )
+
+    query = query.order(filters?.orderBy ?? 'created_at', {
+      ascending: filters?.orderAsc ?? false,
+    })
+
+    if (filters?.limit) {
+      query = query.limit(filters.limit)
+    }
+    if (filters?.offset) {
+      query = query.range(
+        filters.offset,
+        filters.offset + (filters.limit ?? 12) - 1,
+      )
+    }
+
+    const { data, error } = await query
+
+    if (error) throw error
+    return data as LikeWithPrompt[]
+  })
 
 export const fetchLikeIds = createServerFn({ method: 'GET' }).handler(
   async () => {
@@ -109,6 +160,8 @@ export const removeLike = createServerFn({ method: 'POST' })
 
 export const likeKeys = {
   all: ['likes'] as const,
+  lists: () => [...likeKeys.all, 'list'] as const,
+  list: (filters?: LikesFilters) => [...likeKeys.lists(), filters] as const,
   ids: () => [...likeKeys.all, 'ids'] as const,
   check: (input: LikeInput) => [...likeKeys.all, 'check', input] as const,
 }
@@ -116,6 +169,17 @@ export const likeKeys = {
 // ============================================
 // Query Options (for loaders)
 // ============================================
+
+export function userLikesQueryOptions(
+  filters?: LikesFilters,
+  options?: Partial<UseQueryOptions<LikeWithPrompt[]>>,
+) {
+  return queryOptions({
+    queryKey: likeKeys.list(filters),
+    queryFn: () => fetchUserLikes({ data: filters }),
+    ...options,
+  })
+}
 
 export function likeIdsQueryOptions(
   options?: Partial<UseQueryOptions<string[]>>,
@@ -141,6 +205,18 @@ export function isLikedQueryOptions(
 // ============================================
 // Hooks
 // ============================================
+
+export function useUserLikes(
+  filters?: LikesFilters,
+  options?: Partial<UseQueryOptions<LikeWithPrompt[]>>,
+) {
+  const { data: user } = useUser()
+  const userId = user?.id ?? ''
+  return useQuery({
+    ...userLikesQueryOptions(filters, options),
+    enabled: !!userId && options?.enabled !== false,
+  })
+}
 
 export function useLikeIds(options?: Partial<UseQueryOptions<string[]>>) {
   const { data: user } = useUser()
