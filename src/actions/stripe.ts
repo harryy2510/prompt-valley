@@ -118,3 +118,15 @@ export function useCreateCheckoutSession() {
     },
   })
 }
+
+// ============================================
+// Portal Session Hook (for billing management)
+// ============================================
+
+export function useCreatePortalSession() {
+  return useMutation({
+    mutationFn: async () => {
+      return supabaseInvoke<{ url: string }>('create-portal-session', {})
+    },
+  })
+}

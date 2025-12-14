@@ -16,6 +16,7 @@ import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as LikedRouteImport } from './routes/liked'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as BillingRouteImport } from './routes/billing'
 import { Route as _guestRouteImport } from './routes/__guest'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TagsIdRouteImport } from './routes/tags/$id'
@@ -59,6 +60,11 @@ const ContactRoute = ContactRouteImport.update({
   path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BillingRoute = BillingRouteImport.update({
+  id: '/billing',
+  path: '/billing',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const _guestRoute = _guestRouteImport.update({
   id: '/__guest',
   getParentRoute: () => rootRouteImport,
@@ -96,6 +102,7 @@ const _guestAuthRoute = _guestAuthRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/billing': typeof BillingRoute
   '/contact': typeof ContactRoute
   '/liked': typeof LikedRoute
   '/pricing': typeof PricingRoute
@@ -111,6 +118,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/billing': typeof BillingRoute
   '/contact': typeof ContactRoute
   '/liked': typeof LikedRoute
   '/pricing': typeof PricingRoute
@@ -128,6 +136,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/__guest': typeof _guestRouteWithChildren
+  '/billing': typeof BillingRoute
   '/contact': typeof ContactRoute
   '/liked': typeof LikedRoute
   '/pricing': typeof PricingRoute
@@ -145,6 +154,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/billing'
     | '/contact'
     | '/liked'
     | '/pricing'
@@ -160,6 +170,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/billing'
     | '/contact'
     | '/liked'
     | '/pricing'
@@ -176,6 +187,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/__guest'
+    | '/billing'
     | '/contact'
     | '/liked'
     | '/pricing'
@@ -193,6 +205,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   _guestRoute: typeof _guestRouteWithChildren
+  BillingRoute: typeof BillingRoute
   ContactRoute: typeof ContactRoute
   LikedRoute: typeof LikedRoute
   PricingRoute: typeof PricingRoute
@@ -255,6 +268,13 @@ declare module '@tanstack/react-router' {
       path: '/contact'
       fullPath: '/contact'
       preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/billing': {
+      id: '/billing'
+      path: '/billing'
+      fullPath: '/billing'
+      preLoaderRoute: typeof BillingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/__guest': {
@@ -323,6 +343,7 @@ const _guestRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   _guestRoute: _guestRouteWithChildren,
+  BillingRoute: BillingRoute,
   ContactRoute: ContactRoute,
   LikedRoute: LikedRoute,
   PricingRoute: PricingRoute,

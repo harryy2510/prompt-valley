@@ -257,10 +257,10 @@ function UserMenu() {
             </a>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
-            <a href="/billing">
+            <Link to="/billing">
               <CreditCard className="size-4" />
               Billing & Subscription
-            </a>
+            </Link>
           </DropdownMenuItem>
           <DropdownMenuItem onClick={handleWhatsNew}>
             <Flag className="size-4" />
