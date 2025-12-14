@@ -3,6 +3,7 @@ import { ChevronDownIcon } from 'lucide-react'
 
 import { cn } from '@/libs/cn'
 import { Button } from '@/components/ui/button'
+import { Link } from '@tanstack/react-router'
 
 // Types
 type MegaMenuCategory = {
@@ -66,7 +67,7 @@ function MegaMenu({
             align === 'right' && 'right-0',
           )}
         >
-          <div className="min-w-[400px] rounded-lg border bg-popover p-4 shadow-lg">
+          <div className="min-w-100 rounded-lg border bg-popover p-4 shadow-lg">
             <div className="flex gap-6">
               {sections.map((section, sectionIndex) => (
                 <div key={sectionIndex} className="flex-1">
@@ -164,7 +165,7 @@ function NavMegaMenu({ items, className, ...props }: NavMegaMenuProps) {
 
         return (
           <Button key={index} variant="nav-link" size="nav" asChild>
-            <a href={item.href}>{item.label}</a>
+            <Link to={item.href}>{item.label}</Link>
           </Button>
         )
       })}

@@ -52,6 +52,8 @@ export default defineConfig({
     dedupe: ['react', 'react-dom'],
   },
   server: {
-    allowedHosts: ['.localcan.dev'],
+    host: true,
+    port: 6173,
+    allowedHosts: ['.localcan.dev', '.local'],
   },
 })

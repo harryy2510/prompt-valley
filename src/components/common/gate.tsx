@@ -1,4 +1,3 @@
-import { Link } from '@tanstack/react-router'
 import type { ReactNode } from 'react'
 
 import { useUser } from '@/actions/auth'
@@ -11,13 +10,20 @@ import {
 } from '@/actions/profile'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+import { showBuyDialog, showSignInDialog } from '@/stores/app'
+import { Link } from '@tanstack/react-router'
 
 // ============================================
 // Types
 // ============================================
 
 type GateProps = {
-  children: ReactNode
+  children?: ReactNode
+
+  /**
+   * Show dialog or redirect
+   */
+  mode?: 'dialog' | 'redirect'
 
   /**
    * Require user to be authenticated
@@ -65,48 +71,55 @@ type GateProps = {
 // Default Fallback Components
 // ============================================
 
-function DefaultLoadingFallback() {
-  return (
-    <div className="flex flex-col items-center justify-center gap-4 py-12">
-      <Skeleton className="h-8 w-48" />
-      <Skeleton className="h-4 w-64" />
-    </div>
-  )
+export function DefaultLoadingFallback() {
+  return <Skeleton className="h-8 w-20" />
 }
 
-function DefaultUnauthenticatedFallback() {
-  return (
-    <div className="flex flex-col items-center justify-center gap-4 rounded-lg border border-dashed p-8 text-center">
-      <div className="space-y-2">
-        <h3 className="text-lg font-semibold">Sign in required</h3>
-        <p className="text-sm text-muted-foreground">
-          Please sign in to access this content.
-        </p>
-      </div>
-      <Button asChild>
-        <Link to="/auth">Sign In</Link>
+export function DefaultUnauthenticatedFallback({
+  mode,
+}: {
+  mode?: 'dialog' | 'redirect'
+}) {
+  if (mode === 'dialog') {
+    return (
+      <Button onClick={showSignInDialog} variant="nav-link" size="nav">
+        Log in
       </Button>
-    </div>
-  )
-}
-
-function DefaultUnauthorizedFallback() {
+    )
+  }
   return (
-    <div className="flex flex-col items-center justify-center gap-4 rounded-lg border border-dashed p-8 text-center">
-      <div className="space-y-2">
-        <h3 className="text-lg font-semibold">Pro access required</h3>
-        <p className="text-sm text-muted-foreground">
-          Upgrade to Pro to unlock this feature.
-        </p>
-      </div>
-      <Button variant="gradient" asChild>
-        <a href="/pricing">Upgrade to Pro</a>
-      </Button>
-    </div>
+    <Button asChild variant="nav-link" size="nav">
+      <Link to="/auth">Log in</Link>
+    </Button>
   )
 }
 
-function DefaultForbiddenFallback() {
+export function DefaultUnauthorizedFallback({
+  mode,
+}: {
+  mode?: 'dialog' | 'redirect'
+}) {
+  if (mode === 'dialog') {
+    return (
+      <Button onClick={showBuyDialog} variant="gradient" size="cta">
+        <span>
+          Get <span className="font-bold">PRO</span>
+        </span>
+      </Button>
+    )
+  }
+  return (
+    <Button variant="gradient" size="cta" asChild>
+      <Link to="/pricing">
+        <span>
+          Get <span className="font-bold">PRO</span>
+        </span>
+      </Link>
+    </Button>
+  )
+}
+
+export function DefaultForbiddenFallback() {
   return (
     <div className="flex flex-col items-center justify-center gap-4 rounded-lg border border-dashed p-8 text-center">
       <div className="space-y-2">
@@ -125,6 +138,7 @@ function DefaultForbiddenFallback() {
 
 export function Gate({
   children,
+  mode = 'redirect',
   requireAuth = true,
   requiredTier,
   requiredRole,
@@ -134,35 +148,40 @@ export function Gate({
   forbiddenFallback,
   silent = false,
 }: GateProps) {
-  const { data: user, isLoading: isUserLoading } = useUser()
-  const { data: profile, isLoading: isProfileLoading } = useProfile()
-
-  const isLoading = isUserLoading || isProfileLoading
+  const { isLoading, isAuthenticated, isPro, isAdmin } = useGate()
 
   // Loading state
   if (isLoading) {
-    if (silent) return null
-    return <>{loadingFallback ?? <DefaultLoadingFallback />}</>
-  }
-
-  // Authentication check
-  if (requireAuth && !user) {
-    if (silent) return null
     return (
-      <>{unauthenticatedFallback ?? <DefaultUnauthenticatedFallback />}</>
+      <>{loadingFallback ?? (silent ? null : <DefaultLoadingFallback />)}</>
     )
   }
 
   // Tier check (only if authenticated and tier is required)
-  if (requiredTier === 'pro' && !hasProAccess(profile)) {
-    if (silent) return null
-    return <>{unauthorizedFallback ?? <DefaultUnauthorizedFallback />}</>
+  if (requiredTier === 'pro' && !isPro) {
+    return (
+      <>
+        {unauthorizedFallback ??
+          (silent ? null : <DefaultUnauthorizedFallback mode={mode} />)}
+      </>
+    )
+  }
+
+  // Authentication check
+  if (requireAuth && !isAuthenticated) {
+    return (
+      <>
+        {unauthenticatedFallback ??
+          (silent ? null : <DefaultUnauthenticatedFallback mode={mode} />)}
+      </>
+    )
   }
 
   // Role check (only if authenticated and role is required)
-  if (requiredRole === 'admin' && !hasAdminAccess(profile)) {
-    if (silent) return null
-    return <>{forbiddenFallback ?? <DefaultForbiddenFallback />}</>
+  if (requiredRole === 'admin' && !isAdmin) {
+    return (
+      <>{forbiddenFallback ?? (silent ? null : <DefaultForbiddenFallback />)}</>
+    )
   }
 
   // All checks passed
@@ -174,20 +193,30 @@ export function Gate({
 // ============================================
 
 type SimpleGateProps = {
-  children: ReactNode
+  children?: ReactNode
   fallback?: ReactNode
+  loadingFallback?: ReactNode
   silent?: boolean
+  mode?: 'dialog' | 'redirect'
 }
 
 /**
  * Gate that only checks for authentication
  */
-export function AuthGate({ children, fallback, silent }: SimpleGateProps) {
+export function AuthGate({
+  children,
+  fallback,
+  loadingFallback,
+  silent,
+  mode,
+}: SimpleGateProps) {
   return (
     <Gate
       requireAuth
       unauthenticatedFallback={fallback}
+      loadingFallback={loadingFallback}
       silent={silent}
+      mode={mode}
     >
       {children}
     </Gate>
@@ -197,13 +226,21 @@ export function AuthGate({ children, fallback, silent }: SimpleGateProps) {
 /**
  * Gate that checks for Pro tier access
  */
-export function ProGate({ children, fallback, silent }: SimpleGateProps) {
+export function ProGate({
+  children,
+  fallback,
+  loadingFallback,
+  silent,
+  mode,
+}: SimpleGateProps) {
   return (
     <Gate
       requireAuth
       requiredTier="pro"
       unauthorizedFallback={fallback}
+      loadingFallback={loadingFallback}
       silent={silent}
+      mode={mode}
     >
       {children}
     </Gate>
@@ -213,13 +250,21 @@ export function ProGate({ children, fallback, silent }: SimpleGateProps) {
 /**
  * Gate that checks for admin role
  */
-export function AdminGate({ children, fallback, silent }: SimpleGateProps) {
+export function AdminGate({
+  children,
+  fallback,
+  loadingFallback,
+  silent,
+  mode,
+}: SimpleGateProps) {
   return (
     <Gate
       requireAuth
       requiredRole="admin"
       forbiddenFallback={fallback}
+      loadingFallback={loadingFallback}
       silent={silent}
+      mode={mode}
     >
       {children}
     </Gate>

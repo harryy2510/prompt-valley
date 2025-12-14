@@ -21,24 +21,23 @@ const buttonVariants = cva(
           'hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50',
         link: 'text-primary underline-offset-4 hover:underline',
         gradient:
-          'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg shadow-blue-500/25 dark:shadow-blue-500/20',
+          'bg-[url(@/assets/pro-upsell-bg.webp)] bg-size-[100%_200%] bg-center text-white',
         // Brand variants - main CTA buttons
         'brand-primary':
           'bg-foreground text-background hover:bg-foreground/90 rounded-md',
         'brand-secondary':
           'text-foreground rounded-md border border-border hover:bg-muted',
         // Navigation variants
-        'nav-link':
-          'text-sm font-semibold text-foreground hover:bg-muted rounded-md',
+        'nav-link': 'text-sm text-foreground hover:bg-muted rounded-md',
         'nav-link-muted':
-          'text-sm font-medium text-muted-foreground hover:bg-muted rounded-md',
+          'text-sm text-muted-foreground hover:bg-muted rounded-md',
         // Inverse variants - for dark/colored backgrounds
         inverse: 'bg-white text-foreground hover:bg-white/90 shadow-sm',
         'inverse-outline':
           'bg-transparent text-white border border-white/40 hover:bg-white/10 hover:border-white/60',
         // Overlay variant - for card overlays
         overlay:
-          'bg-foreground/80 text-white backdrop-blur-sm hover:bg-foreground/90 text-xs font-medium',
+          'bg-foreground/80 text-white backdrop-blur-sm hover:bg-foreground/90 text-xs',
       },
       size: {
         default: 'h-9 px-4 py-2 has-[>svg]:px-3',

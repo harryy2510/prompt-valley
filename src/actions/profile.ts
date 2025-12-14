@@ -6,6 +6,7 @@ import {
 import { createServerFn } from '@tanstack/react-start'
 import { getSupabaseServerClient } from '@/libs/supabase/server'
 import type { Tables } from '@/types/database.types'
+import { useUser } from '@/actions/auth'
 
 // ============================================
 // Types
@@ -25,10 +26,7 @@ export const fetchProfile = createServerFn({ method: 'GET' }).handler(
     const supabase = getSupabaseServerClient()
 
     // RLS on users table filters to current user automatically
-    const { data, error } = await supabase
-      .from('users')
-      .select('*')
-      .single()
+    const { data, error } = await supabase.from('users').select('*').single()
 
     if (error) {
       // User might not have a profile yet (new user) or not authenticated
@@ -72,7 +70,11 @@ export function profileQueryOptions(
 export function useProfile(
   options?: Partial<UseQueryOptions<UserProfile | null>>,
 ) {
-  return useQuery(profileQueryOptions(options))
+  const { data: user } = useUser()
+  return useQuery({
+    ...profileQueryOptions(options),
+    enabled: options?.enabled && !!user?.id,
+  })
 }
 
 // ============================================

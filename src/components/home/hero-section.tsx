@@ -1,4 +1,3 @@
-import { SignInDialog } from '@/components/auth'
 import { Button } from '@/components/ui/button'
 
 import image1 from '@/assets/landing/carousel-image-1.webp'
@@ -6,6 +5,8 @@ import icon1 from '@/assets/landing/carousel-icon-1.webp'
 import icon2 from '@/assets/landing/carousel-icon-2.webp'
 import icon3 from '@/assets/landing/carousel-icon-3.webp'
 import { cn } from '@/libs/cn'
+import { Link } from '@tanstack/react-router'
+import { AuthGate } from '@/components/common/gate'
 
 // ============================================
 // Carousel Card Component
@@ -14,7 +15,7 @@ import { cn } from '@/libs/cn'
 function CarouselCardItem({ src }: { src: string }) {
   return (
     <div className="w-full overflow-hidden rounded-2xl bg-muted">
-      <img src={src} className="size-full object-cover" />
+      <img alt="" src={src} className="size-full object-cover" />
     </div>
   )
 }
@@ -78,19 +79,25 @@ export function HeroSection() {
               and Image models to create high-quality AI output.
             </p>
 
-            <div className="flex flex-wrap items-center gap-4">
-              <SignInDialog>
-                <Button className="w-60 max-w-100" size="xl">
-                  <span>
-                    Start <span className="font-bold text-amber-200">Free</span>
-                  </span>
-                </Button>
-              </SignInDialog>
-            </div>
-
-            <p className="text-sm text-muted-foreground">
-              Free forever. No credit card required.
-            </p>
+            <AuthGate
+              fallback={
+                <>
+                  <div className="flex flex-wrap items-center gap-4">
+                    <Button asChild className="w-60 max-w-100" size="xl">
+                      <Link to="/auth">
+                        <span>
+                          Start{' '}
+                          <span className="font-bold text-amber-200">Free</span>
+                        </span>
+                      </Link>
+                    </Button>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    Free forever. No credit card required.
+                  </p>
+                </>
+              }
+            />
           </div>
 
           {/* Right - 3 Vertical Scrolling Carousels */}

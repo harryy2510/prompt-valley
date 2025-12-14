@@ -1,183 +1,201 @@
-import { useState, type ComponentProps } from 'react'
-import NumberFlow from '@number-flow/react'
-import { SparklesIcon } from 'lucide-react'
-
-import { cn } from '@/libs/cn'
+import { useState } from 'react'
+import { Sparkle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { PricingToggle, type PricingPeriod } from '@/components/cards/pricing-toggle'
-import type { Tables } from '@/types/database.types'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { cn } from '@/libs/cn'
+import {
+  StripeProductWithPricesAndCoupon,
+  useCreateCheckoutSession,
+} from '@/actions/stripe'
+import { AuthGate } from '@/components/common/gate'
+import { showSignInDialog } from '@/stores/app'
 
-// Database-aligned types
-type StripeProduct = Tables<'stripe_products'>
-type StripePrice = Tables<'stripe_prices'>
-type StripeCoupon = Tables<'stripe_coupons'>
+// ============================================
+// Types
+// ============================================
 
-// Price info extracted from database
-type PriceInfo = {
-  id: string
-  amount: number // in dollars (already converted from cents)
-  interval: 'month' | 'year'
+type BillingInterval = 'month' | 'year'
+
+type PricingCardProps = {
+  product: StripeProductWithPricesAndCoupon
+  className?: string
 }
 
-type PricingCardProps = ComponentProps<'div'> & {
-  // Product with prices
-  product: StripeProduct & {
-    prices: StripePrice[]
-  }
-  // Optional coupon for discount
-  coupon?: StripeCoupon | null
-  // Features list (from product.features or manual override)
-  features?: string[]
-  // CTA
-  ctaText?: string
-  onCtaClick?: (priceId: string, period: PricingPeriod) => void
-  ctaLoading?: boolean
-  // Fine print
-  finePrint?: string
-  // Default period
-  defaultPeriod?: PricingPeriod
+// ============================================
+// Helper Functions
+// ============================================
+
+function formatPrice(cents: number): string {
+  return `$${Math.round(cents / 100)}`
 }
 
-// Helper to extract and organize prices
-function extractPrices(prices: StripePrice[]): { monthly?: PriceInfo; yearly?: PriceInfo } {
-  const result: { monthly?: PriceInfo; yearly?: PriceInfo } = {}
-
-  for (const price of prices) {
-    if (!price.active) continue
-
-    const amount = price.unit_amount / 100 // Convert cents to dollars
-
-    if (price.recurring_interval === 'month') {
-      result.monthly = { id: price.id, amount, interval: 'month' }
-    } else if (price.recurring_interval === 'year') {
-      // Convert yearly to monthly equivalent for display
-      result.yearly = { id: price.id, amount: Math.round(amount / 12), interval: 'year' }
-    }
-  }
-
-  return result
+function calculateDiscountedPrice(
+  price: number,
+  percentOff: number | null,
+): number {
+  if (!percentOff) return price
+  const discount = percentOff / 100
+  return Math.round(price * (1 - discount))
 }
 
-// Apply coupon discount
-function applyDiscount(amount: number, coupon?: StripeCoupon | null): number {
-  if (!coupon?.valid) return amount
-
-  if (coupon.percent_off) {
-    return Math.round(amount * (1 - coupon.percent_off / 100))
-  }
-
-  if (coupon.amount_off) {
-    return Math.max(0, amount - coupon.amount_off / 100)
-  }
-
-  return amount
+function getYearlySavingsPercent(
+  monthlyPrice: number,
+  yearlyPrice: number,
+): number {
+  const yearlyMonthlyEquivalent = yearlyPrice / 12
+  return Math.round((1 - yearlyMonthlyEquivalent / monthlyPrice) * 100)
 }
 
-function PricingCard({
-  product,
-  coupon,
-  features: featuresProp,
-  ctaText = 'Get PRO',
-  onCtaClick,
-  ctaLoading = false,
-  finePrint = 'Renews automatically • Cancel anytime',
-  defaultPeriod = 'yearly',
-  className,
-  ...props
-}: PricingCardProps) {
-  const [period, setPeriod] = useState<PricingPeriod>(defaultPeriod)
+// ============================================
+// Pricing Card Component
+// ============================================
 
-  const prices = extractPrices(product.prices)
-  const features = featuresProp ?? product.marketing_features ?? []
+export function PricingCard({ product, className }: PricingCardProps) {
+  const checkout = useCreateCheckoutSession()
+  const [billingInterval, setBillingInterval] =
+    useState<BillingInterval>('year')
 
-  // Get current price based on period
-  const currentPriceInfo = period === 'yearly' ? prices.yearly : prices.monthly
-  if (!currentPriceInfo) return null
+  // Get prices by interval
+  const monthlyPrice = product.prices.find(
+    (p) => p.recurring_interval === 'month',
+  )
+  const yearlyPrice = product.prices.find(
+    (p) => p.recurring_interval === 'year',
+  )
 
-  // Calculate prices with/without discount
-  const originalPrice = currentPriceInfo.amount
-  const discountedPrice = applyDiscount(originalPrice, coupon)
-  const hasDiscount = coupon?.valid && discountedPrice < originalPrice
+  if (!monthlyPrice || !yearlyPrice) {
+    return null
+  }
 
-  // Calculate yearly discount percentage
-  const yearlyDiscountPercent = prices.monthly && prices.yearly
-    ? Math.round((1 - prices.yearly.amount / prices.monthly.amount) * 100)
-    : 0
+  const monthlyAmount = monthlyPrice.unit_amount ?? 0
+  const yearlyAmount = yearlyPrice.unit_amount ?? 0
+
+  // Calculate savings percentage for yearly
+  const yearlySavings = getYearlySavingsPercent(monthlyAmount, yearlyAmount)
+
+  // Get current price based on selection
+  const currentPrice = billingInterval === 'month' ? monthlyPrice : yearlyPrice
+  const currentUnitAmount = currentPrice.unit_amount ?? 0
+
+  // Calculate per-month cost (for yearly, divide by 12)
+  const perMonthAmount =
+    billingInterval === 'year'
+      ? Math.round(currentUnitAmount / 12)
+      : currentUnitAmount
+
+  // Apply coupon discount if available
+  const coupon = product.coupon
+  const discountedPerMonth = calculateDiscountedPrice(
+    perMonthAmount,
+    coupon?.percent_off ?? null,
+  )
+  const hasDiscount = coupon && discountedPerMonth < perMonthAmount
+
+  const handleCheckout = () => {
+    checkout.mutate({ priceId: currentPrice.id, couponId: coupon?.id })
+  }
 
   return (
-    <div
-      data-slot="pricing-card"
-      className={cn(
-        'flex flex-col items-center w-full max-w-md rounded-xl bg-card p-8',
-        className,
-      )}
-      {...props}
-    >
-      {/* Period toggle */}
-      <PricingToggle
-        value={period}
-        onChange={setPeriod}
-        yearlyDiscount={yearlyDiscountPercent > 0 ? `${yearlyDiscountPercent}% Off` : undefined}
-      />
+    <div className={cn('w-full max-w-md', className)}>
+      {/* Billing Toggle */}
+      <div className="mb-6 flex justify-center">
+        <Tabs
+          value={billingInterval}
+          onValueChange={(v) => setBillingInterval(v as BillingInterval)}
+        >
+          <TabsList>
+            <TabsTrigger value="year">
+              Yearly ({yearlySavings}% Off)
+            </TabsTrigger>
+            <TabsTrigger value="month">Monthly</TabsTrigger>
+          </TabsList>
+        </Tabs>
+      </div>
 
-      {/* Pricing section */}
-      <div className="mt-8 flex flex-col items-center">
-        {/* Coupon badge */}
-        {hasDiscount && coupon?.name && (
-          <div className="mb-4 inline-flex items-center gap-1.5 rounded-md bg-foreground px-3 py-1.5 text-xs font-semibold tracking-wide text-background uppercase">
+      {/* Pricing Card */}
+      <div className="rounded-xl border bg-background p-6">
+        {/* Limited Offer Badge */}
+        {coupon && (
+          <div className="mb-4 inline-flex items-center gap-1.5 rounded-full bg-secondary-200 px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-foreground">
             {coupon.name}
           </div>
         )}
 
-        {/* Price display */}
-        <div className="flex items-baseline gap-2">
+        {/* Price Display */}
+        <div className="mb-6 flex items-end gap-2">
           {hasDiscount && (
-            <span className="text-h4 text-muted-foreground line-through">
-              $<NumberFlow value={originalPrice} />
+            <span className="text-5xl font-medium text-muted-foreground line-through">
+              {formatPrice(perMonthAmount)}
             </span>
           )}
-          <span className="text-display text-foreground">
-            $<NumberFlow value={discountedPrice} />
+          <span className="text-5xl font-bold">
+            {formatPrice(discountedPerMonth)}
           </span>
-          <span className="text-body2 text-muted-foreground">
+          <span className="text-sm text-muted-foreground pb-1">
             per month
-            {period === 'yearly' && (
-              <span className="block text-caption">billed yearly</span>
+            {billingInterval === 'year' && (
+              <>
+                <br />
+                billed yearly
+              </>
             )}
           </span>
         </div>
-      </div>
 
-      {/* Features */}
-      <ul className="mt-8 w-full space-y-3">
-        {features.map((feature: string, index: number) => (
-          <li key={index} className="flex items-start gap-3 text-body2">
-            <SparklesIcon className="size-4 shrink-0 mt-0.5 text-primary" />
-            <span className="text-foreground">{feature}</span>
-          </li>
-        ))}
-      </ul>
+        {/* Features List */}
+        <ul className="mb-6 space-y-3">
+          {product.marketing_features?.map((feature, index) => (
+            <li key={index} className="flex items-start gap-2">
+              <Sparkle className="mt-0.5 size-4 shrink-0 text-primary fill-primary" />
+              <span className="text-sm">{feature}</span>
+            </li>
+          ))}
+        </ul>
 
-      {/* CTA Button */}
-      <Button
-        variant="brand-primary"
-        size="lg"
-        className="mt-8 w-full"
-        onClick={() => onCtaClick?.(currentPriceInfo.id, period)}
-        disabled={ctaLoading}
-      >
-        {ctaLoading ? 'Processing...' : ctaText}
-      </Button>
+        {/* CTA Button */}
+        <AuthGate
+          loadingFallback={
+            <Button size="lg" variant="gradient" className="w-full">
+              <span>
+                Get <span className="font-bold">PRO</span>
+              </span>
+            </Button>
+          }
+          fallback={
+            <Button
+              size="lg"
+              variant="gradient"
+              className="w-full"
+              onClick={showSignInDialog}
+            >
+              <span>
+                Get <span className="font-bold">PRO</span>
+              </span>
+            </Button>
+          }
+        >
+          <Button
+            size="lg"
+            variant="gradient"
+            className="w-full"
+            disabled={checkout.isPending}
+            onClick={handleCheckout}
+          >
+            {checkout.isPending ? (
+              'Loading...'
+            ) : (
+              <span>
+                Get <span className="font-bold">PRO</span>
+              </span>
+            )}
+          </Button>
+        </AuthGate>
 
-      {/* Fine print */}
-      {finePrint && (
-        <p className="mt-3 text-caption text-muted-foreground text-center">
-          {finePrint}
+        {/* Subscription Info */}
+        <p className="mt-4 text-center text-xs text-muted-foreground">
+          Renews automatically &bull; Cancel anytime
         </p>
-      )}
+      </div>
     </div>
   )
 }
-
-export { PricingCard }
-export type { PricingCardProps }

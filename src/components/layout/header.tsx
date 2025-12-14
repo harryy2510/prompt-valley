@@ -2,26 +2,24 @@ import { Link } from '@tanstack/react-router'
 import { Search } from 'lucide-react'
 
 import { useCategories, type Category } from '@/actions/categories'
-import { useUser } from '@/actions/auth'
-import { SignInDialog } from '@/components/auth'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { LogoWithText } from './logo-with-text'
 import { NavMegaMenu, type MegaMenuSection } from './mega-menu'
+import { AuthGate, ProGate } from '@/components/common/gate'
 
 // ============================================
 // Header Component
 // ============================================
 
 export function Header() {
-  const { data: user } = useUser()
   const { data: categories } = useCategories()
 
   // Build navigation items from categories
   const navItems = buildNavItems(categories ?? [])
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
       <div className="container mx-auto px-2 flex h-14 items-center gap-4">
         {/* Logo */}
         <Link to="/" className="shrink-0">
@@ -43,23 +41,16 @@ export function Header() {
 
         {/* Right side actions */}
         <div className="ml-auto flex items-center gap-2">
-          <Button variant="nav-link" size="nav" asChild>
-            <Link to="/pricing">Get PRO</Link>
-          </Button>
+          <ProGate />
 
-          {user ? (
-            // Authenticated - show user menu later
+          <AuthGate>
             <Button variant="ghost" size="sm" asChild>
               <Link to="/dashboard">Dashboard</Link>
             </Button>
-          ) : (
-            // Guest - show login/signup
-            <>
-              <SignInDialog>
-                <Button variant="nav-link" size="nav">
-                  Log in
-                </Button>
-              </SignInDialog>
+          </AuthGate>
+
+          <AuthGate
+            fallback={
               <Button size="sm" asChild>
                 <Link to="/auth">
                   <span>
@@ -67,8 +58,8 @@ export function Header() {
                   </span>
                 </Link>
               </Button>
-            </>
-          )}
+            }
+          />
         </div>
       </div>
     </header>
@@ -95,7 +86,7 @@ function buildNavItems(categories: Category[]) {
           {
             categories: category.children.map((child) => ({
               title: child.name,
-              href: `/?category=${child.id}`,
+              href: `/category/${child.id}`,
             })),
           },
         ],

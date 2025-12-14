@@ -213,11 +213,19 @@ export function useUserFavorites(
   filters?: FavoritesFilters,
   options?: Partial<UseQueryOptions<FavoriteWithPrompt[]>>,
 ) {
-  return useQuery(userFavoritesQueryOptions(filters, options))
+  const { data: user } = useUser()
+  return useQuery({
+    ...userFavoritesQueryOptions(filters, options),
+    enabled: options?.enabled && !!user?.id,
+  })
 }
 
 export function useFavoriteIds(options?: Partial<UseQueryOptions<string[]>>) {
-  return useQuery(favoriteIdsQueryOptions(options))
+  const { data: user } = useUser()
+  return useQuery({
+    ...favoriteIdsQueryOptions(options),
+    enabled: options?.enabled && !!user?.id,
+  })
 }
 
 export function useIsFavorite(
@@ -227,7 +235,7 @@ export function useIsFavorite(
   const { data: user } = useUser()
   return useQuery({
     ...isFavoriteQueryOptions({ promptId, userId: user?.id ?? '' }, options),
-    enabled: !!user?.id,
+    enabled: options?.enabled && !!user?.id,
   })
 }
 

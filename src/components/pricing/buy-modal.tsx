@@ -1,16 +1,29 @@
-import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
-import { PricingCard } from './pricing-card'
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
+import { PricingCard } from '../cards/pricing-card'
 import { useStripeProduct } from '@/actions/stripe'
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
 import { LogoPro } from '@/components/layout/logo-pro'
+import { useStoreValue } from 'zustand-x'
+import { QuoteIcon } from 'lucide-react'
+import { appStore } from '@/stores/app'
+import { ReactNode } from 'react'
 
 // ============================================
 // Types
 // ============================================
 
 type BuyModalProps = {
-  open: boolean
-  onOpenChange: (open: boolean) => void
+  /** Trigger element that opens the dialog */
+  children?: ReactNode
+  /** Whether the dialog is open (controlled) */
+  open?: boolean
+  /** Callback when open state changes */
+  onOpenChange?: (open: boolean) => void
 }
 
 // ============================================
@@ -29,14 +42,27 @@ const testimonial = {
 // Buy Modal Component
 // ============================================
 
-export function BuyModal({ open, onOpenChange }: BuyModalProps) {
+export function BuyModal({ children, open, onOpenChange }: BuyModalProps) {
   const { data: product } = useStripeProduct()
+  const storeValue = useStoreValue(appStore, 'buyDialog')
+
+  const controlledOpen = typeof open !== 'undefined' ? open : storeValue
+
+  const setControlledOpenState = (value: boolean) =>
+    typeof open !== 'undefined'
+      ? onOpenChange?.(value)
+      : appStore.set('buyDialog', value)
 
   if (!product) return null
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent size="lg" className="max-h-[90vh] overflow-y-auto">
+    <Dialog open={controlledOpen} onOpenChange={setControlledOpenState}>
+      {children && <DialogTrigger asChild>{children}</DialogTrigger>}
+      <DialogContent
+        size="xl"
+        className="max-h-[90vh] border-none overflow-y-auto"
+      >
+        <div className="h-2 w-full overflow-hidden absolute left-0 top-0 bg-[url(@/assets/landing/footer-upsell-background.webp)] bg-size-[auto_100%] xl:bg-size-[100%_auto] bg-center bg-no-repeat" />
         <VisuallyHidden>
           <DialogTitle>Get PromptValley Pro</DialogTitle>
         </VisuallyHidden>
@@ -54,23 +80,23 @@ export function BuyModal({ open, onOpenChange }: BuyModalProps) {
 
         {/* Pricing Card */}
         <div className="flex justify-center">
-          <PricingCard product={product} className="max-w-sm" />
+          <PricingCard product={product} />
+        </div>
+
+        <div className="justify-center items-center flex mt-2">
+          <QuoteIcon className="rotate-180 stroke-gray-200 fill-gray-200" />
         </div>
 
         {/* Testimonial */}
-        <div className="mt-4 border-t pt-6">
-          <div className="text-center">
-            <p className="text-lg italic text-muted-foreground">
-              "{testimonial.quote}"
-            </p>
-            <div className="mt-4 flex items-center justify-center gap-3">
-              <div className="size-10 rounded-full bg-muted" />
-              <div className="text-left">
-                <p className="text-sm font-medium">{testimonial.author}</p>
-                <p className="text-xs uppercase tracking-wide text-muted-foreground">
-                  {testimonial.role}
-                </p>
-              </div>
+        <div className="text-center">
+          <p className="text-base font-bold">{testimonial.quote}</p>
+          <div className="mt-4 flex items-center justify-center gap-3">
+            <div className="size-10 rounded-full bg-muted" />
+            <div className="text-left">
+              <p className="text-sm font-medium">{testimonial.author}</p>
+              <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                {testimonial.role}
+              </p>
             </div>
           </div>
         </div>

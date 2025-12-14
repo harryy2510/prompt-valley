@@ -8,6 +8,8 @@ import {
 } from '@/components/ui/dialog'
 
 import { SignInForm } from './sign-in-form'
+import { useStoreValue } from 'zustand-x'
+import { appStore } from '@/stores/app'
 
 export type SignInDialogProps = {
   /** Trigger element that opens the dialog */
@@ -23,8 +25,17 @@ export function SignInDialog({
   open,
   onOpenChange,
 }: SignInDialogProps) {
+  const storeValue = useStoreValue(appStore, 'signInDialog')
+
+  const controlledOpen = typeof open !== 'undefined' ? open : storeValue
+
+  const setControlledOpenState = (value: boolean) =>
+    typeof open !== 'undefined'
+      ? onOpenChange?.(value)
+      : appStore.set('signInDialog', value)
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={controlledOpen} onOpenChange={setControlledOpenState}>
       {children && <DialogTrigger asChild>{children}</DialogTrigger>}
       <DialogContent className="max-w-md p-8">
         <DialogTitle className="sr-only">Sign In</DialogTitle>

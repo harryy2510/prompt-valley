@@ -18,7 +18,7 @@ export const Route = createFileRoute('/__guest')({
     // Session is already in context from root route
     if (context.user) {
       throw redirect({
-        to: search.redirect || '/dashboard',
+        to: search.redirect || '/',
       })
     }
   },

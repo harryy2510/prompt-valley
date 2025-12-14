@@ -18,6 +18,8 @@ import { userQueryOptions, useAuthStateListener } from '@/actions/auth'
 import { categoriesQueryOptions } from '@/actions/categories'
 import { tagsQueryOptions } from '@/actions/tags'
 import { promptsQueryOptions } from '@/actions/prompts'
+import { SignInDialog } from '@/components/auth'
+import { BuyModal } from '@/components/pricing'
 
 // ============================================
 // Router Context Type
@@ -127,6 +129,8 @@ function RootDocument({ children }: PropsWithChildren) {
       </head>
       <body>
         {children}
+        <SignInDialog />
+        <BuyModal />
         <TanStackDevtools
           config={{ position: 'bottom-right' }}
           plugins={[TanStackRouterDevtools, TanStackQueryDevtools]}

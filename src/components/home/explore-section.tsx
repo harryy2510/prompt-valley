@@ -17,6 +17,7 @@ import {
 import { Separator } from '@/components/ui/separator'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useProfile } from '@/actions/profile'
+import { AuthGate, ProGate } from '@/components/common/gate'
 
 // ============================================
 // Explore Section Component
@@ -97,13 +98,7 @@ export function ExploreSection() {
             ))}
 
             {/* Upsell Card */}
-            <UpsellCard
-              label="PRO"
-              title="Unlock everything PromptValley has to offer."
-              description="Cancel anytime."
-              ctaText="Get PRO"
-              className="h-full"
-            />
+            <ProGate fallback={<UpsellCard />} />
 
             {/* Remaining prompts */}
             {prompts.slice(3).map((prompt) => (
@@ -114,11 +109,15 @@ export function ExploreSection() {
       </div>
 
       {/* Load More */}
-      <div className="mt-12 text-center">
-        <Button variant="brand-primary" size="lg" asChild>
-          <Link to="/">Sign up to Continue</Link>
-        </Button>
-      </div>
+      <AuthGate
+        fallback={
+          <div className="mt-12 text-center">
+            <Button variant="brand-primary" size="lg" asChild>
+              <Link to="/auth">Sign up to Continue</Link>
+            </Button>
+          </div>
+        }
+      />
     </section>
   )
 }
