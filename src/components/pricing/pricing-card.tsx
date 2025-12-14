@@ -96,7 +96,7 @@ export function PricingCard({ product, className }: PricingCardProps) {
   return (
     <div className={cn('w-full max-w-md', className)}>
       {/* Billing Toggle */}
-      <div className="mb-6 flex">
+      <div className="mb-6 flex justify-center">
         <Tabs
           value={billingInterval}
           onValueChange={(v) => setBillingInterval(v as BillingInterval)}

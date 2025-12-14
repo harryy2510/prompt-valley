@@ -1,5 +1,6 @@
 import type { ComponentProps } from 'react'
 import { BookmarkIcon } from 'lucide-react'
+import { Link } from '@tanstack/react-router'
 
 import { cn } from '@/libs/cn'
 import { Badge } from '@/components/ui/badge'
@@ -52,12 +53,17 @@ function PromptCard({
   )
 
   return (
-    <article
-      data-slot="prompt-card"
-      className={cn('group flex flex-col gap-3 cursor-pointer', className)}
+    <Link
+      to="/prompts/$id"
+      params={{ id: prompt.id }}
       onClick={onClick}
-      {...props}
+      className="block"
     >
+      <article
+        data-slot="prompt-card"
+        className={cn('group flex flex-col gap-3 cursor-pointer', className)}
+        {...props}
+      >
       {/* Image Container */}
       <div className="relative overflow-hidden rounded-lg bg-muted">
         <ImageGrid images={prompt.images} title={prompt.title} />
@@ -113,7 +119,8 @@ function PromptCard({
           ))}
         </div>
       </div>
-    </article>
+      </article>
+    </Link>
   )
 }
 

@@ -11,8 +11,6 @@ import { LogoPro } from '@/components/layout/logo-pro'
 type BuyModalProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
-  onCheckout?: (priceId: string) => void
-  isLoading?: boolean
 }
 
 // ============================================
@@ -31,12 +29,7 @@ const testimonial = {
 // Buy Modal Component
 // ============================================
 
-export function BuyModal({
-  open,
-  onOpenChange,
-  onCheckout,
-  isLoading,
-}: BuyModalProps) {
+export function BuyModal({ open, onOpenChange }: BuyModalProps) {
   const { data: product } = useStripeProduct()
 
   if (!product) return null
@@ -50,7 +43,7 @@ export function BuyModal({
 
         {/* Pro Badge and Header */}
         <div className="text-center">
-          <div className="mx-auto mb-4 flex size-16 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500 to-purple-600">
+          <div className="mx-auto mb-4 flex items-center justify-center">
             <LogoPro className="size-16" />
           </div>
           <h2 className="text-2xl font-bold">
@@ -61,12 +54,7 @@ export function BuyModal({
 
         {/* Pricing Card */}
         <div className="flex justify-center">
-          <PricingCard
-            product={product}
-            onCheckout={onCheckout}
-            isLoading={isLoading}
-            className="max-w-sm"
-          />
+          <PricingCard product={product} className="max-w-sm" />
         </div>
 
         {/* Testimonial */}
