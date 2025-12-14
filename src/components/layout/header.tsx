@@ -35,6 +35,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { openFeedback, openAnnouncements } from '@/libs/userback'
+import { getImageUrl } from '@/libs/storage'
 
 // ============================================
 // Header Component
@@ -220,9 +221,7 @@ function UserMenu() {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" className="rounded-full">
           <Avatar className="size-8">
-            {profile?.avatar_url && (
-              <AvatarImage src={profile.avatar_url} alt={profile.name ?? ''} />
-            )}
+            <AvatarImage src={getImageUrl(profile?.avatar_url) ?? undefined} alt={profile?.name ?? ''} />
             <AvatarFallback className="text-xs">{initials}</AvatarFallback>
           </Avatar>
         </Button>
@@ -251,10 +250,10 @@ function UserMenu() {
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
-            <a href="/settings">
+            <Link to="/settings">
               <Settings className="size-4" />
               Account Settings
-            </a>
+            </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
             <Link to="/billing">

@@ -31,12 +31,13 @@ function BillingPage() {
     createPortalSession.mutate(undefined, {
       onSuccess: (result) => {
         if (result?.url) {
-          window.location.href = result.url
+          // Use replace so back button doesn't return to this redirect page
+          window.location.replace(result.url)
         }
       },
       onError: () => {
         // If error (e.g., no subscription), redirect to pricing
-        window.location.href = '/pricing'
+        window.location.replace('/pricing')
       },
     })
   }, [])

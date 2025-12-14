@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as SavedRouteImport } from './routes/saved'
 import { Route as PrivacyRouteImport } from './routes/privacy'
@@ -28,6 +29,11 @@ import { Route as _guestAuthRouteImport } from './routes/__guest/auth'
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
   path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SearchRoute = SearchRouteImport.update({
@@ -109,6 +115,7 @@ export interface FileRoutesByFullPath {
   '/privacy': typeof PrivacyRoute
   '/saved': typeof SavedRoute
   '/search': typeof SearchRoute
+  '/settings': typeof SettingsRoute
   '/terms': typeof TermsRoute
   '/auth': typeof _guestAuthRoute
   '/categories/$id': typeof CategoriesIdRoute
@@ -125,6 +132,7 @@ export interface FileRoutesByTo {
   '/privacy': typeof PrivacyRoute
   '/saved': typeof SavedRoute
   '/search': typeof SearchRoute
+  '/settings': typeof SettingsRoute
   '/terms': typeof TermsRoute
   '/auth': typeof _guestAuthRoute
   '/categories/$id': typeof CategoriesIdRoute
@@ -143,6 +151,7 @@ export interface FileRoutesById {
   '/privacy': typeof PrivacyRoute
   '/saved': typeof SavedRoute
   '/search': typeof SearchRoute
+  '/settings': typeof SettingsRoute
   '/terms': typeof TermsRoute
   '/__guest/auth': typeof _guestAuthRoute
   '/categories/$id': typeof CategoriesIdRoute
@@ -161,6 +170,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/saved'
     | '/search'
+    | '/settings'
     | '/terms'
     | '/auth'
     | '/categories/$id'
@@ -177,6 +187,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/saved'
     | '/search'
+    | '/settings'
     | '/terms'
     | '/auth'
     | '/categories/$id'
@@ -194,6 +205,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/saved'
     | '/search'
+    | '/settings'
     | '/terms'
     | '/__guest/auth'
     | '/categories/$id'
@@ -212,6 +224,7 @@ export interface RootRouteChildren {
   PrivacyRoute: typeof PrivacyRoute
   SavedRoute: typeof SavedRoute
   SearchRoute: typeof SearchRoute
+  SettingsRoute: typeof SettingsRoute
   TermsRoute: typeof TermsRoute
   CategoriesIdRoute: typeof CategoriesIdRoute
   ModelsIdRoute: typeof ModelsIdRoute
@@ -226,6 +239,13 @@ declare module '@tanstack/react-router' {
       path: '/terms'
       fullPath: '/terms'
       preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/search': {
@@ -350,6 +370,7 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacyRoute: PrivacyRoute,
   SavedRoute: SavedRoute,
   SearchRoute: SearchRoute,
+  SettingsRoute: SettingsRoute,
   TermsRoute: TermsRoute,
   CategoriesIdRoute: CategoriesIdRoute,
   ModelsIdRoute: ModelsIdRoute,
