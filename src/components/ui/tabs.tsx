@@ -37,10 +37,10 @@ function TabsList({
     <TabsPrimitive.List
       data-slot="tabs-list"
       className={cn(
-        'inline-flex w-fit items-center',
+        'inline-flex w-fit items-center rounded-full',
         // Default variant - contained pills
         variant === 'default' &&
-          'h-9 rounded-lg bg-muted p-[3px] text-muted-foreground justify-center',
+          'h-9 bg-muted p-[3px] text-muted-foreground justify-center',
         // Filter variant - transparent with gaps
         variant === 'filter' && 'gap-1 bg-transparent',
         // Underline variant - with bottom border
@@ -63,13 +63,13 @@ function TabsTrigger({
     <TabsPrimitive.Trigger
       data-slot="tabs-trigger"
       className={cn(
-        'cursor-pointer inline-flex items-center justify-center gap-1.5 text-sm font-medium whitespace-nowrap transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*="size-"])]:size-4',
+        'cursor-pointer rounded-full inline-flex items-center justify-center gap-1.5 text-sm font-medium whitespace-nowrap transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*="size-"])]:size-4',
         // Default variant
         variant === 'default' &&
-          'h-[calc(100%-1px)] flex-1 rounded-md border border-transparent px-2 py-1 data-[state=active]:bg-background data-[state=active]:shadow-sm dark:data-[state=active]:bg-input/30 dark:data-[state=active]:border-input text-foreground dark:text-muted-foreground dark:data-[state=active]:text-foreground',
+          'h-[calc(100%-1px)] flex-1 border border-transparent px-2 py-1 data-[state=active]:bg-background data-[state=active]:shadow-sm dark:data-[state=active]:bg-input/30 dark:data-[state=active]:border-input text-foreground dark:text-muted-foreground dark:data-[state=active]:text-foreground',
         // Filter variant - pill style tabs
         variant === 'filter' &&
-          'h-8 rounded-md border border-border bg-background px-3 text-muted-foreground hover:bg-muted hover:text-foreground data-[state=active]:bg-foreground data-[state=active]:text-background data-[state=active]:border-foreground',
+          'h-8 border border-border bg-background px-3 text-muted-foreground hover:bg-muted hover:text-foreground data-[state=active]:bg-foreground data-[state=active]:text-background data-[state=active]:border-foreground',
         // Underline variant
         variant === 'underline' &&
           'h-9 border-b-2 border-transparent px-1 pb-2 text-muted-foreground hover:text-foreground data-[state=active]:border-primary data-[state=active]:text-foreground',

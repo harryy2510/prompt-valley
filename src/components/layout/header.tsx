@@ -44,7 +44,7 @@ export function Header() {
         {/* Right side actions */}
         <div className="ml-auto flex items-center gap-2">
           <Button variant="nav-link" size="nav" asChild>
-            <Link to="/">Get PRO</Link>
+            <Link to="/pricing">Get PRO</Link>
           </Button>
 
           {user ? (

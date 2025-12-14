@@ -1,0 +1,64 @@
+import { createFileRoute } from '@tanstack/react-router'
+import { MainLayout } from '@/components/layout'
+import { PricingCard, PricingFaq } from '@/components/pricing'
+import {
+  useStripeProduct,
+  stripeProductQueryOptions,
+  useCreateCheckoutSession,
+} from '@/actions/stripe'
+import { LogoPro } from '@/components/layout/logo-pro'
+
+export const Route = createFileRoute('/pricing')({
+  loader: async ({ context }) => {
+    await context.queryClient.ensureQueryData(stripeProductQueryOptions())
+  },
+  component: PricingPage,
+})
+
+function PricingPage() {
+  const { data: product } = useStripeProduct()
+  const checkout = useCreateCheckoutSession()
+
+  const handleCheckout = (priceId: string) => {
+    checkout.mutate({
+      priceId,
+      couponId: product?.coupon?.id,
+    })
+  }
+
+  return (
+    <MainLayout>
+      <div className="container mx-auto py-16">
+        {/* Hero Section */}
+        <div className="grid items-center gap-12 lg:grid-cols-2">
+          {/* Left - Text */}
+          <div>
+            <div className="mb-4 inline-flex items-center gap-2">
+              <LogoPro className="size-16" />
+            </div>
+            <h1 className="text-4xl font-bold leading-tight sm:text-5xl">
+              One simple plan unlocks everything.
+            </h1>
+            <p className="mt-4 text-lg text-muted-foreground">
+              No bundles. No add-ons.
+            </p>
+          </div>
+
+          {/* Right - Pricing Card */}
+          <div className="flex justify-center lg:justify-end">
+            {product && (
+              <PricingCard
+                product={product}
+                onCheckout={handleCheckout}
+                isLoading={checkout.isPending}
+              />
+            )}
+          </div>
+        </div>
+
+        {/* FAQ Section */}
+        <PricingFaq />
+      </div>
+    </MainLayout>
+  )
+}
