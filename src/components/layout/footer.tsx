@@ -8,7 +8,6 @@ import { LogoWithText } from './logo-with-text'
 const leftLinks = [
   { label: 'Explore', href: '/' },
   { label: 'Pricing', href: '/pricing' },
-  { label: 'Blog', href: '/blog' },
 ]
 
 const rightLinks = [
