@@ -40,11 +40,16 @@ export const Route = createRootRouteWithContext<RouterContext>()({
     // Use React Query to fetch required data
     const [user] = await Promise.all([
       context.queryClient.ensureQueryData(userQueryOptions()),
-      context.queryClient.ensureQueryData(profileQueryOptions()),
       context.queryClient.ensureQueryData(categoriesQueryOptions()),
       context.queryClient.ensureQueryData(tagsQueryOptions()),
       context.queryClient.ensureQueryData(promptsQueryOptions()),
     ])
+
+    if (user) {
+      await context.queryClient.ensureQueryData(
+        profileQueryOptions({ userId: user.id }),
+      )
+    }
 
     return { user }
   },

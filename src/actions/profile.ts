@@ -7,6 +7,7 @@ import { createServerFn } from '@tanstack/react-start'
 import { getSupabaseServerClient } from '@/libs/supabase/server'
 import type { Tables } from '@/types/database.types'
 import { useUser } from '@/actions/auth'
+import { z } from 'zod'
 
 // ============================================
 // Types
@@ -18,15 +19,30 @@ export type Tier = 'free' | 'pro'
 export type UserRole = 'user' | 'admin'
 
 // ============================================
+// Zod Schemas
+// ============================================
+
+const profileInputSchema = z.object({
+  userId: z.uuid(),
+})
+
+export type ProfileInput = z.infer<typeof profileInputSchema>
+
+// ============================================
 // Server Functions
 // ============================================
 
-export const fetchProfile = createServerFn({ method: 'GET' }).handler(
-  async () => {
+export const fetchProfile = createServerFn({ method: 'GET' })
+  .inputValidator(profileInputSchema)
+  .handler(async ({ data: { userId } }) => {
     const supabase = getSupabaseServerClient()
 
     // RLS on users table filters to current user automatically
-    const { data, error } = await supabase.from('users').select('*').single()
+    const { data, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', userId)
+      .single()
 
     if (error) {
       // User might not have a profile yet (new user) or not authenticated
@@ -37,8 +53,7 @@ export const fetchProfile = createServerFn({ method: 'GET' }).handler(
     }
 
     return data as UserProfile
-  },
-)
+  })
 
 // ============================================
 // Query Keys
@@ -46,7 +61,8 @@ export const fetchProfile = createServerFn({ method: 'GET' }).handler(
 
 export const profileKeys = {
   all: ['profile'] as const,
-  current: () => [...profileKeys.all, 'current'] as const,
+  current: (input: ProfileInput) =>
+    [...profileKeys.all, 'current', input] as const,
 }
 
 // ============================================
@@ -54,11 +70,12 @@ export const profileKeys = {
 // ============================================
 
 export function profileQueryOptions(
+  input: ProfileInput,
   options?: Partial<UseQueryOptions<UserProfile | null>>,
 ) {
   return queryOptions({
-    queryKey: profileKeys.current(),
-    queryFn: () => fetchProfile(),
+    queryKey: profileKeys.current(input),
+    queryFn: () => fetchProfile({ data: input }),
     ...options,
   })
 }
@@ -72,7 +89,7 @@ export function useProfile(
 ) {
   const { data: user } = useUser()
   return useQuery({
-    ...profileQueryOptions(options),
+    ...profileQueryOptions({ userId: user?.id ?? '' }, options),
     enabled: options?.enabled && !!user?.id,
   })
 }

@@ -22,8 +22,6 @@ export type FavoriteWithPrompt = UserFavorite & {
   prompt: PromptWithRelations
 }
 
-export type FavoritesFilters = z.infer<typeof favoritesFiltersSchema>
-
 // ============================================
 // Zod Schemas
 // ============================================
@@ -42,7 +40,9 @@ const favoriteInputSchema = z.object({
   userId: z.uuid(),
 })
 
-type FavoriteInput = z.infer<typeof favoriteInputSchema>
+export type FavoriteInput = z.infer<typeof favoriteInputSchema>
+
+export type FavoritesFilters = z.infer<typeof favoritesFiltersSchema>
 
 // ============================================
 // Server Functions

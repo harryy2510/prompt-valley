@@ -16,8 +16,7 @@ import {
 } from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { useProfile } from '@/actions/profile'
-import { AuthGate, ProGate } from '@/components/common/gate'
+import { AuthGate, ProGate, useGate } from '@/components/common/gate'
 
 // ============================================
 // Explore Section Component
@@ -26,10 +25,10 @@ import { AuthGate, ProGate } from '@/components/common/gate'
 export function ExploreSection() {
   const [selectedModel, setSelectedModel] = useState<string>('all')
   const [activeTab, setActiveTab] = useState<string>('latest')
-  const { data: profile } = useProfile()
+  const { isPro } = useGate()
 
   const { data: prompts = [], isLoading } = usePrompts({
-    limit: profile?.tier === 'pro' ? 12 : 11,
+    limit: isPro ? 12 : 11,
     categoryId: activeTab !== 'latest' ? activeTab : undefined,
     modelId: selectedModel !== 'all' ? selectedModel : undefined,
   })
