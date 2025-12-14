@@ -1,6 +1,7 @@
-import { queryOptions, useQuery } from '@tanstack/react-query'
+import { queryOptions, useQuery, useMutation } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { getSupabaseServerClient } from '@/libs/supabase/server'
+import { supabaseInvoke } from '@/libs/supabase/client'
 import type { Tables } from '@/types/database.types'
 
 // ============================================
@@ -85,4 +86,33 @@ export function stripeProductQueryOptions() {
 
 export function useStripeProduct() {
   return useQuery(stripeProductQueryOptions())
+}
+
+// ============================================
+// Checkout Types
+// ============================================
+
+type CheckoutInput = {
+  priceId: string
+  couponId?: string
+}
+
+// ============================================
+// Checkout Hook (calls Edge Function)
+// ============================================
+
+export function useCreateCheckoutSession() {
+  return useMutation({
+    mutationFn: async (input: CheckoutInput) => {
+      return supabaseInvoke<{ url: string }>('create-checkout-session', {
+        priceId: input.priceId,
+        couponId: input.couponId,
+      })
+    },
+    onSuccess: (result) => {
+      if (result?.url) {
+        window.location.href = result.url
+      }
+    },
+  })
 }

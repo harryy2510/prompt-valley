@@ -14,8 +14,6 @@ export const Route = createFileRoute('/pricing')({
 function PricingPage() {
   const { data: product } = useStripeProduct()
 
-  const handleCheckout = (priceId: string) => {}
-
   return (
     <MainLayout>
       <div className="container mx-auto py-16">
@@ -36,13 +34,7 @@ function PricingPage() {
 
           {/* Right - Pricing Card */}
           <div className="flex justify-center lg:justify-end">
-            {product && (
-              <PricingCard
-                product={product}
-                onCheckout={handleCheckout}
-                // isLoading={checkout.isPending}
-              />
-            )}
+            {product && <PricingCard product={product} />}
           </div>
         </div>
 

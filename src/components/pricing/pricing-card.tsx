@@ -3,7 +3,10 @@ import { Sparkle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { cn } from '@/libs/cn'
-import type { StripeProductWithPricesAndCoupon } from '@/actions/stripe'
+import {
+  StripeProductWithPricesAndCoupon,
+  useCreateCheckoutSession,
+} from '@/actions/stripe'
 
 // ============================================
 // Types
@@ -13,8 +16,6 @@ type BillingInterval = 'month' | 'year'
 
 type PricingCardProps = {
   product: StripeProductWithPricesAndCoupon
-  onCheckout?: (priceId: string) => void
-  isLoading?: boolean
   className?: string
 }
 
@@ -47,12 +48,8 @@ function getYearlySavingsPercent(
 // Pricing Card Component
 // ============================================
 
-export function PricingCard({
-  product,
-  onCheckout,
-  isLoading,
-  className,
-}: PricingCardProps) {
+export function PricingCard({ product, className }: PricingCardProps) {
+  const checkout = useCreateCheckoutSession()
   const [billingInterval, setBillingInterval] =
     useState<BillingInterval>('year')
 
@@ -92,11 +89,8 @@ export function PricingCard({
   )
   const hasDiscount = coupon && discountedPerMonth < perMonthAmount
 
-  // Handle checkout
   const handleCheckout = () => {
-    if (onCheckout) {
-      onCheckout(currentPrice.id)
-    }
+    checkout.mutate({ priceId: currentPrice.id, couponId: coupon?.id })
   }
 
   return (
@@ -160,10 +154,10 @@ export function PricingCard({
         <Button
           size="lg"
           className="w-full"
+          disabled={checkout.isPending}
           onClick={handleCheckout}
-          disabled={isLoading}
         >
-          {isLoading ? 'Loading...' : 'Get PRO'}
+          {checkout.isPending ? 'Loading...' : 'Get PRO'}
         </Button>
 
         {/* Subscription Info */}

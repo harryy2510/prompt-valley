@@ -28,3 +28,20 @@ export function getSupabaseBrowserClient() {
 
   return browserClient
 }
+
+export async function supabaseInvoke<
+  TRow extends Record<string, unknown> = Record<string, unknown>,
+  TBody extends Record<string, unknown> = Record<string, unknown>,
+>(functionName: string, body: TBody): Promise<null | TRow> {
+  const response = await getSupabaseBrowserClient().functions.invoke<TRow>(
+    functionName,
+    { body },
+  )
+  if (response.error) {
+    const errorResponse = await response.response?.json()
+    // @ts-ignore
+    const errorMessage = errorResponse?.error ?? response.error.message
+    throw new Error(errorMessage)
+  }
+  return response.data
+}

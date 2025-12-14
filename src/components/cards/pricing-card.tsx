@@ -88,8 +88,7 @@ function PricingCard({
   const [period, setPeriod] = useState<PricingPeriod>(defaultPeriod)
 
   const prices = extractPrices(product.prices)
-  // Note: After running migration, regenerate types to get marketing_features
-  const features = featuresProp ?? (product as StripeProduct & { marketing_features?: string[] }).marketing_features ?? product.features ?? []
+  const features = featuresProp ?? product.marketing_features ?? []
 
   // Get current price based on period
   const currentPriceInfo = period === 'yearly' ? prices.yearly : prices.monthly
