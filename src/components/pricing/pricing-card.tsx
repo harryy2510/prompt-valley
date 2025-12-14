@@ -120,7 +120,7 @@ export function PricingCard({
       <div className="rounded-xl border bg-background p-6">
         {/* Limited Offer Badge */}
         {coupon && (
-          <div className="mb-4 inline-flex items-center gap-1.5 rounded-md bg-primary/10 px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-primary">
+          <div className="mb-4 inline-flex items-center gap-1.5 rounded-full bg-secondary-200 px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-foreground">
             {coupon.name}
           </div>
         )}

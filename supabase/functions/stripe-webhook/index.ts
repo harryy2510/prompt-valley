@@ -32,6 +32,36 @@ const eventHandlers: Record<string, string> = {
   'promotion_code.updated': 'handle_stripe_promotion_code_webhook',
 }
 
+// Helper to enrich coupon data with full details from Stripe API
+async function enrichCouponEvent(event: Stripe.Event): Promise<Stripe.Event> {
+  if (!event.type.startsWith('coupon.') || event.type === 'coupon.deleted') {
+    return event
+  }
+
+  const couponFromWebhook = event.data.object as Stripe.Coupon
+  console.log('Fetching full coupon details for:', couponFromWebhook.id)
+
+  try {
+    // Fetch full coupon details from Stripe API with applies_to expanded
+    const fullCoupon = await stripe.coupons.retrieve(couponFromWebhook.id, {
+      expand: ['applies_to'],
+    })
+    console.log('Full coupon data:', JSON.stringify(fullCoupon))
+
+    // Replace webhook data with full API response
+    return {
+      ...event,
+      data: {
+        ...event.data,
+        object: fullCoupon,
+      },
+    }
+  } catch (err) {
+    console.error('Failed to fetch coupon details:', err)
+    return event
+  }
+}
+
 serve(async (req) => {
   const signature = req.headers.get('stripe-signature')
 
@@ -43,7 +73,7 @@ serve(async (req) => {
     const body = await req.text()
 
     // Verify the webhook signature (use async version for Deno)
-    const event = await stripe.webhooks.constructEventAsync(
+    let event = await stripe.webhooks.constructEventAsync(
       body,
       signature,
       webhookSecret,
@@ -55,6 +85,11 @@ serve(async (req) => {
     const handlerFunction = eventHandlers[event.type]
 
     if (handlerFunction) {
+      // For coupon events, fetch full details from API
+      if (event.type.startsWith('coupon.')) {
+        event = await enrichCouponEvent(event)
+      }
+
       const supabaseAdmin = createClient(
         Deno.env.get('SUPABASE_URL') ?? '',
         Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',

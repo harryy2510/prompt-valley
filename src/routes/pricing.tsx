@@ -1,11 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { MainLayout } from '@/components/layout'
 import { PricingCard, PricingFaq } from '@/components/pricing'
-import {
-  useStripeProduct,
-  stripeProductQueryOptions,
-  useCreateCheckoutSession,
-} from '@/actions/stripe'
+import { useStripeProduct, stripeProductQueryOptions } from '@/actions/stripe'
 import { LogoPro } from '@/components/layout/logo-pro'
 
 export const Route = createFileRoute('/pricing')({
@@ -17,14 +13,8 @@ export const Route = createFileRoute('/pricing')({
 
 function PricingPage() {
   const { data: product } = useStripeProduct()
-  const checkout = useCreateCheckoutSession()
 
-  const handleCheckout = (priceId: string) => {
-    checkout.mutate({
-      priceId,
-      couponId: product?.coupon?.id,
-    })
-  }
+  const handleCheckout = (priceId: string) => {}
 
   return (
     <MainLayout>
@@ -50,7 +40,7 @@ function PricingPage() {
               <PricingCard
                 product={product}
                 onCheckout={handleCheckout}
-                isLoading={checkout.isPending}
+                // isLoading={checkout.isPending}
               />
             )}
           </div>
