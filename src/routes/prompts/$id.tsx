@@ -375,7 +375,7 @@ function PromptContent({
           Join PromptValley Pro to access this prompt along with hundreds of
           expert-crafted templates that deliver better AI results.
         </p>
-        <Button variant="outline" size="xl" onClick={showBuyDialog}>
+        <Button variant="outline" size="xl" onClick={() => showBuyDialog('prompt_detail')}>
           <span>
             Get <span className="font-bold">PRO</span>
           </span>

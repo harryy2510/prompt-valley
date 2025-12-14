@@ -1,4 +1,5 @@
 import { createStore } from 'zustand-x'
+import { trackUpgradeModalOpened } from '@/libs/posthog'
 
 export const appStore = createStore(
   {
@@ -15,6 +16,7 @@ export function showSignInDialog() {
   appStore.set('signInDialog', true)
 }
 
-export function showBuyDialog() {
+export function showBuyDialog(source = 'unknown') {
+  trackUpgradeModalOpened(source)
   appStore.set('buyDialog', true)
 }

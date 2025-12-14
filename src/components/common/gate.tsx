@@ -101,7 +101,7 @@ export function DefaultUnauthorizedFallback({
 }) {
   if (mode === 'dialog') {
     return (
-      <Button onClick={showBuyDialog} variant="gradient" size="cta">
+      <Button onClick={() => showBuyDialog('gate')} variant="gradient" size="cta">
         <span>
           Get <span className="font-bold">PRO</span>
         </span>
