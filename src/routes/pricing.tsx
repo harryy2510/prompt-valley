@@ -1,5 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { useEffect, useRef } from 'react'
+
 import { MainLayout } from '@/components/layout'
+import { trackPricingViewed } from '@/libs/posthog'
 import { PricingCard, PricingFaq } from '@/components/pricing'
 import { useStripeProduct, stripeProductQueryOptions } from '@/actions/stripe'
 import { LogoPro } from '@/components/layout/logo-pro'
@@ -13,6 +16,15 @@ export const Route = createFileRoute('/pricing')({
 
 function PricingPage() {
   const { data: product } = useStripeProduct()
+
+  // Track pricing page view (only once)
+  const hasTracked = useRef(false)
+  useEffect(() => {
+    if (!hasTracked.current) {
+      trackPricingViewed()
+      hasTracked.current = true
+    }
+  }, [])
 
   return (
     <MainLayout>

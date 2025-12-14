@@ -28,6 +28,7 @@ import {
   contactFormSchema,
   type ContactFormInput,
 } from '@/actions/contact'
+import { trackContactFormSubmitted } from '@/libs/posthog'
 
 export const Route = createFileRoute('/contact')({
   component: ContactPage,
@@ -50,6 +51,7 @@ function ContactPage() {
   const handleSubmit = async (data: ContactFormInput) => {
     try {
       await sendEmail.mutateAsync(data)
+      trackContactFormSubmitted()
       setIsSuccess(true)
       form.reset()
     } catch {

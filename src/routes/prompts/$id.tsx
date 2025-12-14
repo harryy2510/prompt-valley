@@ -30,6 +30,7 @@ import { cn } from '@/libs/cn'
 import { compact, uniqBy } from 'lodash-es'
 import { toast } from 'sonner'
 import { Image } from '@/components/common/image'
+import { trackPromptViewed, trackPromptCopied } from '@/libs/posthog'
 
 export const Route = createFileRoute('/prompts/$id')({
   loader: async ({ context, params }) => {
@@ -70,11 +71,12 @@ function PromptDetailPage() {
 
   // Track view on mount (only once per session)
   useEffect(() => {
-    if (id) {
+    if (id && prompt) {
       incrementViews.mutate(id)
+      trackPromptViewed(id, prompt.title, prompt.tier)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id])
+  }, [id, prompt?.id])
 
   if (!prompt) return null
 
@@ -104,6 +106,7 @@ function PromptDetailPage() {
     if (!prompt.content) return
     await navigator.clipboard.writeText(prompt.content)
     incrementCopies.mutate(id)
+    trackPromptCopied(id, prompt.title, prompt.tier)
     toast.success('Prompt copied to clipboard!')
   }
 

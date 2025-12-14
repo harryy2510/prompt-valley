@@ -1,7 +1,9 @@
 import { createFileRoute, Link, notFound } from '@tanstack/react-router'
 import { z } from 'zod'
+import { useEffect, useRef } from 'react'
 
 import { MainLayout } from '@/components/layout'
+import { trackModelViewed } from '@/libs/posthog'
 import { NotFound } from '@/components/error/not-found'
 import { PromptCard, PromptCardSkeleton } from '@/components/cards/prompt-card'
 import { RouterPagination } from '@/components/common/router-pagination'
@@ -80,6 +82,20 @@ function ModelPage() {
   const { data: totalCount } = usePromptsCount({ modelId: id })
 
   const totalPages = Math.ceil((totalCount ?? 0) / ITEMS_PER_PAGE)
+
+  // Track model view
+  const hasTracked = useRef(false)
+  useEffect(() => {
+    if (model && !hasTracked.current) {
+      trackModelViewed(model.id, model.name)
+      hasTracked.current = true
+    }
+  }, [model])
+
+  // Reset tracking when model changes
+  useEffect(() => {
+    hasTracked.current = false
+  }, [id])
 
   if (!model) return null
 

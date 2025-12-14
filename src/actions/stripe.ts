@@ -3,6 +3,7 @@ import { createServerFn } from '@tanstack/react-start'
 import { getSupabaseServerClient } from '@/libs/supabase/server'
 import { supabaseInvoke } from '@/libs/supabase/client'
 import type { Tables } from '@/types/database.types'
+import { trackCheckoutStarted } from '@/libs/posthog'
 
 // ============================================
 // Types
@@ -104,6 +105,7 @@ type CheckoutInput = {
 export function useCreateCheckoutSession() {
   return useMutation({
     mutationFn: async (input: CheckoutInput) => {
+      trackCheckoutStarted(input.priceId)
       return supabaseInvoke<{ url: string }>('create-checkout-session', {
         priceId: input.priceId,
         couponId: input.couponId,

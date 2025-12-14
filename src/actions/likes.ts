@@ -11,6 +11,7 @@ import type { Tables } from '@/types/database.types'
 import { promptKeys, type PromptWithRelations } from './prompts'
 import { useUser } from '@/actions/auth'
 import { z } from 'zod'
+import { trackPromptLiked, trackPromptUnliked } from '@/libs/posthog'
 
 // ============================================
 // Types
@@ -249,6 +250,7 @@ export function useAddLike() {
       return addLike({ data: { promptId, userId: user.id } })
     },
     onSuccess: async (_, promptId) => {
+      trackPromptLiked(promptId)
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: likeKeys.all }),
         queryClient.invalidateQueries({
@@ -269,6 +271,7 @@ export function useRemoveLike() {
       return removeLike({ data: { promptId, userId: user.id } })
     },
     onSuccess: async (_, promptId) => {
+      trackPromptUnliked(promptId)
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: likeKeys.all }),
         queryClient.invalidateQueries({

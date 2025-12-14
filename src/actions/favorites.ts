@@ -11,6 +11,7 @@ import type { Tables } from '@/types/database.types'
 import { promptKeys, type PromptWithRelations } from './prompts'
 import { useUser } from '@/actions/auth'
 import { z } from 'zod'
+import { trackPromptSaved, trackPromptUnsaved } from '@/libs/posthog'
 
 // ============================================
 // Types
@@ -252,6 +253,7 @@ export function useAddFavorite() {
       return addFavorite({ data: { promptId, userId: user.id } })
     },
     onSuccess: async (_, promptId) => {
+      trackPromptSaved(promptId)
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: favoriteKeys.all }),
         queryClient.invalidateQueries({
@@ -272,6 +274,7 @@ export function useRemoveFavorite() {
       return removeFavorite({ data: { promptId, userId: user.id } })
     },
     onSuccess: async (_, promptId) => {
+      trackPromptUnsaved(promptId)
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: favoriteKeys.all }),
         queryClient.invalidateQueries({

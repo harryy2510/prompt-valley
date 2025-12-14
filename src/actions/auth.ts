@@ -9,6 +9,13 @@ import { getSupabaseServerClient } from '@/libs/supabase/server'
 import { getSupabaseBrowserClient } from '@/libs/supabase/client'
 import { useEffect } from 'react'
 import { z } from 'zod'
+import {
+  identifyUser,
+  resetUser,
+  trackSignInStarted,
+  trackSignInCompleted,
+  trackSignOut,
+} from '@/libs/posthog'
 
 // ============================================
 // Zod Schemas
@@ -124,6 +131,10 @@ export function useSignOut() {
   return useMutation({
     mutationFn: signOutServer,
     onSuccess: async () => {
+      // Track sign out event and reset PostHog user
+      trackSignOut()
+      resetUser()
+
       // Clear the user from cache
       queryClient.setQueryData(authKeys.user(), null)
       // Invalidate all queries that depend on auth
@@ -135,6 +146,9 @@ export function useSignOut() {
 export function useSendOtp() {
   return useMutation({
     mutationFn: (data: SendOtpInput) => sendOtpServer({ data }),
+    onMutate: () => {
+      trackSignInStarted('email')
+    },
   })
 }
 
@@ -146,6 +160,12 @@ export function useVerifyOtp() {
     onSuccess: (result) => {
       if (result.success && result.user) {
         queryClient.setQueryData(authKeys.user(), result.user)
+
+        // Identify user in PostHog and track sign in
+        identifyUser(result.user.id, {
+          email: result.user.email,
+        })
+        trackSignInCompleted('email')
       }
     },
   })
@@ -170,8 +190,17 @@ export function useAuthStateListener() {
 
         if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
           queryClient.setQueryData(authKeys.user(), session?.user ?? null)
+
+          // Identify user in PostHog on auth state change
+          if (session?.user) {
+            identifyUser(session.user.id, {
+              email: session.user.email,
+            })
+          }
         } else if (event === 'SIGNED_OUT') {
           queryClient.setQueryData(authKeys.user(), null)
+          // Reset PostHog user on sign out
+          resetUser()
           // Invalidate all queries to refetch with new auth state
           void queryClient.invalidateQueries()
         }

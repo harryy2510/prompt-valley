@@ -1,8 +1,9 @@
+packages:
+  - .
+
 onlyBuiltDependencies:
+  - core-js
   - esbuild
   - msw
   - supabase
   - workerd
-
-packages:
-  - .

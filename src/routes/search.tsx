@@ -1,8 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { z } from 'zod'
 import { Search } from 'lucide-react'
+import { useEffect, useRef } from 'react'
 
 import { MainLayout } from '@/components/layout'
+import { trackSearch } from '@/libs/posthog'
 import { PromptCard, PromptCardSkeleton } from '@/components/cards/prompt-card'
 import { RouterPagination } from '@/components/common/router-pagination'
 import {
@@ -57,6 +59,7 @@ export const Route = createFileRoute('/search')({
 
 function SearchPage() {
   const { q, page } = Route.useSearch()
+  const hasTracked = useRef(false)
 
   const { data: prompts = [], isLoading } = usePrompts(
     { search: q, limit: ITEMS_PER_PAGE, offset: (page - 1) * ITEMS_PER_PAGE },
@@ -68,6 +71,19 @@ function SearchPage() {
   )
 
   const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE)
+
+  // Track search when results load
+  useEffect(() => {
+    if (q && !isLoading && !hasTracked.current) {
+      trackSearch(q, totalCount)
+      hasTracked.current = true
+    }
+  }, [q, isLoading, totalCount])
+
+  // Reset tracking when query changes
+  useEffect(() => {
+    hasTracked.current = false
+  }, [q])
 
   // Empty state - no query
   if (!q) {

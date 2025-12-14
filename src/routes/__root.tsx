@@ -24,6 +24,7 @@ import { profileQueryOptions } from '@/actions/profile'
 import { Toaster } from '@/components/ui/sonner'
 import { NotFound } from '@/components/error/not-found'
 import { DefaultCatchBoundary } from '@/components/error/default-catch-boundary'
+import { initPostHog } from '@/libs/posthog'
 
 // ============================================
 // Router Context Type
@@ -120,6 +121,12 @@ export const Route = createRootRouteWithContext<RouterContext>()({
 
 function RootDocument({ children }: PropsWithChildren) {
   useAuthStateListener()
+
+  // Initialize PostHog on client
+  if (typeof window !== 'undefined') {
+    initPostHog()
+  }
+
   return (
     <html lang="en" className="light">
       <head>
