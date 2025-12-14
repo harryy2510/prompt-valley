@@ -22,6 +22,8 @@ import { SignInDialog } from '@/components/auth'
 import { BuyModal } from '@/components/pricing'
 import { profileQueryOptions } from '@/actions/profile'
 import { Toaster } from '@/components/ui/sonner'
+import { NotFound } from '@/components/error/not-found'
+import { DefaultCatchBoundary } from '@/components/error/default-catch-boundary'
 
 // ============================================
 // Router Context Type
@@ -37,6 +39,8 @@ export interface RouterContext {
 // ============================================
 
 export const Route = createRootRouteWithContext<RouterContext>()({
+  errorComponent: DefaultCatchBoundary,
+  notFoundComponent: NotFound,
   beforeLoad: async ({ context }) => {
     // Use React Query to fetch required data
     const [user] = await Promise.all([

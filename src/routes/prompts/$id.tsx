@@ -3,6 +3,7 @@ import { Heart, Bookmark, Copy, ExternalLink, LucideLock } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 import { MainLayout } from '@/components/layout'
+import { NotFound } from '@/components/error/not-found'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import {
@@ -41,17 +42,9 @@ export const Route = createFileRoute('/prompts/$id')({
     }
   },
   notFoundComponent: () => (
-    <MainLayout>
-      <div className="container mx-auto py-16 text-center">
-        <h1 className="text-2xl font-bold">Prompt not found</h1>
-        <p className="mt-2 text-muted-foreground">
-          The prompt you're looking for doesn't exist or has been removed.
-        </p>
-        <Button asChild className="mt-4">
-          <Link to="/">Go back home</Link>
-        </Button>
-      </div>
-    </MainLayout>
+    <NotFound>
+      <p>The prompt you're looking for doesn't exist or has been removed.</p>
+    </NotFound>
   ),
   component: PromptDetailPage,
 })

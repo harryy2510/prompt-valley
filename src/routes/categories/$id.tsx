@@ -2,6 +2,7 @@ import { createFileRoute, Link, notFound } from '@tanstack/react-router'
 import { z } from 'zod'
 
 import { MainLayout } from '@/components/layout'
+import { NotFound } from '@/components/error/not-found'
 import { PromptCard, PromptCardSkeleton } from '@/components/cards/prompt-card'
 import { RouterPagination } from '@/components/common/router-pagination'
 import { Badge } from '@/components/ui/badge'
@@ -59,14 +60,9 @@ export const Route = createFileRoute('/categories/$id')({
     }
   },
   notFoundComponent: () => (
-    <MainLayout>
-      <div className="container mx-auto py-16 text-center">
-        <h1 className="text-2xl font-bold">Category not found</h1>
-        <p className="mt-2 text-muted-foreground">
-          The category you're looking for doesn't exist.
-        </p>
-      </div>
-    </MainLayout>
+    <NotFound>
+      <p>The category you're looking for doesn't exist.</p>
+    </NotFound>
   ),
   component: CategoryPage,
 })

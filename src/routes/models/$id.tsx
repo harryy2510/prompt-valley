@@ -2,6 +2,7 @@ import { createFileRoute, Link, notFound } from '@tanstack/react-router'
 import { z } from 'zod'
 
 import { MainLayout } from '@/components/layout'
+import { NotFound } from '@/components/error/not-found'
 import { PromptCard, PromptCardSkeleton } from '@/components/cards/prompt-card'
 import { RouterPagination } from '@/components/common/router-pagination'
 import { modelQueryOptions, useModel } from '@/actions/models'
@@ -52,14 +53,9 @@ export const Route = createFileRoute('/models/$id')({
     }
   },
   notFoundComponent: () => (
-    <MainLayout>
-      <div className="container mx-auto py-16 text-center">
-        <h1 className="text-2xl font-bold">Model not found</h1>
-        <p className="mt-2 text-muted-foreground">
-          The AI model you're looking for doesn't exist.
-        </p>
-      </div>
-    </MainLayout>
+    <NotFound>
+      <p>The AI model you're looking for doesn't exist.</p>
+    </NotFound>
   ),
   component: ModelPage,
 })
