@@ -89,7 +89,7 @@ function SearchPage() {
   if (!q) {
     return (
       <MainLayout>
-        <div className="container mx-auto py-16 text-center">
+        <div className="container mx-auto px-4 py-16 text-center">
           <Search className="mx-auto size-12 text-muted-foreground/50" />
           <h1 className="mt-4 text-2xl font-bold">Search Prompts</h1>
           <p className="mt-2 text-muted-foreground">
@@ -102,7 +102,7 @@ function SearchPage() {
 
   return (
     <MainLayout>
-      <div className="container mx-auto py-8">
+      <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center gap-3">

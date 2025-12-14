@@ -12,6 +12,7 @@ import {
   Flag,
   HelpCircle,
   LogOut,
+  Heart,
 } from 'lucide-react'
 import { useDebounceCallback } from 'usehooks-ts'
 
@@ -47,7 +48,7 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
-      <div className="container mx-auto px-2 flex h-14 items-center gap-4">
+      <div className="container mx-auto px-4 flex h-14 items-center gap-4">
         {/* Logo */}
         <Link to="/" className="shrink-0">
           <LogoWithText className="h-6 w-20" />
@@ -241,6 +242,12 @@ function UserMenu() {
             <Link to="/saved">
               <Bookmark className="size-4" />
               Saved Prompts
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link to="/liked">
+              <Heart className="size-4" />
+              Liked Prompts
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>

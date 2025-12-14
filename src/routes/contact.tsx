@@ -62,7 +62,7 @@ function ContactPage() {
   if (isSuccess) {
     return (
       <MainLayout>
-        <div className="container mx-auto py-16">
+        <div className="container mx-auto px-4 py-16">
           <div className="mx-auto max-w-lg text-center">
             <div className="mx-auto flex size-16 items-center justify-center rounded-full bg-green-100">
               <CheckCircle className="size-8 text-green-600" />
@@ -90,7 +90,7 @@ function ContactPage() {
 
   return (
     <MainLayout>
-      <div className="container mx-auto py-16">
+      <div className="container mx-auto px-4 py-16">
         <div className="mx-auto max-w-xl">
           <Card>
             <CardHeader className="text-center">

@@ -36,7 +36,7 @@ export function CtaSection() {
             src={bgImage}
             className="absolute top-[50%] translate-y-[-50%] left-0 max-w-40 hidden sm:block"
           />
-          <div className="container mx-auto max-w-[320px] text-center py-20">
+          <div className="container mx-auto max-w-[320px] text-center py-20 px-4">
             {/* Heading */}
             <h4 className="text-xl font-bold lg:text-2xl">
               Sign up for free and elevate your vision

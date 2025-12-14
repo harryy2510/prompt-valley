@@ -20,7 +20,7 @@ function HomePage() {
     <>
       <MainLayout>
         <HeroSection />
-        <div className="container mx-auto px-2">
+        <div className="container mx-auto px-4">
           <ExploreSection />
           <RolesSection />
           <CategoriesSection />

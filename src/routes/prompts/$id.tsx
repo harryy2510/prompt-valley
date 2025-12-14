@@ -128,7 +128,7 @@ function PromptDetailPage() {
 
   return (
     <MainLayout>
-      <div className="container mx-auto py-8">
+      <div className="container mx-auto px-4 py-8">
         {/* Title row */}
         <div className="mb-6 flex items-start justify-between">
           <h1 className="text-3xl font-bold">{prompt.title}</h1>

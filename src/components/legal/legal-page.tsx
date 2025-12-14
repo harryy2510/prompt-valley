@@ -32,7 +32,7 @@ export function LegalPage({
 }: LegalPageProps) {
   return (
     <MainLayout>
-      <div className="container mx-auto py-16">
+      <div className="container mx-auto px-4 py-16">
         <div className="mx-auto max-w-2xl">
           {/* Title */}
           <h1 className="text-4xl font-bold">{title}</h1>

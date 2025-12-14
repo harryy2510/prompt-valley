@@ -101,7 +101,7 @@ function ModelPage() {
 
   return (
     <MainLayout>
-      <div className="container mx-auto py-8">
+      <div className="container mx-auto px-4 py-8">
         {/* Breadcrumb */}
         <div className="mb-6 flex items-center gap-2 text-sm text-muted-foreground">
           <Link to="/" className="hover:text-foreground">

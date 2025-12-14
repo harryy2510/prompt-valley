@@ -28,7 +28,7 @@ function PricingPage() {
 
   return (
     <MainLayout>
-      <div className="container mx-auto py-16 bg-linear-to-b from-primary-50 to-transparent">
+      <div className="container mx-auto px-4 py-16 bg-linear-to-b from-primary-50 to-transparent">
         {/* Hero Section */}
         <div className="grid items-center gap-12 lg:grid-cols-2">
           {/* Left - Text */}
