@@ -23,8 +23,7 @@ export function ThemeToggle() {
   )
 
   useEffect(() => {
-    // TODO: Only light theme for now
-    // applyTheme(theme)
+    applyTheme(theme)
   }, [theme])
 
   const toggleTheme = () => {

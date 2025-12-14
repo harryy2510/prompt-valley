@@ -1,15 +1,17 @@
-import { Link, useNavigate } from '@tanstack/react-router'
-import { Search, Heart, Bookmark, LogOut, User } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { Link, useNavigate, useSearch, useLocation } from '@tanstack/react-router'
+import { Heart, Bookmark, LogOut, User } from 'lucide-react'
+import { useDebounceCallback } from 'usehooks-ts'
 
 import { useCategories, type Category } from '@/actions/categories'
 import { useProfile } from '@/actions/profile'
 import { useSignOut } from '@/actions/auth'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { LogoWithText } from './logo-with-text'
 import { NavMegaMenu, type MegaMenuSection } from './mega-menu'
 import { AuthGate, ProGate } from '@/components/common/gate'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
+import { SearchInput } from '@/components/common/search-input'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -39,14 +41,7 @@ export function Header() {
         </Link>
 
         {/* Search */}
-        <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            type="search"
-            placeholder="Search"
-            className="pl-9 bg-muted/50 border-transparent focus-visible:bg-background"
-          />
-        </div>
+        <HeaderSearch />
 
         {/* Navigation */}
         <NavMegaMenu items={navItems} className="hidden md:flex" />
@@ -71,6 +66,71 @@ export function Header() {
         </div>
       </div>
     </header>
+  )
+}
+
+// ============================================
+// Header Search Component
+// ============================================
+
+function HeaderSearch() {
+  const navigate = useNavigate()
+  const location = useLocation()
+
+  // Get current search query from URL if on search page
+  const searchParams = useSearch({ strict: false }) as { q?: string } | undefined
+  const currentQuery = location.pathname === '/search' ? (searchParams?.q ?? '') : ''
+
+  const [value, setValue] = useState(currentQuery)
+
+  // Sync input value when URL changes (e.g., navigating back)
+  useEffect(() => {
+    if (location.pathname === '/search') {
+      setValue(searchParams?.q ?? '')
+    } else {
+      setValue('')
+    }
+  }, [location.pathname, searchParams?.q])
+
+  // Debounced navigation to search page
+  const debouncedNavigate = useDebounceCallback((query: string) => {
+    if (query.trim()) {
+      navigate({ to: '/search', search: { q: query.trim(), page: 1 } })
+    } else if (location.pathname === '/search') {
+      navigate({ to: '/' })
+    }
+  }, 300)
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value
+    setValue(newValue)
+    debouncedNavigate(newValue)
+  }
+
+  const handleClear = () => {
+    setValue('')
+    if (location.pathname === '/search') {
+      navigate({ to: '/' })
+    }
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && value.trim()) {
+      // Immediately navigate on Enter
+      navigate({ to: '/search', search: { q: value.trim(), page: 1 } })
+    }
+  }
+
+  return (
+    <div className="flex-1 max-w-sm">
+      <SearchInput
+        placeholder="Search prompts..."
+        value={value}
+        onChange={handleChange}
+        onClear={handleClear}
+        onKeyDown={handleKeyDown}
+      />
+    </div>
   )
 }
 
