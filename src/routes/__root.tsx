@@ -45,7 +45,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
       context.queryClient.ensureQueryData(promptsQueryOptions()),
     ])
 
-    if (user) {
+    if (user?.id) {
       await context.queryClient.ensureQueryData(
         profileQueryOptions({ userId: user.id }),
       )

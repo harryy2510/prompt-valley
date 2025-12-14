@@ -88,9 +88,10 @@ export function useProfile(
   options?: Partial<UseQueryOptions<UserProfile | null>>,
 ) {
   const { data: user } = useUser()
+  const userId = user?.id ?? ''
   return useQuery({
-    ...profileQueryOptions({ userId: user?.id ?? '' }, options),
-    enabled: options?.enabled && !!user?.id,
+    ...profileQueryOptions({ userId }, options),
+    enabled: !!userId && options?.enabled,
   })
 }
 
