@@ -36,6 +36,21 @@ const modelsFiltersSchema = z
 // Server Functions
 // ============================================
 
+export const fetchModel = createServerFn({ method: 'GET' })
+  .inputValidator(z.string())
+  .handler(async ({ data: id }) => {
+    const supabase = getSupabaseServerClient()
+
+    const { data, error } = await supabase
+      .from('ai_models')
+      .select('*, provider:ai_providers(*)')
+      .eq('id', id)
+      .single()
+
+    if (error) throw error
+    return data as AIModel
+  })
+
 export const fetchModels = createServerFn({ method: 'GET' })
   .inputValidator(modelsFiltersSchema)
   .handler(async ({ data: filters }) => {
@@ -74,11 +89,24 @@ export const modelKeys = {
   all: ['models'] as const,
   lists: () => [...modelKeys.all, 'list'] as const,
   list: (filters?: ModelsFilters) => [...modelKeys.lists(), filters] as const,
+  details: () => [...modelKeys.all, 'detail'] as const,
+  detail: (id: string) => [...modelKeys.details(), id] as const,
 }
 
 // ============================================
 // Query Options (for loaders)
 // ============================================
+
+export function modelQueryOptions(
+  id: string,
+  options?: Partial<UseQueryOptions<AIModel>>,
+) {
+  return queryOptions({
+    queryKey: modelKeys.detail(id),
+    queryFn: () => fetchModel({ data: id }),
+    ...options,
+  })
+}
 
 export function modelsQueryOptions(
   filters?: ModelsFilters,
@@ -94,6 +122,13 @@ export function modelsQueryOptions(
 // ============================================
 // Hooks
 // ============================================
+
+export function useModel(
+  id: string,
+  options?: Partial<UseQueryOptions<AIModel>>,
+) {
+  return useQuery(modelQueryOptions(id, options))
+}
 
 export function useModels(
   filters?: ModelsFilters,

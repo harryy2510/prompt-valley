@@ -17,6 +17,7 @@ import { Route as _authedRouteImport } from './routes/__authed'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TagsIdRouteImport } from './routes/tags/$id'
 import { Route as PromptsIdRouteImport } from './routes/prompts/$id'
+import { Route as ModelsIdRouteImport } from './routes/models/$id'
 import { Route as CategoriesIdRouteImport } from './routes/categories/$id'
 import { Route as _guestAuthRouteImport } from './routes/__guest/auth'
 import { Route as _authedDashboardRouteImport } from './routes/__authed/dashboard'
@@ -59,6 +60,11 @@ const PromptsIdRoute = PromptsIdRouteImport.update({
   path: '/prompts/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ModelsIdRoute = ModelsIdRouteImport.update({
+  id: '/models/$id',
+  path: '/models/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CategoriesIdRoute = CategoriesIdRouteImport.update({
   id: '/categories/$id',
   path: '/categories/$id',
@@ -83,6 +89,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof _authedDashboardRoute
   '/auth': typeof _guestAuthRoute
   '/categories/$id': typeof CategoriesIdRoute
+  '/models/$id': typeof ModelsIdRoute
   '/prompts/$id': typeof PromptsIdRoute
   '/tags/$id': typeof TagsIdRoute
 }
@@ -94,6 +101,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof _authedDashboardRoute
   '/auth': typeof _guestAuthRoute
   '/categories/$id': typeof CategoriesIdRoute
+  '/models/$id': typeof ModelsIdRoute
   '/prompts/$id': typeof PromptsIdRoute
   '/tags/$id': typeof TagsIdRoute
 }
@@ -108,6 +116,7 @@ export interface FileRoutesById {
   '/__authed/dashboard': typeof _authedDashboardRoute
   '/__guest/auth': typeof _guestAuthRoute
   '/categories/$id': typeof CategoriesIdRoute
+  '/models/$id': typeof ModelsIdRoute
   '/prompts/$id': typeof PromptsIdRoute
   '/tags/$id': typeof TagsIdRoute
 }
@@ -121,6 +130,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/auth'
     | '/categories/$id'
+    | '/models/$id'
     | '/prompts/$id'
     | '/tags/$id'
   fileRoutesByTo: FileRoutesByTo
@@ -132,6 +142,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/auth'
     | '/categories/$id'
+    | '/models/$id'
     | '/prompts/$id'
     | '/tags/$id'
   id:
@@ -145,6 +156,7 @@ export interface FileRouteTypes {
     | '/__authed/dashboard'
     | '/__guest/auth'
     | '/categories/$id'
+    | '/models/$id'
     | '/prompts/$id'
     | '/tags/$id'
   fileRoutesById: FileRoutesById
@@ -157,6 +169,7 @@ export interface RootRouteChildren {
   PrivacyRoute: typeof PrivacyRoute
   TermsRoute: typeof TermsRoute
   CategoriesIdRoute: typeof CategoriesIdRoute
+  ModelsIdRoute: typeof ModelsIdRoute
   PromptsIdRoute: typeof PromptsIdRoute
   TagsIdRoute: typeof TagsIdRoute
 }
@@ -219,6 +232,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PromptsIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/models/$id': {
+      id: '/models/$id'
+      path: '/models/$id'
+      fullPath: '/models/$id'
+      preLoaderRoute: typeof ModelsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/categories/$id': {
       id: '/categories/$id'
       path: '/categories/$id'
@@ -273,6 +293,7 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacyRoute: PrivacyRoute,
   TermsRoute: TermsRoute,
   CategoriesIdRoute: CategoriesIdRoute,
+  ModelsIdRoute: ModelsIdRoute,
   PromptsIdRoute: PromptsIdRoute,
   TagsIdRoute: TagsIdRoute,
 }

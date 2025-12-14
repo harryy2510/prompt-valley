@@ -45,9 +45,9 @@ function PromptCard({
 }: PromptCardProps) {
   const isPro = prompt.tier === 'pro'
   const tagsList = uniqBy(prompt.tags?.map((t) => t.tag), 'id')
-  const providers = compact(
+  const models = compact(
     uniqBy(
-      prompt.models?.map((model) => model.model.provider),
+      prompt.models?.map((m) => m.model),
       'id',
     ),
   )
@@ -106,8 +106,19 @@ function PromptCard({
 
         {/* Tags row */}
         <div className="flex flex-wrap items-center gap-1.5">
-          {providers.map((provider) => (
-            <ProviderBadge key={provider.id} provider={provider} />
+          {models.map((model) => (
+            <Link
+              key={model.id}
+              to="/models/$id"
+              params={{ id: model.id }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {model.provider ? (
+                <ProviderBadge provider={model.provider} />
+              ) : (
+                <span className="text-xs text-muted-foreground">{model.name}</span>
+              )}
+            </Link>
           ))}
           {prompt.category && (
             <Link

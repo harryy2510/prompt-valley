@@ -59,10 +59,10 @@ function PromptDetailPage() {
   const isPremium = prompt.tier === 'pro'
   const hasAccess = !isPremium || isPro
 
-  // Get unique providers from models
-  const providers = compact(
+  // Get unique models
+  const models = compact(
     uniqBy(
-      prompt.models?.map((model) => model.model.provider),
+      prompt.models?.map((m) => m.model),
       'id',
     ),
   )
@@ -180,15 +180,25 @@ function PromptDetailPage() {
               </span>
             </div>
 
-            {/* Model */}
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">Model</span>
+            {/* Models */}
+            {models.length > 0 && (
               <div className="flex items-center gap-2">
-                {providers.map((provider) => (
-                  <ProviderBadge key={provider.id} provider={provider} />
-                ))}
+                <span className="text-sm text-muted-foreground">
+                  {models.length === 1 ? 'Model' : 'Models'}
+                </span>
+                <div className="flex flex-wrap items-center gap-2">
+                  {models.map((model) => (
+                    <Link key={model.id} to="/models/$id" params={{ id: model.id }}>
+                      {model.provider ? (
+                        <ProviderBadge provider={model.provider} />
+                      ) : (
+                        <Badge variant="outline">{model.name}</Badge>
+                      )}
+                    </Link>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Category */}
             {prompt.category && (

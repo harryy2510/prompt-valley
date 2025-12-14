@@ -193,10 +193,15 @@ export const fetchPromptsCount = createServerFn({ method: 'GET' })
   .handler(async ({ data: filters }) => {
     const supabase = getSupabaseServerClient()
 
-    // For tag filtering, we need to join with prompt_tags
-    const selectClause = filters.tagId
-      ? 'id, tags:prompt_tags!inner(tag_id)'
-      : 'id'
+    // Build select clause with inner joins for filtering
+    const joins: string[] = ['id']
+    if (filters.tagId) {
+      joins.push('tags:prompt_tags!inner(tag_id)')
+    }
+    if (filters.modelId) {
+      joins.push('models:prompt_models!inner(model_id)')
+    }
+    const selectClause = joins.join(', ')
 
     let query = supabase
       .from('prompts_with_access')
@@ -212,6 +217,9 @@ export const fetchPromptsCount = createServerFn({ method: 'GET' })
     }
     if (filters.tagId) {
       query = query.eq('tags.tag_id', filters.tagId)
+    }
+    if (filters.modelId) {
+      query = query.eq('models.model_id', filters.modelId)
     }
     if (filters.tier) {
       query = query.eq('tier', filters.tier)
