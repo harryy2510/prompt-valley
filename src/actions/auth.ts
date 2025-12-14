@@ -16,6 +16,7 @@ import {
   trackSignInCompleted,
   trackSignOut,
 } from '@/libs/posthog'
+import { identifyUserback, resetUserback } from '@/libs/userback'
 
 // ============================================
 // Zod Schemas
@@ -131,9 +132,10 @@ export function useSignOut() {
   return useMutation({
     mutationFn: signOutServer,
     onSuccess: async () => {
-      // Track sign out event and reset PostHog user
+      // Track sign out event and reset analytics
       trackSignOut()
       resetUser()
+      void resetUserback()
 
       // Clear the user from cache
       queryClient.setQueryData(authKeys.user(), null)
@@ -161,8 +163,11 @@ export function useVerifyOtp() {
       if (result.success && result.user) {
         queryClient.setQueryData(authKeys.user(), result.user)
 
-        // Identify user in PostHog and track sign in
+        // Identify user in analytics
         identifyUser(result.user.id, {
+          email: result.user.email,
+        })
+        identifyUserback(result.user.id, {
           email: result.user.email,
         })
         trackSignInCompleted('email')
@@ -191,16 +196,20 @@ export function useAuthStateListener() {
         if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
           queryClient.setQueryData(authKeys.user(), session?.user ?? null)
 
-          // Identify user in PostHog on auth state change
+          // Identify user in analytics on auth state change
           if (session?.user) {
             identifyUser(session.user.id, {
+              email: session.user.email,
+            })
+            identifyUserback(session.user.id, {
               email: session.user.email,
             })
           }
         } else if (event === 'SIGNED_OUT') {
           queryClient.setQueryData(authKeys.user(), null)
-          // Reset PostHog user on sign out
+          // Reset analytics users on sign out
           resetUser()
+          void resetUserback()
           // Invalidate all queries to refetch with new auth state
           void queryClient.invalidateQueries()
         }

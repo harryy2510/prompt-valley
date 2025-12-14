@@ -5,7 +5,14 @@ import {
   useSearch,
   useLocation,
 } from '@tanstack/react-router'
-import { Heart, Bookmark, LogOut } from 'lucide-react'
+import {
+  Bookmark,
+  Settings,
+  CreditCard,
+  Flag,
+  HelpCircle,
+  LogOut,
+} from 'lucide-react'
 import { useDebounceCallback } from 'usehooks-ts'
 
 import { useCategories, type Category } from '@/actions/categories'
@@ -26,6 +33,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { openFeedback, openAnnouncements } from '@/libs/userback'
 
 // ============================================
 // Header Component
@@ -192,6 +200,10 @@ function UserMenu() {
     })
   }
 
+  const handleWhatsNew = () => {
+    openAnnouncements()
+  }
+
   // Get initials for fallback
   const initials = profile?.name
     ? profile.name
@@ -228,14 +240,28 @@ function UserMenu() {
           <DropdownMenuItem asChild>
             <Link to="/saved">
               <Bookmark className="size-4" />
-              Saved
+              Saved Prompts
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
-            <Link to="/liked">
-              <Heart className="size-4" />
-              Liked
-            </Link>
+            <a href="/settings">
+              <Settings className="size-4" />
+              Account Settings
+            </a>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <a href="/billing">
+              <CreditCard className="size-4" />
+              Billing & Subscription
+            </a>
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={handleWhatsNew}>
+            <Flag className="size-4" />
+            What's New
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={openFeedback}>
+            <HelpCircle className="size-4" />
+            Feedback
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
@@ -245,7 +271,7 @@ function UserMenu() {
           disabled={signOut.isPending}
         >
           <LogOut className="size-4" />
-          Sign out
+          Log out
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

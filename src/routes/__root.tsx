@@ -25,6 +25,7 @@ import { Toaster } from '@/components/ui/sonner'
 import { NotFound } from '@/components/error/not-found'
 import { DefaultCatchBoundary } from '@/components/error/default-catch-boundary'
 import { initPostHog } from '@/libs/posthog'
+import { initUserback } from '@/libs/userback'
 
 // ============================================
 // Router Context Type
@@ -122,9 +123,10 @@ export const Route = createRootRouteWithContext<RouterContext>()({
 function RootDocument({ children }: PropsWithChildren) {
   useAuthStateListener()
 
-  // Initialize PostHog on client
+  // Initialize analytics on client
   if (typeof window !== 'undefined') {
     initPostHog()
+    void initUserback()
   }
 
   return (
