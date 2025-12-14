@@ -55,6 +55,8 @@ export function Header() {
         <div className="ml-auto flex items-center gap-2">
           <ProGate />
 
+          <AuthGate />
+
           <AuthGate
             fallback={
               <Button size="sm" asChild>

@@ -101,7 +101,11 @@ export function DefaultUnauthorizedFallback({
 }) {
   if (mode === 'dialog') {
     return (
-      <Button onClick={() => showBuyDialog('gate')} variant="gradient" size="cta">
+      <Button
+        onClick={() => showBuyDialog('gate')}
+        variant="gradient"
+        size="nav"
+      >
         <span>
           Get <span className="font-bold">PRO</span>
         </span>
@@ -109,7 +113,7 @@ export function DefaultUnauthorizedFallback({
     )
   }
   return (
-    <Button variant="gradient" size="cta" asChild>
+    <Button variant="gradient" size="nav" asChild>
       <Link to="/pricing">
         <span>
           Get <span className="font-bold">PRO</span>
