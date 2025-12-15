@@ -153,10 +153,12 @@ function RootDocument({ children }: PropsWithChildren) {
         <Toaster position="bottom-center" />
         <SignInDialog />
         <BuyModal />
-        <TanStackDevtools
-          config={{ position: 'bottom-right' }}
-          plugins={[TanStackRouterDevtools, TanStackQueryDevtools]}
-        />
+        {import.meta.env.DEV && (
+          <TanStackDevtools
+            config={{ position: 'bottom-right' }}
+            plugins={[TanStackRouterDevtools, TanStackQueryDevtools]}
+          />
+        )}
         <Scripts />
       </body>
     </html>
