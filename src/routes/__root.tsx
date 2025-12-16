@@ -50,6 +50,9 @@ export const Route = createRootRouteWithContext<RouterContext>()({
       context.queryClient.ensureQueryData(categoriesQueryOptions()),
       context.queryClient.ensureQueryData(tagsQueryOptions()),
       context.queryClient.ensureQueryData(promptsQueryOptions()),
+      context.queryClient.ensureQueryData(
+        promptsQueryOptions({ isFeatured: true }),
+      ),
     ])
 
     if (user?.id) {
