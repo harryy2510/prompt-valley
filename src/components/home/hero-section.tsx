@@ -1,12 +1,13 @@
 import { Button } from '@/components/ui/button'
 
-import image1 from '@/assets/landing/carousel-image-1.webp'
-import icon1 from '@/assets/landing/carousel-icon-1.webp'
-import icon2 from '@/assets/landing/carousel-icon-2.webp'
-import icon3 from '@/assets/landing/carousel-icon-3.webp'
 import { cn } from '@/libs/cn'
 import { Link } from '@tanstack/react-router'
 import { AuthGate } from '@/components/common/gate'
+import { useFeaturedPrompts } from '@/actions/prompts'
+import shuffle from 'lodash-es/shuffle'
+import compact from 'lodash-es/compact'
+import { Image } from '@/components/common/image'
+import { useMemo } from 'react'
 
 // ============================================
 // Carousel Card Component
@@ -15,7 +16,7 @@ import { AuthGate } from '@/components/common/gate'
 function CarouselCardItem({ src }: { src: string }) {
   return (
     <div className="w-full overflow-hidden rounded-2xl bg-muted">
-      <img alt="" src={src} className="size-full object-cover" />
+      <Image alt="" src={src} className="size-full object-cover" />
     </div>
   )
 }
@@ -37,7 +38,7 @@ function VerticalCarousel({
   return (
     <div
       className={cn(
-        'relative h-[800px] overflow-hidden pointer-events-none',
+        'relative h-200 overflow-hidden pointer-events-none',
         className,
       )}
     >
@@ -57,11 +58,42 @@ function VerticalCarousel({
   )
 }
 
+function distributePromptImages<
+  T extends {
+    id: string
+    images?: (string | null | undefined)[] | null | undefined
+  },
+>(
+  prompts: T[] | null | undefined,
+  imagesPerPrompt = 3,
+): [string[], string[], string[]] {
+  const chunks: [string[], string[], string[]] = [[], [], []]
+
+  if (!prompts) return chunks
+
+  for (const prompt of shuffle(prompts)) {
+    const images = shuffle(compact(prompt.images)).slice(0, imagesPerPrompt)
+
+    // Randomize starting chunk so distribution isn't predictable
+    const startChunk = Math.floor(Math.random() * 3)
+
+    images.forEach((image, index) => {
+      // Each image from same prompt goes to a different chunk
+      chunks[(startChunk + index) % 3].push(image)
+    })
+  }
+
+  // Shuffle within each chunk for final randomization
+  return [shuffle(chunks[0]), shuffle(chunks[1]), shuffle(chunks[2])]
+}
+
 // ============================================
 // Hero Section Component
 // ============================================
 
 export function HeroSection() {
+  const { data: prompts } = useFeaturedPrompts()
+  const chunks = useMemo(() => distributePromptImages(prompts), [prompts])
   return (
     <section className="relative overflow-hidden bg-linear-to-b from-secondary-100 to-transparent">
       <div className="container mx-auto px-4">
@@ -103,9 +135,15 @@ export function HeroSection() {
           {/* Right - 3 Vertical Scrolling Carousels */}
           <div className="relative hidden lg:block">
             <div className="grid grid-cols-3 gap-4">
-              <VerticalCarousel images={[image1, icon1]} direction="up" />
-              <VerticalCarousel images={[image1, icon2]} direction="down" />
-              <VerticalCarousel images={[image1, icon3]} direction="up" />
+              {chunks.map((images, index) => {
+                return (
+                  <VerticalCarousel
+                    key={index}
+                    images={images}
+                    direction={index % 2 === 0 ? 'up' : 'down'}
+                  />
+                )
+              })}
             </div>
           </div>
         </div>
