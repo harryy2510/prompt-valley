@@ -33,6 +33,7 @@ import {
   type UpdateProfileInput,
 } from '@/actions/profile'
 import { getImageUrl } from '@/libs/storage'
+import { seo } from '@/utils/seo'
 
 // ============================================
 // Route Config
@@ -45,6 +46,13 @@ export const Route = createFileRoute('/settings')({
       throw redirect({ to: '/' })
     }
   },
+  head: () => ({
+    meta: seo({
+      title: 'Account Settings',
+      description: 'Manage your Prompt Valley account settings and profile.',
+      noIndex: true,
+    }),
+  }),
   component: SettingsPage,
 })
 

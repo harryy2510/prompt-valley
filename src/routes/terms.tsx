@@ -1,7 +1,17 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { LegalPage } from '@/components/legal'
+import { seo } from '@/utils/seo'
 
 export const Route = createFileRoute('/terms')({
+  head: () => ({
+    meta: seo({
+      title: 'Terms of Service',
+      description:
+        'Read the Terms of Service for Prompt Valley. Learn about your rights and responsibilities when using our AI prompt marketplace.',
+      image: '/og/legal.png',
+      url: '/terms',
+    }),
+  }),
   component: TermsPage,
 })
 

@@ -1,7 +1,17 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { LegalPage } from '@/components/legal'
+import { seo } from '@/utils/seo'
 
 export const Route = createFileRoute('/privacy')({
+  head: () => ({
+    meta: seo({
+      title: 'Privacy Policy',
+      description:
+        'Learn how Prompt Valley collects, uses, and protects your personal information. Your privacy matters to us.',
+      image: '/og/legal.png',
+      url: '/privacy',
+    }),
+  }),
   component: PrivacyPage,
 })
 

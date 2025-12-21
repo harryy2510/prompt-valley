@@ -31,15 +31,41 @@ import { compact, uniqBy } from 'lodash-es'
 import { toast } from 'sonner'
 import { Image } from '@/components/common/image'
 import { trackPromptViewed, trackPromptCopied } from '@/libs/posthog'
+import { seo, getStaticOgImage } from '@/utils/seo'
+import { getImageUrl } from '@/libs/storage'
 
 export const Route = createFileRoute('/prompts/$id')({
   loader: async ({ context, params }) => {
     try {
-      await context.queryClient.ensureQueryData(
+      const prompt = await context.queryClient.ensureQueryData(
         promptDetailQueryOptions(params.id),
       )
+      return { prompt }
     } catch {
       throw notFound()
+    }
+  },
+  head: ({ loaderData }) => {
+    const prompt = loaderData?.prompt
+    if (!prompt) return { meta: [] }
+
+    const description =
+      prompt.content?.slice(0, 160) ||
+      `Discover the "${prompt.title}" prompt for AI. Browse, copy, and use this curated prompt for better AI results.`
+
+    // Use prompt's first image if available, otherwise use static OG image
+    const ogImage = prompt.images?.[0]
+      ? getImageUrl(prompt.images[0])
+      : getStaticOgImage('prompt')
+
+    return {
+      meta: seo({
+        title: prompt.title,
+        description,
+        image: ogImage ?? undefined,
+        url: `/prompts/${prompt.id}`,
+        type: 'article',
+      }),
     }
   },
   notFoundComponent: () => (

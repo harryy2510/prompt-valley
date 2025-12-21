@@ -7,6 +7,7 @@ import { trackTagViewed } from '@/libs/posthog'
 import { NotFound } from '@/components/error/not-found'
 import { PromptCard, PromptCardSkeleton } from '@/components/cards/prompt-card'
 import { RouterPagination } from '@/components/common/router-pagination'
+import { seo, getStaticOgImage } from '@/utils/seo'
 import { tagQueryOptions, useTag } from '@/actions/tags'
 import {
   promptsQueryOptions,
@@ -36,7 +37,7 @@ export const Route = createFileRoute('/tags/$id')({
     const offset = (page - 1) * ITEMS_PER_PAGE
 
     try {
-      await Promise.all([
+      const [tag, , countResult] = await Promise.all([
         context.queryClient.ensureQueryData(tagQueryOptions(params.id)),
         context.queryClient.ensureQueryData(
           promptsQueryOptions({
@@ -49,8 +50,22 @@ export const Route = createFileRoute('/tags/$id')({
           promptsCountQueryOptions({ tagId: params.id }),
         ),
       ])
+      return { tag, count: countResult }
     } catch {
       throw notFound()
+    }
+  },
+  head: ({ loaderData }) => {
+    const tag = loaderData?.tag
+    if (!tag) return { meta: [] }
+
+    return {
+      meta: seo({
+        title: `${tag.name} Prompts`,
+        description: `Explore ${loaderData?.count ?? ''} AI prompts tagged with "${tag.name}". Browse, copy, and use these curated prompts for better AI results.`,
+        image: getStaticOgImage('tag'),
+        url: `/tags/${tag.id}`,
+      }),
     }
   },
   notFoundComponent: () => (

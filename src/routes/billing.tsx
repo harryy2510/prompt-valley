@@ -5,6 +5,7 @@ import { Loader2 } from 'lucide-react'
 import { MainLayout } from '@/components/layout'
 import { userQueryOptions } from '@/actions/auth'
 import { useCreatePortalSession } from '@/actions/stripe'
+import { seo } from '@/utils/seo'
 
 // ============================================
 // Route Config
@@ -17,6 +18,13 @@ export const Route = createFileRoute('/billing')({
       throw redirect({ to: '/' })
     }
   },
+  head: () => ({
+    meta: seo({
+      title: 'Billing',
+      description: 'Manage your Prompt Valley subscription and billing.',
+      noIndex: true,
+    }),
+  }),
   component: BillingPage,
 })
 

@@ -7,6 +7,7 @@ import { trackModelViewed } from '@/libs/posthog'
 import { NotFound } from '@/components/error/not-found'
 import { PromptCard, PromptCardSkeleton } from '@/components/cards/prompt-card'
 import { RouterPagination } from '@/components/common/router-pagination'
+import { seo, getStaticOgImage } from '@/utils/seo'
 import { modelQueryOptions, useModel } from '@/actions/models'
 import {
   promptsQueryOptions,
@@ -37,7 +38,7 @@ export const Route = createFileRoute('/models/$id')({
     const offset = (page - 1) * ITEMS_PER_PAGE
 
     try {
-      await Promise.all([
+      const [model, , countResult] = await Promise.all([
         context.queryClient.ensureQueryData(modelQueryOptions(params.id)),
         context.queryClient.ensureQueryData(
           promptsQueryOptions({
@@ -50,8 +51,24 @@ export const Route = createFileRoute('/models/$id')({
           promptsCountQueryOptions({ modelId: params.id }),
         ),
       ])
+      return { model, count: countResult }
     } catch {
       throw notFound()
+    }
+  },
+  head: ({ loaderData }) => {
+    const model = loaderData?.model
+    if (!model) return { meta: [] }
+
+    const providerName = model.provider?.name ? ` by ${model.provider.name}` : ''
+
+    return {
+      meta: seo({
+        title: `${model.name} Prompts`,
+        description: `Explore ${loaderData?.count ?? ''} curated prompts for ${model.name}${providerName}. Browse, copy, and use these AI prompts for better results.`,
+        image: getStaticOgImage('model'),
+        url: `/models/${model.id}`,
+      }),
     }
   },
   notFoundComponent: () => (

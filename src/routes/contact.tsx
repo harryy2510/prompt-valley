@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form'
 import { Mail, Send, CheckCircle, Loader2 } from 'lucide-react'
 
 import { MainLayout } from '@/components/layout'
+import { seo } from '@/utils/seo'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -31,6 +32,15 @@ import {
 import { trackContactFormSubmitted } from '@/libs/posthog'
 
 export const Route = createFileRoute('/contact')({
+  head: () => ({
+    meta: seo({
+      title: 'Contact Us',
+      description:
+        'Have a question or feedback about Prompt Valley? Get in touch with our team. We would love to hear from you.',
+      image: '/og/contact.png',
+      url: '/contact',
+    }),
+  }),
   component: ContactPage,
 })
 

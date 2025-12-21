@@ -8,6 +8,7 @@ import { NotFound } from '@/components/error/not-found'
 import { PromptCard, PromptCardSkeleton } from '@/components/cards/prompt-card'
 import { RouterPagination } from '@/components/common/router-pagination'
 import { Badge } from '@/components/ui/badge'
+import { seo, getStaticOgImage } from '@/utils/seo'
 import {
   categoryQueryOptions,
   useCategory,
@@ -44,7 +45,7 @@ export const Route = createFileRoute('/categories/$id')({
     const offset = (page - 1) * ITEMS_PER_PAGE
 
     try {
-      await Promise.all([
+      const [category, , countResult] = await Promise.all([
         context.queryClient.ensureQueryData(categoryQueryOptions(params.id)),
         context.queryClient.ensureQueryData(
           promptsQueryOptions({
@@ -57,8 +58,22 @@ export const Route = createFileRoute('/categories/$id')({
           promptsCountQueryOptions({ categoryId }),
         ),
       ])
+      return { category, count: countResult }
     } catch {
       throw notFound()
+    }
+  },
+  head: ({ loaderData }) => {
+    const category = loaderData?.category
+    if (!category) return { meta: [] }
+
+    return {
+      meta: seo({
+        title: `${category.name} Prompts`,
+        description: `Explore ${loaderData?.count ?? ''} curated ${category.name.toLowerCase()} prompts for AI. Browse, copy, and use these prompts for better AI results.`,
+        image: getStaticOgImage('category'),
+        url: `/categories/${category.id}`,
+      }),
     }
   },
   notFoundComponent: () => (

@@ -5,6 +5,7 @@ import { useEffect, useRef } from 'react'
 
 import { MainLayout } from '@/components/layout'
 import { trackSearch } from '@/libs/posthog'
+import { seo } from '@/utils/seo'
 import { PromptCard, PromptCardSkeleton } from '@/components/cards/prompt-card'
 import { RouterPagination } from '@/components/common/router-pagination'
 import {
@@ -33,11 +34,11 @@ export const Route = createFileRoute('/search')({
   validateSearch: searchSchema,
   loaderDeps: ({ search: { q, page } }) => ({ q, page }),
   loader: async ({ context, deps: { q, page } }) => {
-    if (!q) return
+    if (!q) return { query: '', count: 0 }
 
     const offset = (page - 1) * ITEMS_PER_PAGE
 
-    await Promise.all([
+    const [, countResult] = await Promise.all([
       context.queryClient.ensureQueryData(
         promptsQueryOptions({
           search: q,
@@ -49,6 +50,32 @@ export const Route = createFileRoute('/search')({
         promptsCountQueryOptions({ search: q }),
       ),
     ])
+    return { query: q, count: countResult }
+  },
+  head: ({ loaderData }) => {
+    const query = loaderData?.query
+    if (!query) {
+      return {
+        meta: seo({
+          title: 'Search Prompts',
+          description:
+            'Search through our curated collection of AI prompts. Find the perfect prompt for ChatGPT, Midjourney, DALL-E, and more.',
+          image: '/og/search.png',
+          url: '/search',
+          noIndex: true,
+        }),
+      }
+    }
+
+    return {
+      meta: seo({
+        title: `Search: ${query}`,
+        description: `Found ${loaderData?.count ?? 0} AI prompts matching "${query}". Browse and copy curated prompts for better AI results.`,
+        image: '/og/search.png',
+        url: `/search?q=${encodeURIComponent(query)}`,
+        noIndex: true, // Don't index search results
+      }),
+    }
   },
   component: SearchPage,
 })

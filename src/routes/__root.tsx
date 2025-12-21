@@ -77,6 +77,8 @@ export const Route = createRootRouteWithContext<RouterContext>()({
           'Discover a growing collection of high quality AI prompts across multiple categories. Simple to browse, easy to copy, and designed for better AI results.',
         keywords:
           'ai prompts, prompt library, prompt collection, chatgpt prompts, midjourney prompts, dalle prompts, stable diffusion prompts, best ai prompts, prompt ideas, prompt directory, prompt marketplace, creative prompts, productivity prompts, writing prompts, coding prompts, marketing prompts, seo prompts, business prompts, brainstorming prompts, image prompts, text prompts, top ai prompts, curated ai prompts, prompt categories, prompt generator, prompt templates, ai workflow prompts, daily prompts, professional prompts, premium prompts, prompt packs, prompt vault, prompt valley, ai tools, ai resources, ai content ideas',
+        image: '/og/default.png',
+        url: '/',
       }),
     ],
     links: [

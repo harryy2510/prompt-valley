@@ -5,6 +5,7 @@ import { MainLayout } from '@/components/layout'
 import { PromptCard, PromptCardSkeleton } from '@/components/cards/prompt-card'
 import { userLikesQueryOptions, useUserLikes } from '@/actions/likes'
 import { userQueryOptions } from '@/actions/auth'
+import { seo } from '@/utils/seo'
 
 // ============================================
 // Route Config
@@ -20,6 +21,13 @@ export const Route = createFileRoute('/liked')({
   loader: async ({ context }) => {
     await context.queryClient.ensureQueryData(userLikesQueryOptions())
   },
+  head: () => ({
+    meta: seo({
+      title: 'Liked Prompts',
+      description: 'View prompts you have liked on Prompt Valley.',
+      noIndex: true,
+    }),
+  }),
   component: LikedPage,
 })
 

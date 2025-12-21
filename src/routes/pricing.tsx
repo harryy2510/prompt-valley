@@ -6,11 +6,21 @@ import { trackPricingViewed } from '@/libs/posthog'
 import { PricingCard, PricingFaq } from '@/components/pricing'
 import { useStripeProduct, stripeProductQueryOptions } from '@/actions/stripe'
 import { LogoPro } from '@/components/layout/logo-pro'
+import { seo } from '@/utils/seo'
 
 export const Route = createFileRoute('/pricing')({
   loader: async ({ context }) => {
     await context.queryClient.ensureQueryData(stripeProductQueryOptions())
   },
+  head: () => ({
+    meta: seo({
+      title: 'Pricing',
+      description:
+        'Unlock unlimited access to premium AI prompts with Prompt Valley Pro. One simple plan with no bundles or add-ons.',
+      image: '/og/pricing.png',
+      url: '/pricing',
+    }),
+  }),
   component: PricingPage,
 })
 

@@ -5,6 +5,7 @@ import { MainLayout } from '@/components/layout'
 import { PromptCard, PromptCardSkeleton } from '@/components/cards/prompt-card'
 import { userFavoritesQueryOptions, useUserFavorites } from '@/actions/favorites'
 import { userQueryOptions } from '@/actions/auth'
+import { seo } from '@/utils/seo'
 
 // ============================================
 // Route Config
@@ -20,6 +21,13 @@ export const Route = createFileRoute('/saved')({
   loader: async ({ context }) => {
     await context.queryClient.ensureQueryData(userFavoritesQueryOptions())
   },
+  head: () => ({
+    meta: seo({
+      title: 'Saved Prompts',
+      description: 'View and manage your saved AI prompts on Prompt Valley.',
+      noIndex: true,
+    }),
+  }),
   component: SavedPage,
 })
 
