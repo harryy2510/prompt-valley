@@ -3,6 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "preinstall": "pnpx only-allow pnpm",
     "dev": "vite dev",
     "build": "vite build",
     "serve": "vite preview",
@@ -16,7 +17,17 @@
     "types:cf": "wrangler types",
     "types:db": "pnpx supabase gen types typescript --project-id \"uguvrytefzvyjypcbngo\" --schema public > src/types/database.types.ts",
     "link": "pnpx supabase link --project-ref \"uguvrytefzvyjypcbngo\"",
-    "types": "pnpm types:cf && pnpm types:db"
+    "types": "pnpm types:cf && pnpm types:db",
+    "prepare": "pnpm types && pnpx is-ci || husky"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,css,scss,md,yml,yaml}": [
+      "prettier --write"
+    ]
   },
   "dependencies": {
     "@cloudflare/vite-plugin": "^1.17.1",
@@ -108,6 +119,7 @@
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.2",
     "babel-plugin-react-compiler": "^1.0.0",
+    "husky": "^9.1.7",
     "jsdom": "^27.3.0",
     "prettier": "^3.7.4",
     "supabase": "^2.67.1",
