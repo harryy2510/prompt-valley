@@ -1,18 +1,20 @@
 import type { Config } from 'prettier'
 
 const config: Config = {
-  overrides: [
-    {
-      files: ['*.jsonc'],
-      options: {
-        parser: 'json',
-      },
-    },
-  ],
-  arrowParens: 'always',
-  semi: false,
-  singleQuote: true,
-  trailingComma: 'all',
+	arrowParens: 'always',
+	overrides: [
+		{
+			files: ['*.jsonc'],
+			options: {
+				parser: 'json',
+			},
+		},
+	],
+	semi: false,
+	singleQuote: true,
+	tabWidth: 2,
+	trailingComma: 'all',
+	useTabs: true,
 }
 
 export default config
